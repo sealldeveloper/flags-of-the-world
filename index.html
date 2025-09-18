@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flag Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="top-right-section">
+            <div class="timer" id="timer">00:00</div>
+            <button id="give-up-btn" class="give-up-small">Give Up</button>
+        </div>
+        <div class="progress" id="progress">0/0</div>
+
+        <main>
+            <div id="game-screen" class="screen active">
+                <div class="flags-container">
+                    <div class="flag-item prev">
+                        <img id="prev-flag" src="" alt="Previous flag">
+                    </div>
+                    <div class="flag-item current">
+                        <img id="current-flag" src="" alt="Current flag">
+                    </div>
+                    <div class="flag-item next">
+                        <img id="next-flag" src="" alt="Next flag">
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <button id="prev-btn" class="nav-btn">←</button>
+                    <input type="text" id="country-input" placeholder="Country name..." autocomplete="off" data-form-type="other" data-lpignore="true" data-1p-ignore="true" readonly onfocus="this.removeAttribute('readonly');">
+                    <button id="next-btn" class="nav-btn">→</button>
+                </div>
+
+                <div class="action-buttons">
+                    <!-- Skip button removed, Give up moved to top -->
+                </div>
+
+                <div id="feedback" class="feedback"></div>
+            </div>
+
+            <div id="results-screen" class="screen">
+                <div class="results-content">
+                    <h2>Results</h2>
+                    <div class="final-stats">
+                        <div class="stat">
+                            <span class="label">Time:</span>
+                            <span id="final-time">00:00</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Correct:</span>
+                            <span id="correct-count">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Success:</span>
+                            <span id="success-rate">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="missed-flags">
+                        <h3>Missed Flags <span id="missed-count"></span></h3>
+                        <div id="missed-list"></div>
+                    </div>
+
+                    <button id="play-again-btn">Play Again</button>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            Made by <a href="https://seall.dev" target="_blank">seall.dev</a>
+        </footer>
+    </div>
+
+
+    <script src="script.js"></script>
+</body>
+</html>
