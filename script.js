@@ -265,21 +265,25 @@ function shuffleArray(array) {
 }
 
 function initializeGame() {
-    gameFlags = shuffleArray(FLAGS_DATA);
+    gameFlags = shuffleArray(FLAGS_DATA).map(flag => ({
+        url: flag.url,
+        country: flag.country
+        // Don't copy the 'guessed' property to ensure fresh start
+    }));
     abbreviations = { ...ABBREVIATIONS };
     currentIndex = 0;
     correctAnswers = 0;
     missedFlags = [];
     startTime = null; // Don't start timer yet
-    
+
     if (gameFlags.length === 0) {
         alert('Please add flag data to the FLAGS_DATA array in script.js');
         return;
     }
-    
+
     updateProgress();
     updateFlagDisplay();
-    
+
     // Focus input
     countryInput.focus();
 }
