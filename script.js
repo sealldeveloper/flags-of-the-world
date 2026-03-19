@@ -889,7 +889,7 @@ document.addEventListener('keydown', (e) => {
         return;
     }
     
-    if (gameScreen.classList.contains('active')) {
+    if (gameScreen.classList.contains('active') && document.activeElement !== countryInput) {
         if (e.key === 'ArrowLeft') {
             e.preventDefault();
             navigateFlags('prev');
