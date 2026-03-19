@@ -241,6 +241,9 @@ const ABBREVIATIONS = {
     'st kitts and nevis': 'Saint Kitts and Nevis',
     'st vincent': 'Saint Vincent and the Grenadines',
     'gambia': 'The Gambia',
+    'the gambia': 'The Gambia',
+    'bahamas': 'Bahamas',
+    'the bahamas': 'Bahamas',
     'swaziland': 'Eswatini',
     'ivory coast': 'Côte d’Ivoire',
     'east timor': 'Timor Leste',
@@ -252,7 +255,8 @@ const ABBREVIATIONS = {
     'png': 'Papua New Guinea',
     'nz': 'New Zealand',
     'st lucia': 'Saint Lucia',
-    'turkey': 'Türkiye'
+    'turkey': 'Türkiye',
+    'dprk': 'North Korea'
 };
 
 function shuffleArray(array) {
