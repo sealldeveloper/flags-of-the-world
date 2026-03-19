@@ -256,7 +256,8 @@ const ABBREVIATIONS = {
     'nz': 'New Zealand',
     'st lucia': 'Saint Lucia',
     'turkey': 'Türkiye',
-    'dprk': 'North Korea'
+    'dprk': 'North Korea',
+    'the philippines': 'Philippines'
 };
 
 function shuffleArray(array) {
@@ -444,14 +445,18 @@ function handleCorrectAnswer() {
         return;
     }
     
-    // Navigate to next unsolved flag immediately in background
-    navigateFlags('next');
-    
+    // Save country name before navigating away
+    const prevCountry = gameFlags[currentIndex].country;
+
+    // Navigate to a random unsolved flag
+    currentIndex = findRandomUnsolvedFlag();
+    updateFlagDisplay();
+
     // Focus input immediately
     countryInput.focus();
-    
-    // Show feedback and animation in background (doesn't block input)
-    feedback.textContent = `Correct! ${gameFlags[currentIndex - 1] ? gameFlags[currentIndex - 1].country : 'Previous flag'}`;
+
+    // Show feedback
+    feedback.textContent = `Correct! ${prevCountry}`;
     feedback.className = 'feedback correct';
     
     // Clear feedback after delay
@@ -491,7 +496,7 @@ function findNextUnsolvedFlag(direction) {
     let nextIndex = currentIndex;
     let attempts = 0;
     const maxAttempts = gameFlags.length;
-    
+
     do {
         if (direction === 'next') {
             nextIndex = nextIndex < gameFlags.length - 1 ? nextIndex + 1 : 0;
@@ -500,8 +505,17 @@ function findNextUnsolvedFlag(direction) {
         }
         attempts++;
     } while (gameFlags[nextIndex].guessed && attempts < maxAttempts);
-    
+
     return nextIndex;
+}
+
+function findRandomUnsolvedFlag() {
+    const unsolved = gameFlags
+        .map((flag, i) => ({ flag, i }))
+        .filter(({ flag, i }) => !flag.guessed && i !== currentIndex);
+
+    if (unsolved.length === 0) return currentIndex;
+    return unsolved[Math.floor(Math.random() * unsolved.length)].i;
 }
 
 function slideFlags(direction) {
