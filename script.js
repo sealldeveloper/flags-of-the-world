@@ -235,6 +235,9 @@ const ABBREVIATIONS = {
     'uk': 'United Kingdom',
     'car': 'Central African Republic',
     'drc': 'Democratic Republic of the Congo',
+    'the democratic republic of the congo': 'Democratic Republic of the Congo',
+    'the democratic republic of congo': 'Democratic Republic of the Congo',
+    'democratic republic of congo': 'Democratic Republic of the Congo',
     'republic of congo': 'Republic of the Congo',
     'democratic republic of congo': 'Democratic Republic of the Congo',
     'skan': 'Saint Kitts and Nevis',
@@ -256,6 +259,7 @@ const ABBREVIATIONS = {
     'nz': 'New Zealand',
     'st lucia': 'Saint Lucia',
     'turkey': 'Türkiye',
+    'turkiye': 'Türkiye',
     'dprk': 'North Korea',
     'the philippines': 'Philippines'
 };
@@ -914,9 +918,18 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// Preload all flag images into the browser cache
+function preloadImages() {
+    FLAGS_DATA.forEach(flag => {
+        const img = new Image();
+        img.src = flag.url;
+    });
+}
+
 // Initialize game when page loads
 document.addEventListener('DOMContentLoaded', () => {
     if (FLAGS_DATA.length > 0) {
+        preloadImages();
         initializeGame();
     } else {
         alert('Please add your flag data to the FLAGS_DATA array in script.js to start the game.');
