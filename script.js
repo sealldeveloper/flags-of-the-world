@@ -445,18 +445,14 @@ function handleCorrectAnswer() {
         return;
     }
     
-    // Save country name before navigating away
-    const prevCountry = gameFlags[currentIndex].country;
-
-    // Navigate to a random unsolved flag
-    currentIndex = findRandomUnsolvedFlag();
-    updateFlagDisplay();
+    // Navigate to next unsolved flag immediately in background
+    navigateFlags('next');
 
     // Focus input immediately
     countryInput.focus();
 
-    // Show feedback
-    feedback.textContent = `Correct! ${prevCountry}`;
+    // Show feedback and animation in background (doesn't block input)
+    feedback.textContent = `Correct! ${gameFlags[currentIndex - 1] ? gameFlags[currentIndex - 1].country : 'Previous flag'}`;
     feedback.className = 'feedback correct';
     
     // Clear feedback after delay
