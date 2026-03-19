@@ -343,6 +343,90 @@ button:active {
     transform: translateY(1px);
 }
 
+#loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: #1a1f2e;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+#loading-overlay.hidden {
+    display: none;
+}
+
+#loading-message {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e0e6ed;
+}
+
+#loading-bar-container {
+    width: 300px;
+    height: 8px;
+    background: #2d3748;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#loading-bar {
+    height: 100%;
+    width: 0%;
+    background: #4299e1;
+    border-radius: 4px;
+    transition: width 0.1s ease;
+}
+
+#loading-count {
+    font-size: 0.9rem;
+    color: #9ca3af;
+}
+
+.pause-small {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    background-color: #4a5568;
+    color: white;
+    border-radius: 4px;
+    min-width: 70px;
+}
+
+.pause-small:hover {
+    background-color: #2d3748;
+}
+
+#pause-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+#pause-overlay.active {
+    display: flex;
+}
+
+#pause-message {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #e0e6ed;
+    letter-spacing: 0.2em;
+}
+
+#pause-hint {
+    font-size: 1rem;
+    color: #9ca3af;
+}
+
 .give-up-small {
     padding: 6px 12px;
     font-size: 0.8rem;

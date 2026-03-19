@@ -10,6 +10,7 @@
     <div class="container">
         <div class="top-right-section">
             <div class="timer" id="timer">00:00</div>
+            <button id="pause-btn" class="pause-small">Pause</button>
             <button id="give-up-btn" class="give-up-small">Give Up</button>
         </div>
         <div class="progress" id="progress">0/0</div>
@@ -74,6 +75,17 @@
         </footer>
     </div>
 
+
+    <div id="loading-overlay">
+        <div id="loading-message">Loading flags...</div>
+        <div id="loading-bar-container"><div id="loading-bar"></div></div>
+        <div id="loading-count"></div>
+    </div>
+
+    <div id="pause-overlay">
+        <div id="pause-message">PAUSED</div>
+        <div id="pause-hint">Press P or Escape to resume</div>
+    </div>
 
     <script src="script.js"></script>
 </body>

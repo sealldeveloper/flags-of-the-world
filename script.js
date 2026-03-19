@@ -1,6 +1,9 @@
 // Game state
 let currentIndex = 0;
 let startTime = null;
+let pausedAt = null;
+let totalPausedTime = 0;
+let isPaused = false;
 let correctAnswers = 0;
 let missedFlags = [];
 let gameFlags = [];
@@ -21,7 +24,11 @@ const feedback = document.getElementById('feedback');
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const giveUpBtn = document.getElementById('give-up-btn');
+const pauseBtn = document.getElementById('pause-btn');
 const playAgainBtn = document.getElementById('play-again-btn');
+
+// Pause overlay
+const pauseOverlay = document.getElementById('pause-overlay');
 
 // Screen elements
 const gameScreen = document.getElementById('game-screen');
@@ -284,6 +291,11 @@ function initializeGame() {
     correctAnswers = 0;
     missedFlags = [];
     startTime = null; // Don't start timer yet
+    pausedAt = null;
+    totalPausedTime = 0;
+    isPaused = false;
+    pauseOverlay.classList.remove('active');
+    pauseBtn.textContent = 'Pause';
 
     if (gameFlags.length === 0) {
         alert('Please add flag data to the FLAGS_DATA array in script.js');
@@ -380,27 +392,51 @@ function updateFlagDisplay(animate = false, direction = null) {
 
 function startTimer() {
     if (startTime) return; // Already started
-    
+
     startTime = Date.now();
-    
+    totalPausedTime = 0;
+
     // Flash the timer to indicate it started
     timerElement.classList.add('timer-flash');
     setTimeout(() => {
         timerElement.classList.remove('timer-flash');
     }, 600);
-    
+
     function updateTimer() {
         if (!startTime) return;
-        
-        const elapsed = Date.now() - startTime;
+        if (isPaused) {
+            requestAnimationFrame(updateTimer);
+            return;
+        }
+
+        const elapsed = Date.now() - startTime - totalPausedTime;
         const minutes = Math.floor(elapsed / 60000);
         const seconds = Math.floor((elapsed % 60000) / 1000);
-        
+
         timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        
+
         requestAnimationFrame(updateTimer);
     }
     updateTimer();
+}
+
+function togglePause() {
+    if (!startTime) return; // Don't allow pause before game starts
+
+    isPaused = !isPaused;
+
+    if (isPaused) {
+        pausedAt = Date.now();
+        pauseOverlay.classList.add('active');
+        pauseBtn.textContent = 'Resume';
+        countryInput.blur();
+    } else {
+        totalPausedTime += Date.now() - pausedAt;
+        pausedAt = null;
+        pauseOverlay.classList.remove('active');
+        pauseBtn.textContent = 'Pause';
+        countryInput.focus();
+    }
 }
 
 function normalizeAnswer(answer) {
@@ -549,7 +585,7 @@ function endGame() {
         document.getElementById('final-time').textContent = '00:00';
     } else {
         const endTime = Date.now();
-        const totalTime = endTime - startTime;
+        const totalTime = endTime - startTime - totalPausedTime;
         const minutes = Math.floor(totalTime / 60000);
         const seconds = Math.floor((totalTime % 60000) / 1000);
         const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
@@ -573,7 +609,7 @@ function endGame() {
     // Save personal best (either time-based for 100% or flag count-based for <100%)
     let isNewRecord = false;
     if (startTime) {
-        const totalTime = Date.now() - startTime;
+        const totalTime = Date.now() - startTime - totalPausedTime;
         isNewRecord = savePersonalBest(totalTime, successRate, correctAnswers);
     } else {
         // No timer started, just save flag count
@@ -630,8 +666,11 @@ function endGame() {
     progressElement.style.display = 'none';
     document.querySelector('.top-right-section').style.display = 'none';
     
-    // Stop timer
+    // Stop timer and reset pause
     startTime = null;
+    isPaused = false;
+    pauseOverlay.classList.remove('active');
+    pauseBtn.textContent = 'Pause';
 }
 
 function savePersonalBest(time, successRate, flagCount) {
@@ -891,6 +930,7 @@ countryInput.addEventListener('keypress', (e) => {
 prevBtn.addEventListener('click', () => navigateFlags('prev'));
 nextBtn.addEventListener('click', () => navigateFlags('next'));
 giveUpBtn.addEventListener('click', endGame);
+pauseBtn.addEventListener('click', togglePause);
 playAgainBtn.addEventListener('click', restartGame);
 
 // Google Docs functionality
@@ -907,29 +947,55 @@ document.addEventListener('keydown', (e) => {
         return;
     }
     
-    if (gameScreen.classList.contains('active') && document.activeElement !== countryInput) {
-        if (e.key === 'ArrowLeft') {
-            e.preventDefault();
-            navigateFlags('prev');
-        } else if (e.key === 'ArrowRight') {
-            e.preventDefault();
-            navigateFlags('next');
+    if (gameScreen.classList.contains('active')) {
+        if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+            if (startTime) {
+                e.preventDefault();
+                togglePause();
+                return;
+            }
+        }
+
+        if (!isPaused && document.activeElement !== countryInput) {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                navigateFlags('prev');
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                navigateFlags('next');
+            }
         }
     }
 });
 
 // Preload all flag images into the browser cache
 function preloadImages() {
-    FLAGS_DATA.forEach(flag => {
-        const img = new Image();
-        img.src = flag.url;
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingBar = document.getElementById('loading-bar');
+    const loadingCount = document.getElementById('loading-count');
+    const total = FLAGS_DATA.length;
+    let loaded = 0;
+
+    return new Promise(resolve => {
+        FLAGS_DATA.forEach(flag => {
+            const img = new Image();
+            img.onload = img.onerror = () => {
+                loaded++;
+                const pct = Math.round((loaded / total) * 100);
+                loadingBar.style.width = pct + '%';
+                loadingCount.textContent = `${loaded} / ${total}`;
+                if (loaded === total) resolve();
+            };
+            img.src = flag.url;
+        });
     });
 }
 
 // Initialize game when page loads
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     if (FLAGS_DATA.length > 0) {
-        preloadImages();
+        await preloadImages();
+        document.getElementById('loading-overlay').classList.add('hidden');
         initializeGame();
     } else {
         alert('Please add your flag data to the FLAGS_DATA array in script.js to start the game.');
