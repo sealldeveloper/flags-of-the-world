@@ -306,9 +306,20 @@ function parsePuzzle(raw) {
     }
   }
 
-  // Some formats append an all-dots row after the real grid (circles indicator in
-  // older puzzles). If the very next non-blank line is all dots at the grid width,
-  // consume it silently so the clue parser isn't thrown off.
+  // Some formats declare height=N but the last row is all dots (empty white cells),
+  // which is a format artifact. Trim it so the grid doesn't show a phantom empty row.
+  {
+    const lastRow = solution[solution.length - 1];
+    if (lastRow && lastRow.every(cell => cell === '.')) {
+      solution.pop();
+      circles.pop();
+      // height is re-derived from solution.length below; adjust the declared value
+      // by patching the returned object (parsePuzzle returns height separately)
+    }
+  }
+
+  // Also consume any all-dots row immediately following the grid in the raw text,
+  // which appears in some older puzzle formats as a circles indicator line.
   {
     let peek = i;
     while (peek < lines.length && lines[peek].trim() === '') peek++;
@@ -338,7 +349,7 @@ function parsePuzzle(raw) {
     downCluesRaw.push(line.trim());
   }
 
-  return { puzzleId, dateStr, author, width, height, solution, circles, acrossCluesRaw, downCluesRaw };
+  return { puzzleId, dateStr, author, width, height: solution.length, solution, circles, acrossCluesRaw, downCluesRaw };
 }
 
 // ============================================================
@@ -865,25 +876,25 @@ function onKeyDown(e) {
     case 'ArrowRight':
       e.preventDefault();
       if (direction === 'across') moveInWord(1);
-      else { selectCell(r, nextCol(r, c, 1), 'across'); }
+      else { selectCell(r, nextCol(r, c, 1)); }
       break;
 
     case 'ArrowLeft':
       e.preventDefault();
       if (direction === 'across') moveInWord(-1);
-      else { selectCell(r, nextCol(r, c, -1), 'across'); }
+      else { selectCell(r, nextCol(r, c, -1)); }
       break;
 
     case 'ArrowDown':
       e.preventDefault();
       if (direction === 'down') moveInWord(1);
-      else { selectCell(nextRow(r, c, 1), c, 'down'); }
+      else { selectCell(nextRow(r, c, 1), c); }
       break;
 
     case 'ArrowUp':
       e.preventDefault();
       if (direction === 'down') moveInWord(-1);
-      else { selectCell(nextRow(r, c, -1), c, 'down'); }
+      else { selectCell(nextRow(r, c, -1), c); }
       break;
 
     case ' ':
@@ -945,10 +956,10 @@ function handleLetterKey(letter) {
   state.incorrect[r][c] = false;
 
   updateCellVisual(r, c);
-  // Re-apply selection since updateCellVisual stripped it
   const el = getCellEl(r, c);
   if (el) el.classList.add('selected');
   advanceAfterEntry();
+  saveProgressToStorage();
 }
 
 function advanceAfterEntry() {
@@ -967,16 +978,7 @@ function advanceAfterEntry() {
     }
   }
 
-  // At end of word — advance one step if possible, otherwise go to next word
-  if (direction === 'across') {
-    const nc = nextCol(r, c, 1);
-    if (nc !== c) selectCell(r, nc);
-    else goToNextWord();
-  } else {
-    const nr = nextRow(r, c, 1);
-    if (nr !== r) selectCell(nr, c);
-    else goToNextWord();
-  }
+  // At end of word — stay put
 }
 
 function handleBackspace() {
@@ -996,6 +998,7 @@ function handleBackspace() {
     updateCellVisual(r, c);
     const el = getCellEl(r, c);
     if (el) el.classList.add('selected');
+    saveProgressToStorage();
   } else {
     movePrevInWord();
   }
