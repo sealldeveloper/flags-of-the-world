@@ -3,90 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flag Game</title>
-    <link rel="stylesheet" href="style.css">
+    <title>seall.dev — Games & Puzzles</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1f2e;
+            min-height: 100vh;
+            color: #e0e6ed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 20px 40px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 48px;
+            color: #e0e6ed;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .card {
+            background: #2d3748;
+            border-radius: 12px;
+            padding: 28px 24px;
+            text-decoration: none;
+            color: #e0e6ed;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 2px solid transparent;
+            transition: border-color 0.2s, transform 0.15s, background 0.2s;
+        }
+
+        .card:hover {
+            border-color: #4299e1;
+            background: #3a4a61;
+            transform: translateY(-3px);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            line-height: 1;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: auto;
+            padding-top: 48px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        footer a {
+            color: #4299e1;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="top-right-section">
-            <div class="timer" id="timer">00:00</div>
-            <button id="pause-btn" class="pause-small">Pause</button>
-            <button id="give-up-btn" class="give-up-small">Give Up</button>
-        </div>
-        <div class="progress" id="progress">0/0</div>
+    <h1>assorted puzzles</h1>
 
-        <main>
-            <div id="game-screen" class="screen active">
-                <div class="flags-container">
-                    <div class="flag-item prev">
-                        <img id="prev-flag" src="" alt="Previous flag">
-                    </div>
-                    <div class="flag-item current">
-                        <img id="current-flag" src="" alt="Current flag">
-                    </div>
-                    <div class="flag-item next">
-                        <img id="next-flag" src="" alt="Next flag">
-                    </div>
-                </div>
-
-                <div class="input-section">
-                    <button id="prev-btn" class="nav-btn">←</button>
-                    <input type="text" id="country-input" placeholder="Country name..." autocomplete="off" data-form-type="other" data-lpignore="true" data-1p-ignore="true" readonly onfocus="this.removeAttribute('readonly');">
-                    <button id="next-btn" class="nav-btn">→</button>
-                </div>
-
-                <div class="action-buttons">
-                    <!-- Skip button removed, Give up moved to top -->
-                </div>
-
-                <div id="feedback" class="feedback"></div>
-            </div>
-
-            <div id="results-screen" class="screen">
-                <div class="results-content">
-                    <h2>Results</h2>
-                    <div class="final-stats">
-                        <div class="stat">
-                            <span class="label">Time:</span>
-                            <span id="final-time">00:00</span>
-                        </div>
-                        <div class="stat">
-                            <span class="label">Correct:</span>
-                            <span id="correct-count">0</span>
-                        </div>
-                        <div class="stat">
-                            <span class="label">Success:</span>
-                            <span id="success-rate">0%</span>
-                        </div>
-                    </div>
-
-                    <div class="missed-flags">
-                        <h3>Missed Flags <span id="missed-count"></span></h3>
-                        <div id="missed-list"></div>
-                    </div>
-
-                    <button id="play-again-btn">Play Again</button>
-                </div>
-            </div>
-        </main>
-        
-        <footer>
-            Made by <a href="https://seall.dev" target="_blank">seall.dev</a>
-        </footer>
+    <div class="grid">
+        <a class="card" href="/flags/">
+            <div class="card-icon" id="flags-icon"></div>
+            <div class="card-title">Flags of the World</div>
+        </a>
+        <a class="card" href="/crossword/">
+            <div class="card-icon">✏️</div>
+            <div class="card-title">NYT Crossword</div>
+        </a>
+        <!-- Add more game cards here -->
     </div>
 
+    <footer>Made by <a href="https://seall.dev" target="_blank">seall.dev</a></footer>
 
-    <div id="loading-overlay">
-        <div id="loading-message">Loading flags...</div>
-        <div id="loading-bar-container"><div id="loading-bar"></div></div>
-        <div id="loading-count"></div>
-    </div>
-
-    <div id="pause-overlay">
-        <div id="pause-message">PAUSED</div>
-        <div id="pause-hint">Press P or Escape to resume</div>
-    </div>
-
-    <script src="script.js"></script>
+    <script>
+        function randomFlagEmoji() {
+            const codes = ['AF','AL','DZ','AD','AO','AG','AR','AM','AU','AT','AZ','BS','BH','BD','BB','BY','BE','BZ','BJ','BT','BO','BA','BW','BR','BN','BG','BF','BI','CV','KH','CM','CA','CF','TD','CL','CN','CO','KM','CG','CD','CR','CI','HR','CU','CY','CZ','DK','DJ','DM','DO','EC','EG','SV','GQ','ER','EE','SZ','ET','FJ','FI','FR','GA','GM','GE','DE','GH','GR','GD','GT','GN','GW','GY','HT','HN','HU','IS','IN','ID','IR','IQ','IE','IL','IT','JM','JP','JO','KZ','KE','KI','KP','KR','KW','KG','LA','LV','LB','LS','LR','LY','LI','LT','LU','MG','MW','MY','MV','ML','MT','MH','MR','MU','MX','FM','MD','MC','MN','ME','MA','MZ','MM','NA','NR','NP','NL','NZ','NI','NE','NG','NO','OM','PK','PW','PA','PG','PY','PE','PH','PL','PT','QA','RO','RU','RW','KN','LC','VC','WS','SM','ST','SA','SN','RS','SC','SL','SG','SK','SI','SB','SO','ZA','SS','ES','LK','SD','SR','SE','CH','SY','TW','TJ','TZ','TH','TL','TG','TO','TT','TN','TR','TM','TV','UG','UA','AE','GB','US','UY','UZ','VU','VE','VN','YE','ZM','ZW'];
+            const code = codes[Math.floor(Math.random() * codes.length)];
+            return String.fromCodePoint(...[...code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+        }
+        document.getElementById('flags-icon').textContent = randomFlagEmoji();
+    </script>
 </body>
 </html>

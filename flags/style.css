@@ -12,7 +12,7 @@ body {
 }
 
 body.celebration {
-    background-image: url('assets/dancing-cat.gif');
+    background-image: url('../assets/dancing-cat.gif');
     background-size: 200px 200px;
     background-repeat: repeat;
     animation: rainbow-background 3s ease-in-out infinite;

@@ -948,7 +948,7 @@ document.addEventListener('keydown', (e) => {
     }
     
     if (gameScreen.classList.contains('active')) {
-        if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+        if (e.key === 'Escape') {
             if (startTime) {
                 e.preventDefault();
                 togglePause();
