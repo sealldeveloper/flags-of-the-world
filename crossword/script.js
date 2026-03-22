@@ -502,6 +502,8 @@ function initPuzzleFromData(data, savedProgress = null) {
   applySelectionHighlights();
   updateClueHighlights();
   showPuzzle();
+  // Let the layout settle then fit the grid (double rAF ensures paint is done)
+  requestAnimationFrame(() => requestAnimationFrame(() => fitGrid()));
 
   // Update puzzle selector
   if (state.puzzleList.includes(String(puzzleId))) {
@@ -1654,6 +1656,34 @@ function updateHeaderHeight() {
 const headerObserver = new ResizeObserver(updateHeaderHeight);
 headerObserver.observe(document.getElementById('app-header'));
 updateHeaderHeight();
+
+// Fit grid to available space — compute --cell-size so the entire
+// puzzle fits without scrolling, capped at 36px.
+function fitGrid() {
+  if (!state.puzzleId) return;
+  const header    = document.getElementById('app-header');
+  const toolbar   = document.getElementById('toolbar');
+  const clueBar   = document.getElementById('active-clue-bar');
+  const cluePanels = document.getElementById('clue-panels');
+
+  const usedH = (header?.offsetHeight    ?? 0)
+              + (toolbar?.offsetHeight   ?? 0)
+              + (clueBar?.offsetHeight   ?? 0);
+  const usedW = cluePanels?.offsetWidth ?? 0;
+
+  const availH = window.innerHeight - usedH - 32;
+  const availW = window.innerWidth  - usedW - 32;
+
+  if (availW <= 0 || availH <= 0) return;
+
+  const byW = Math.floor(availW / state.width);
+  const byH = Math.floor(availH / state.height);
+  const size = Math.min(byW, byH, 36);
+  document.documentElement.style.setProperty('--cell-size', `${Math.max(size, 12)}px`);
+}
+const gridObserver = new ResizeObserver(fitGrid);
+gridObserver.observe(document.getElementById('clue-panels'));
+window.addEventListener('resize', fitGrid);
 
 // ============================================================
 // LAUNCH
