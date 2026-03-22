@@ -1641,6 +1641,21 @@ btnThemeToggle.addEventListener('click', () => {
 applyTheme(localStorage.getItem('xw-theme') || 'light');
 
 // ============================================================
+// STICKY TOP MEASUREMENT
+// Keep --sticky-top in sync with actual header+toolbar height
+// so the active clue bar is never obscured when toolbar wraps.
+// ============================================================
+// Keep --header-h in sync with actual header height so toolbar
+// always sticks directly below it, even when the header wraps.
+function updateHeaderHeight() {
+  const h = document.getElementById('app-header')?.offsetHeight ?? 0;
+  document.documentElement.style.setProperty('--header-h', `${h}px`);
+}
+const headerObserver = new ResizeObserver(updateHeaderHeight);
+headerObserver.observe(document.getElementById('app-header'));
+updateHeaderHeight();
+
+// ============================================================
 // LAUNCH
 // ============================================================
 boot();

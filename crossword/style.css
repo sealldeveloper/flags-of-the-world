@@ -427,7 +427,7 @@ select, input { font-family: inherit; }
 
 /* Selection states */
 .xw-cell.selected {
-  background: var(--accent) !important;
+  background: var(--accent-dark) !important;
 }
 .xw-cell.selected .cell-letter { color: #fff; }
 .xw-cell.selected .cell-num { color: rgba(255,255,255,0.85); }
@@ -478,9 +478,9 @@ select, input { font-family: inherit; }
 .xw-cell.revealed .cell-letter { color: #111; }
 
 /* Selected / highlights override locked colors */
-.xw-cell.selected { background: var(--accent) !important; }
 .xw-cell.word-highlight { background: var(--word-highlight) !important; }
 .xw-cell.word-highlight-cross { background: var(--word-highlight-cross) !important; }
+.xw-cell.selected { background: var(--accent-dark) !important; }
 
 /* Revealed indicator dot */
 .xw-cell.revealed::before {
