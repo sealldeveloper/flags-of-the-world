@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crossword Archive</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1f2e;
+      min-height: 100vh;
+      color: #e0e6ed;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 40px;
+    }
+
+    .back-link {
+      align-self: flex-start;
+      color: #4299e1;
+      text-decoration: none;
+      font-size: 0.88rem;
+      margin-bottom: 32px;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #e0e6ed;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-bottom: 40px;
+    }
+
+    .month-group {
+      width: 100%;
+      max-width: 860px;
+      margin-bottom: 28px;
+    }
+
+    .month-heading {
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #4299e1;
+      border-bottom: 1px solid #2d3748;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+    }
+
+    .puzzle-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .puzzle-card {
+      background: #2d3748;
+      border-radius: 8px;
+      padding: 12px 14px;
+      text-decoration: none;
+      color: #e0e6ed;
+      font-size: 0.88rem;
+      border: 1px solid transparent;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .puzzle-card:hover {
+      border-color: #4299e1;
+      background: #3a4a61;
+      transform: translateY(-2px);
+    }
+
+    .puzzle-date { font-weight: bold; }
+    .puzzle-day  { font-size: 0.75rem; color: #9ca3af; }
+
+    #loading {
+      color: #9ca3af;
+      font-size: 0.9rem;
+      margin-top: 40px;
+    }
+
+    footer {
+      margin-top: auto;
+      padding-top: 48px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    footer a { color: #4299e1; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="/crossword/">← Back to Crossword</a>
+  <h1>Crossword Archive</h1>
+  <p class="subtitle">Locally stored puzzles</p>
+
+  <div id="loading">Loading archive...</div>
+  <div id="archive-root"></div>
+
+  <footer>Made by <a href="https://seall.dev" target="_blank">seall.dev</a></footer>
+
+  <script>
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    function formatId(id) {
+      const yy = id.slice(0,2), mm = id.slice(2,4), dd = id.slice(4,6);
+      return { yy, mm, dd,
+        label: `${parseInt(dd,10)} ${MONTHS[parseInt(mm,10)-1]}, 20${yy}`,
+        month: `${MONTHS[parseInt(mm,10)-1]} 20${yy}`,
+        monthKey: `20${yy}-${mm}`,
+        dayName: DAYS[new Date(`20${yy}-${mm}-${dd}`).getDay()],
+      };
+    }
+
+    async function load() {
+      const loading = document.getElementById('loading');
+      const root    = document.getElementById('archive-root');
+
+      try {
+        const res = await fetch('./puzzles/manifest.json');
+        if (!res.ok) throw new Error('No manifest');
+        const ids = await res.json();
+
+        if (ids.length === 0) {
+          loading.textContent = 'No archived puzzles yet.';
+          return;
+        }
+
+        loading.remove();
+
+        // Group by month
+        const groups = {};
+        const order  = [];
+        for (const id of ids) {
+          const f = formatId(id);
+          if (!groups[f.monthKey]) { groups[f.monthKey] = { label: f.month, puzzles: [] }; order.push(f.monthKey); }
+          groups[f.monthKey].puzzles.push({ id, ...f });
+        }
+
+        for (const key of order) {
+          const g = groups[key];
+          const section = document.createElement('div');
+          section.className = 'month-group';
+          section.innerHTML = `<div class="month-heading">${g.label}</div><div class="puzzle-grid"></div>`;
+          const grid = section.querySelector('.puzzle-grid');
+
+          for (const p of g.puzzles) {
+            const a = document.createElement('a');
+            a.className = 'puzzle-card';
+            a.href = `/crossword/?puzzle=${p.id}`;
+            a.innerHTML = `<span class="puzzle-date">${parseInt(p.dd,10)} ${MONTHS[parseInt(p.mm,10)-1]}</span><span class="puzzle-day">${p.dayName}</span>`;
+            grid.appendChild(a);
+          }
+
+          root.appendChild(section);
+        }
+      } catch (e) {
+        loading.textContent = 'Failed to load archive.';
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>

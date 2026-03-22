@@ -206,14 +206,33 @@ async function loadPuzzleList() {
 }
 
 function populatePuzzleSelector(ids) {
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   dom.puzzleSelect.innerHTML = '';
+
+  let group = null;
+  let groupKey = null;
+
   ids.forEach(id => {
+    if (id.length !== 6) return;
+    const yy = id.slice(0, 2);
+    const mm = id.slice(2, 4);
+    const dd = id.slice(4, 6);
+    const key = `20${yy}-${mm}`;
+    const label = `${months[parseInt(mm,10)-1]} 20${yy}`;
+
+    if (key !== groupKey) {
+      group = document.createElement('optgroup');
+      group.label = label;
+      dom.puzzleSelect.appendChild(group);
+      groupKey = key;
+    }
+
     const opt = document.createElement('option');
     opt.value = id;
     const archived = state.archivedIds.has(String(id));
-    opt.textContent = formatPuzzleId(id) + (archived ? ' ★' : '');
+    opt.textContent = `${parseInt(dd,10)} ${months[parseInt(mm,10)-1]}, 20${yy}${archived ? ' ★' : ''}`;
     opt.title = archived ? 'Archived (local)' : 'Live';
-    dom.puzzleSelect.appendChild(opt);
+    group.appendChild(opt);
   });
 }
 
@@ -1470,12 +1489,9 @@ function closeModal() {
 // BOOT & EVENT LISTENERS
 // ============================================================
 async function boot() {
-  // Try import from URL first
+  // Try import from URL hash first
   if (tryImportFromHash()) {
-    // Load puzzle list in background for selector
-    loadPuzzleList()
-      .then(ids => populatePuzzleSelector(ids))
-      .catch(() => {});
+    loadPuzzleList().then(ids => populatePuzzleSelector(ids)).catch(() => {});
     return;
   }
 
@@ -1487,7 +1503,11 @@ async function boot() {
 
     if (ids.length === 0) throw new Error('No puzzles available');
 
-    await loadPuzzle(ids[0]);
+    // Load puzzle specified by ?puzzle= query param, else most recent
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get('puzzle');
+    const target = (requested && ids.includes(requested)) ? requested : ids[0];
+    await loadPuzzle(target);
   } catch (err) {
     console.error(err);
     showError(`Failed to initialize: ${err.message}`);
