@@ -8,8 +8,7 @@
 // ============================================================
 // CONSTANTS & CONFIG
 // ============================================================
-const CORS_PROXY = 'https://corsproxy.io/?';
-const BASE_URL   = 'https://nytsyn.pzzl.com/nytsyn-crossword-mh/nytsyncrossword';
+const BASE_URL = 'https://nyt-crossword-proxy.my-account-306.workers.dev';
 
 // ============================================================
 // STATE
@@ -162,11 +161,10 @@ function showPuzzle() {
 // FETCH HELPERS
 // ============================================================
 async function fetchText(url) {
-  const proxied = `${CORS_PROXY}${encodeURIComponent(url)}`;
-  const res = await fetch(proxied);
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const buf = await res.arrayBuffer();
-  return new TextDecoder('utf-8').decode(buf);
+  return new TextDecoder('iso-8859-1').decode(buf);
 }
 
 // ============================================================

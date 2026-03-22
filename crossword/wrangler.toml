@@ -1,0 +1,4 @@
+name = "nyt-crossword-proxy"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+account_id = "3064f4beee4be0f87ffeb180f2a3dd23"
