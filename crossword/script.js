@@ -56,6 +56,7 @@ const state = {
 
   // Available puzzle list
   puzzleList:  [],   // array of id strings
+  archivedIds: new Set(),  // ids available locally
 };
 
 // ============================================================
@@ -170,11 +171,38 @@ async function fetchText(url) {
 // ============================================================
 // PUZZLE LIST
 // ============================================================
+function localPuzzlePath(id) {
+  const yy = id.slice(0, 2);
+  const mm = id.slice(2, 4);
+  return `./puzzles/20${yy}/${mm}/${id}.txt`;
+}
+
+async function loadManifest() {
+  try {
+    const res = await fetch('./puzzles/manifest.json');
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (_) { return []; }
+}
+
 async function loadPuzzleList() {
-  const raw = await fetchText(`${BASE_URL}?date=list&get=archivecurrent`);
-  const ids = raw.split('\n').map(l => l.trim()).filter(l => /^\d+$/.test(l));
-  state.puzzleList = ids;
-  return ids;
+  const [liveRaw, archived] = await Promise.allSettled([
+    fetchText(`${BASE_URL}?date=list&get=archivecurrent`),
+    loadManifest(),
+  ]);
+
+  const liveIds = liveRaw.status === 'fulfilled'
+    ? liveRaw.value.split('\n').map(l => l.trim()).filter(l => /^\d{6}$/.test(l))
+    : [];
+
+  const archivedIds = archived.status === 'fulfilled' ? archived.value : [];
+
+  // Merge, dedupe, sort newest first
+  const all = [...new Set([...liveIds, ...archivedIds])].sort((a, b) => b.localeCompare(a));
+
+  state.puzzleList   = all;
+  state.archivedIds  = new Set(archivedIds);
+  return all;
 }
 
 function populatePuzzleSelector(ids) {
@@ -182,8 +210,9 @@ function populatePuzzleSelector(ids) {
   ids.forEach(id => {
     const opt = document.createElement('option');
     opt.value = id;
-    // Format: YYMMDD -> readable
-    opt.textContent = formatPuzzleId(id);
+    const archived = state.archivedIds.has(String(id));
+    opt.textContent = formatPuzzleId(id) + (archived ? ' ★' : '');
+    opt.title = archived ? 'Archived (local)' : 'Live';
     dom.puzzleSelect.appendChild(opt);
   });
 }
@@ -380,7 +409,16 @@ async function loadPuzzle(id) {
   winShown = false;
 
   try {
-    const raw = await fetchText(`${BASE_URL}?date=${id}`);
+    let raw;
+    if (state.archivedIds.has(String(id))) {
+      // Serve from local archive (same-origin, no proxy needed)
+      const res = await fetch(localPuzzlePath(id));
+      if (!res.ok) throw new Error(`Local fetch failed: ${res.status}`);
+      const buf = await res.arrayBuffer();
+      raw = new TextDecoder('iso-8859-1').decode(buf);
+    } else {
+      raw = await fetchText(`${BASE_URL}?date=${id}`);
+    }
     const saved = loadProgressFromStorage(id);
     initPuzzleFromData(parsePuzzle(raw), saved);
   } catch (err) {

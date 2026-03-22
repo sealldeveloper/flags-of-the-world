@@ -1,0 +1,71 @@
+name: Fetch NYT Crossword Puzzles
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # 9am UTC = 4am ET, after midnight puzzle drop
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-puzzles:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch and store new puzzles
+        run: |
+          WORKER="https://nyt-crossword-proxy.my-account-306.workers.dev"
+          PUZZLE_DIR="crossword/puzzles"
+
+          # Fetch live list
+          PUZZLES=$(curl -sf "${WORKER}?date=list&get=archivecurrent") || {
+            echo "Failed to fetch puzzle list"
+            exit 1
+          }
+
+          NEW=0
+          while IFS= read -r id; do
+            [[ "$id" =~ ^[0-9]{6}$ ]] || continue
+            yy="${id:0:2}"
+            mm="${id:2:2}"
+            dir="${PUZZLE_DIR}/20${yy}/${mm}"
+            file="${dir}/${id}.txt"
+            if [ ! -f "$file" ]; then
+              mkdir -p "$dir"
+              curl -sf "${WORKER}?date=${id}" -o "$file" && echo "Downloaded $id" || echo "Failed $id"
+              NEW=$((NEW + 1))
+            fi
+          done <<< "$PUZZLES"
+
+          echo "NEW=$NEW" >> "$GITHUB_ENV"
+
+      - name: Regenerate manifest
+        run: |
+          python3 - <<'EOF'
+          import json, glob, os
+
+          puzzles = []
+          for f in glob.glob('crossword/puzzles/**/*.txt', recursive=True):
+              pid = os.path.basename(f)[:-4]
+              if pid.isdigit() and len(pid) == 6:
+                  puzzles.append(pid)
+
+          puzzles.sort(reverse=True)
+
+          with open('crossword/puzzles/manifest.json', 'w') as f:
+              json.dump(puzzles, f)
+
+          print(f"Manifest: {len(puzzles)} puzzles")
+          EOF
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add crossword/puzzles/
+          git diff --cached --quiet && echo "Nothing to commit" && exit 0
+          git commit -m "feat(crossword): archive puzzles $(date +%Y-%m-%d)"
+          git push
