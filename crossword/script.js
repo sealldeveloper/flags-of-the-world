@@ -20,8 +20,10 @@ const state = {
   author:      '',
   width:       0,
   height:      0,
-  solution:    [],   // 2D array [row][col] — letter or '#'
+  solution:    [],   // 2D array [row][col] — letter/string or '#'
   circles:     [],   // 2D array [row][col] — true/false
+  shaded:      [],   // 2D array [row][col] — true/false (darker background)
+  hidden:      [],   // 2D array [row][col] — true/false (void/transparent cell)
   acrossClues: [],   // array of { num, clue }
   downClues:   [],   // array of { num, clue }
   cellNums:    [],   // 2D array of numbers (or null)
@@ -41,6 +43,8 @@ const state = {
   selCol:      0,
   direction:   'across',  // 'across' | 'down'
   lockMode:    true,
+  arrowDir:    false,     // cross-axis arrows change direction
+  overtype:    false,     // advance one cell at a time instead of skipping to next empty
 
   // Undo/redo history
   history:     [],   // array of { userGrid, revealed, locked, incorrect }
@@ -76,6 +80,8 @@ const dom = {
   btnGo:           $('btn-go'),
   btnClearIncorrect: $('btn-clear-incorrect'),
   chkLock:         $('chk-lock'),
+  chkArrowDir:     $('chk-arrow-dir'),
+  chkOvertype:     $('chk-overtype'),
   btnExport:       $('btn-export'),
   btnImport:       $('btn-import'),
   btnUndo:         $('btn-undo'),
@@ -110,6 +116,14 @@ const dom = {
 // ============================================================
 function isBlack(r, c) {
   return state.solution[r]?.[c] === '#';
+}
+
+function isVoid(r, c) {
+  return state.hidden[r]?.[c] === true;
+}
+
+function isRebus(r, c) {
+  return (state.solution[r]?.[c]?.length ?? 0) > 1;
 }
 
 function inBounds(r, c) {
@@ -282,6 +296,8 @@ function parsePuzzle(raw) {
   // Some puzzles have a trailing all-dots row after the real grid — detect and skip it.
   const solution = Array.from({ length: height }, () => Array(width).fill('#'));
   const circles  = Array.from({ length: height }, () => Array(width).fill(false));
+  const shaded   = Array.from({ length: height }, () => Array(width).fill(false));
+  const hidden   = Array.from({ length: height }, () => Array(width).fill(false));
 
   for (let r = 0; r < height; r++) {
     let row = next();
@@ -290,31 +306,52 @@ function parsePuzzle(raw) {
     let c = 0;
     let j = 0;
     while (j < row.length && c < width) {
+      let advanceCol = true;
       if (row[j] === '%') {
-        // '%' is a prefix marker: the immediately following character is circled
-        j++; // skip %
-        const letter = row[j] ?? '';
-        j++; // skip the circled letter
-        solution[r][c] = letter || '.';
+        // '%' prefix: next char is the letter, cell is circled
+        j++;
+        solution[r][c] = row[j] ?? '';
+        j++;
         circles[r][c]  = true;
+      } else if (row[j] === '^') {
+        // '^' prefix: next char is the letter, cell is shaded
+        j++;
+        solution[r][c] = row[j] ?? '';
+        j++;
+        shaded[r][c]   = true;
+      } else if (row[j] === ',') {
+        // ',' prefix: next char is appended to the previous cell (rebus)
+        j++;
+        if (c > 0 && row[j] !== undefined) {
+          solution[r][c - 1] += row[j];
+        }
+        j++;
+        advanceCol = false; // don't consume a new column slot
+      } else if (row[j] === '.') {
+        // '.' = void/hidden cell (transparent black)
+        solution[r][c] = '#';
+        hidden[r][c]   = true;
+        j++;
       } else {
-        // '#' = black, '.' = empty white, letter = answer
+        // '#' = black cell, letter = answer
         solution[r][c] = row[j];
         j++;
       }
-      c++;
+      if (advanceCol) c++;
     }
   }
 
   // Some formats declare height=N but the last row is all dots (empty white cells),
   // which is a format artifact. Trim it so the grid doesn't show a phantom empty row.
   {
-    const lastRow = solution[solution.length - 1];
-    if (lastRow && lastRow.every(cell => cell === '.')) {
+    // Trim phantom trailing row: an all-void (originally all-'.') row that is a format artifact.
+    const lastHidden = hidden[hidden.length - 1];
+    if (lastHidden && lastHidden.every(v => v)) {
       solution.pop();
       circles.pop();
-      // height is re-derived from solution.length below; adjust the declared value
-      // by patching the returned object (parsePuzzle returns height separately)
+      shaded.pop();
+      hidden.pop();
+      // height is re-derived from solution.length below
     }
   }
 
@@ -349,7 +386,7 @@ function parsePuzzle(raw) {
     downCluesRaw.push(line.trim());
   }
 
-  return { puzzleId, dateStr, author, width, height: solution.length, solution, circles, acrossCluesRaw, downCluesRaw };
+  return { puzzleId, dateStr, author, width, height: solution.length, solution, circles, shaded, hidden, acrossCluesRaw, downCluesRaw };
 }
 
 // ============================================================
@@ -449,8 +486,9 @@ async function loadPuzzle(id) {
     } else {
       raw = await fetchText(`${BASE_URL}?date=${id}`);
     }
-    const saved = loadProgressFromStorage(id);
-    initPuzzleFromData(parsePuzzle(raw), saved);
+    const data  = parsePuzzle(raw);
+    const saved = loadProgressFromStorage(data.puzzleId);
+    initPuzzleFromData(data, saved);
   } catch (err) {
     console.error(err);
     showError(`Failed to load puzzle: ${err.message}`);
@@ -458,7 +496,7 @@ async function loadPuzzle(id) {
 }
 
 function initPuzzleFromData(data, savedProgress = null) {
-  const { puzzleId, dateStr, author, width, height, solution, circles, acrossCluesRaw, downCluesRaw } = data;
+  const { puzzleId, dateStr, author, width, height, solution, circles, shaded, hidden, acrossCluesRaw, downCluesRaw } = data;
 
   const { cellNums, acrossStarts, downStarts } = buildNumbering(solution, width, height);
   const { acrossMap, downMap, cellToAcross, cellToDown } =
@@ -473,6 +511,8 @@ function initPuzzleFromData(data, savedProgress = null) {
   state.height      = height;
   state.solution    = solution;
   state.circles     = circles;
+  state.shaded      = shaded  ?? Array.from({ length: height }, () => Array(width).fill(false));
+  state.hidden      = hidden  ?? Array.from({ length: height }, () => Array(width).fill(false));
   state.cellNums    = cellNums;
   state.acrossClues = acrossClues;
   state.downClues   = downClues;
@@ -564,7 +604,7 @@ function renderGrid() {
       cellEls[r][c] = cell;
 
       if (isBlack(r, c)) {
-        cell.classList.add('black');
+        cell.classList.add(isVoid(r, c) ? 'void' : 'black');
       } else {
         // Number
         const num = state.cellNums[r][c];
@@ -580,8 +620,10 @@ function renderGrid() {
         letterEl.className = 'cell-letter';
         cell.appendChild(letterEl);
 
-        // Circle
+        // Circle / shaded / rebus gimmicks
         if (state.circles[r]?.[c]) cell.classList.add('circled');
+        if (state.shaded[r]?.[c])  cell.classList.add('shaded');
+        if (isRebus(r, c))         cell.classList.add('rebus');
 
         // Capture r/c in closure
         cell.addEventListener('click', ((row, col) => () => onCellClick(row, col))(r, c));
@@ -724,9 +766,11 @@ function updateClueHighlights() {
   const acrossNum = state.cellToAcross[cellKey(r, c)];
   const downNum   = state.cellToDown[cellKey(r, c)];
 
-  // Scroll both panels to show the relevant clue
-  if (acrossNum != null) scrollClueIntoView(dom.acrossList, acrossNum);
-  if (downNum   != null) scrollClueIntoView(dom.downList, downNum);
+  // Scroll both panels to show the relevant clue.
+  // Use instant scroll for the orthogonal panel to avoid jitter.
+  const acrossSmooth = direction === 'across';
+  if (acrossNum != null) scrollClueIntoView(dom.acrossList, acrossNum, acrossSmooth);
+  if (downNum   != null) scrollClueIntoView(dom.downList,   downNum,   !acrossSmooth);
 
   // Highlight active direction clue (strong)
   const activeNum  = direction === 'across' ? acrossNum : downNum;
@@ -752,14 +796,14 @@ function updateClueHighlights() {
   dom.activeClueLen.textContent = wordLen ? `(${wordLen})` : '';
 }
 
-function scrollClueIntoView(listEl, num) {
+function scrollClueIntoView(listEl, num, smooth = true) {
   const li = listEl.querySelector(`[data-num="${num}"]`);
   if (!li) return;
   // Center the active clue in the scrollable list
   const listH = listEl.clientHeight;
   const itemTop = li.offsetTop;
   const itemH   = li.offsetHeight;
-  listEl.scrollTo({ top: itemTop - (listH / 2) + (itemH / 2), behavior: 'smooth' });
+  listEl.scrollTo({ top: itemTop - (listH / 2) + (itemH / 2), behavior: smooth ? 'smooth' : 'instant' });
 }
 
 function getCurrentWordCells() {
@@ -790,6 +834,10 @@ function selectCell(r, c, dir = null) {
   if (dir) state.direction = dir;
   updateSelection();
   ensureTimerStarted();
+  // On touch devices, focus the hidden input so the virtual keyboard appears
+  if (navigator.maxTouchPoints > 0) {
+    document.getElementById('xw-mobile-input')?.focus({ preventScroll: true });
+  }
 }
 
 // ============================================================
@@ -847,7 +895,8 @@ function onKeyDown(e) {
   }
 
   const tag = document.activeElement?.tagName;
-  if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  const isMobileInput = document.activeElement?.id === 'xw-mobile-input';
+  if (!isMobileInput && (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA')) return;
 
   const { selRow: r, selCol: c, direction } = state;
 
@@ -855,6 +904,14 @@ function onKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
     e.preventDefault();
     if (e.shiftKey) doRedo(); else doUndo();
+    return;
+  }
+
+  // Ctrl+Backspace: clear word (excluding shared/intersection cells)
+  // Ctrl+Shift+Backspace: clear word (including shared cells)
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Backspace') {
+    e.preventDefault();
+    clearCurrentWord(/* includeShared */ e.shiftKey);
     return;
   }
 
@@ -869,6 +926,10 @@ function onKeyDown(e) {
         e.preventDefault();
         doCheck('word');
         return;
+      case 'P':
+        e.preventDefault();
+        doPartialCheck('word');
+        return;
     }
   }
 
@@ -876,26 +937,44 @@ function onKeyDown(e) {
     case 'ArrowRight':
       e.preventDefault();
       if (direction === 'across') moveInWord(1);
-      else { selectCell(r, nextCol(r, c, 1)); }
+      else if (state.arrowDir) selectCell(r, nextCol(r, c, 1), 'across');
+      else selectCell(r, nextCol(r, c, 1));
       break;
 
     case 'ArrowLeft':
       e.preventDefault();
       if (direction === 'across') moveInWord(-1);
-      else { selectCell(r, nextCol(r, c, -1)); }
+      else if (state.arrowDir) selectCell(r, nextCol(r, c, -1), 'across');
+      else selectCell(r, nextCol(r, c, -1));
       break;
 
     case 'ArrowDown':
       e.preventDefault();
       if (direction === 'down') moveInWord(1);
-      else { selectCell(nextRow(r, c, 1), c); }
+      else if (state.arrowDir) selectCell(nextRow(r, c, 1), c, 'down');
+      else selectCell(nextRow(r, c, 1), c);
       break;
 
     case 'ArrowUp':
       e.preventDefault();
       if (direction === 'down') moveInWord(-1);
-      else { selectCell(nextRow(r, c, -1), c); }
+      else if (state.arrowDir) selectCell(nextRow(r, c, -1), c, 'down');
+      else selectCell(nextRow(r, c, -1), c);
       break;
+
+    case 'Home': {
+      e.preventDefault();
+      const wc = getCurrentWordCells();
+      if (wc.length) selectCell(wc[0].r, wc[0].c);
+      break;
+    }
+
+    case 'End': {
+      e.preventDefault();
+      const wc = getCurrentWordCells();
+      if (wc.length) selectCell(wc[wc.length - 1].r, wc[wc.length - 1].c);
+      break;
+    }
 
     case ' ':
       e.preventDefault();
@@ -908,9 +987,13 @@ function onKeyDown(e) {
       break;
 
     case 'Backspace':
-    case 'Delete':
       e.preventDefault();
       handleBackspace();
+      break;
+
+    case 'Delete':
+      e.preventDefault();
+      handleDelete();
       break;
 
     default:
@@ -952,13 +1035,27 @@ function handleLetterKey(letter) {
   if (state.locked[r][c]) { advanceAfterEntry(); return; }
 
   pushHistory();
-  state.userGrid[r][c]  = letter;
-  state.incorrect[r][c] = false;
 
-  updateCellVisual(r, c);
-  const el = getCellEl(r, c);
-  if (el) el.classList.add('selected');
-  advanceAfterEntry();
+  if (isRebus(r, c)) {
+    const rebusLen = state.solution[r][c].length;
+    const current  = state.userGrid[r][c];
+    // Append letter; if already full, restart from this letter
+    state.userGrid[r][c] = current.length >= rebusLen ? letter : current + letter;
+    state.incorrect[r][c] = false;
+    updateCellVisual(r, c);
+    const el = getCellEl(r, c);
+    if (el) el.classList.add('selected');
+    // Only advance once the rebus entry is fully typed
+    if (state.userGrid[r][c].length === rebusLen) advanceAfterEntry();
+  } else {
+    state.userGrid[r][c]  = letter;
+    state.incorrect[r][c] = false;
+    updateCellVisual(r, c);
+    const el = getCellEl(r, c);
+    if (el) el.classList.add('selected');
+    advanceAfterEntry();
+  }
+
   saveProgressToStorage();
 }
 
@@ -969,12 +1066,25 @@ function advanceAfterEntry() {
 
   if (curIdx === -1) return;
 
-  // Try to find next empty cell in the word
-  for (let i = curIdx + 1; i < wordCells.length; i++) {
-    const { r: nr, c: nc } = wordCells[i];
-    if (!state.locked[nr][nc]) {
-      selectCell(nr, nc);
-      return;
+  if (state.overtype) {
+    // Overtype: move to the very next unlocked cell, whether empty or not
+    for (let i = curIdx + 1; i < wordCells.length; i++) {
+      const { r: nr, c: nc } = wordCells[i];
+      if (!state.locked[nr][nc]) { selectCell(nr, nc); return; }
+    }
+  } else {
+    // Default: skip to the next empty (unfilled) unlocked cell
+    for (let i = curIdx + 1; i < wordCells.length; i++) {
+      const { r: nr, c: nc } = wordCells[i];
+      if (!state.locked[nr][nc] && state.userGrid[nr][nc] === '') {
+        selectCell(nr, nc);
+        return;
+      }
+    }
+    // No empty cell ahead — fall back to just the next unlocked cell
+    for (let i = curIdx + 1; i < wordCells.length; i++) {
+      const { r: nr, c: nc } = wordCells[i];
+      if (!state.locked[nr][nc]) { selectCell(nr, nc); return; }
     }
   }
 
@@ -993,7 +1103,12 @@ function handleBackspace() {
 
   if (state.userGrid[r][c] !== '') {
     pushHistory();
-    state.userGrid[r][c] = '';
+    // For rebus cells, remove just the last typed character
+    if (isRebus(r, c) && state.userGrid[r][c].length > 1) {
+      state.userGrid[r][c] = state.userGrid[r][c].slice(0, -1);
+    } else {
+      state.userGrid[r][c] = '';
+    }
     state.incorrect[r][c] = false;
     updateCellVisual(r, c);
     const el = getCellEl(r, c);
@@ -1004,34 +1119,43 @@ function handleBackspace() {
   }
 }
 
-function movePrevInWord() {
-  const { selRow: r, selCol: c, direction } = state;
-  if (direction === 'across') {
-    const nc = nextCol(r, c, -1);
-    if (nc !== c) {
-      selectCell(r, nc);
-      if (!state.locked[r][nc]) {
-        pushHistory();
-        state.userGrid[r][nc] = '';
-        state.incorrect[r][nc] = false;
-        updateCellVisual(r, nc);
-        const el = getCellEl(r, nc);
-        if (el) el.classList.add('selected');
-      }
-    }
+function handleDelete() {
+  ensureTimerStarted();
+  const { selRow: r, selCol: c } = state;
+  if (isBlack(r, c) || state.locked[r][c]) return;
+
+  pushHistory();
+  // For rebus cells, remove the last typed character; otherwise clear the cell
+  if (isRebus(r, c) && state.userGrid[r][c].length > 1) {
+    state.userGrid[r][c] = state.userGrid[r][c].slice(0, -1);
   } else {
-    const nr = nextRow(r, c, -1);
-    if (nr !== r) {
-      selectCell(nr, c);
-      if (!state.locked[nr][c]) {
-        pushHistory();
-        state.userGrid[nr][c] = '';
-        state.incorrect[nr][c] = false;
-        updateCellVisual(nr, c);
-        const el = getCellEl(nr, c);
-        if (el) el.classList.add('selected');
-      }
-    }
+    state.userGrid[r][c] = '';
+  }
+  state.incorrect[r][c] = false;
+  updateCellVisual(r, c);
+  const el = getCellEl(r, c);
+  if (el) el.classList.add('selected');
+  // Move forward (opposite of backspace)
+  advanceAfterEntry();
+  saveProgressToStorage();
+}
+
+function movePrevInWord() {
+  const { selRow: r, selCol: c } = state;
+  const wordCells = getCurrentWordCells();
+  const curIdx = wordCells.findIndex(cell => cell.r === r && cell.c === c);
+  // At start of word — stay put
+  if (curIdx <= 0) return;
+  const { r: pr, c: pc } = wordCells[curIdx - 1];
+  selectCell(pr, pc);
+  if (!state.locked[pr][pc]) {
+    pushHistory();
+    state.userGrid[pr][pc]  = '';
+    state.incorrect[pr][pc] = false;
+    updateCellVisual(pr, pc);
+    const el = getCellEl(pr, pc);
+    if (el) el.classList.add('selected');
+    saveProgressToStorage();
   }
 }
 
@@ -1039,19 +1163,28 @@ function movePrevInWord() {
 // WORD NAVIGATION (Tab / Shift+Tab)
 // ============================================================
 function getWordList() {
-  // Returns ordered list of {num, dir} words in reading order
+  // Returns ordered list of {num, dir} words in reading order (interleaved by num)
   const words = [];
   const allNums = new Set([
     ...state.acrossClues.map(c => c.num),
     ...state.downClues.map(c => c.num),
   ]);
-  // Sort by number
   const sorted = [...allNums].sort((a, b) => a - b);
   for (const num of sorted) {
     if (state.acrossMap[num]) words.push({ num, dir: 'across' });
     if (state.downMap[num])   words.push({ num, dir: 'down' });
   }
   return words;
+}
+
+function getFullWordList() {
+  // All Across words (sorted by num) then all Down words (sorted by num).
+  // Used by Tab so you sweep all Acrosses then all Downs before looping.
+  const across = state.acrossClues.map(c => ({ num: c.num, dir: 'across' }))
+                   .sort((a, b) => a.num - b.num);
+  const down   = state.downClues.map(c => ({ num: c.num, dir: 'down' }))
+                   .sort((a, b) => a.num - b.num);
+  return [...across, ...down];
 }
 
 function getCurrentWordIndex() {
@@ -1069,33 +1202,41 @@ function isWordComplete(num, dir) {
   return cells.length > 0 && cells.every(({ r, c }) => state.userGrid[r][c] === state.solution[r][c]);
 }
 
+function isWordLocked(num, dir) {
+  const map = dir === 'across' ? state.acrossMap : state.downMap;
+  const cells = map[num] ?? [];
+  return cells.length > 0 && cells.every(({ r, c }) => state.locked[r][c]);
+}
+
 function goToNextWord() {
-  const words = getWordList().filter(w => w.dir === state.direction);
+  const words = getFullWordList();
   if (words.length === 0) return;
   let idx = words.findIndex(w => w.num === getCurrentWordIndex_num() && w.dir === state.direction);
   const startIdx = idx === -1 ? 0 : idx;
   let next = (startIdx + 1) % words.length;
-  // Skip complete words, but don't loop forever
+  // Skip fully-locked (confirmed) words only, not merely correct ones
   let attempts = 0;
-  while (attempts < words.length && isWordComplete(words[next].num, words[next].dir)) {
+  while (attempts < words.length && isWordLocked(words[next].num, words[next].dir)) {
     next = (next + 1) % words.length;
     attempts++;
   }
+  state.direction = words[next].dir;
   jumpToWord(words[next]);
 }
 
 function goToPrevWord() {
-  const words = getWordList().filter(w => w.dir === state.direction);
+  const words = getFullWordList();
   if (words.length === 0) return;
   let idx = words.findIndex(w => w.num === getCurrentWordIndex_num() && w.dir === state.direction);
   const startIdx = idx === -1 ? 0 : idx;
   let next = (startIdx - 1 + words.length) % words.length;
-  // Skip complete words, but don't loop forever
+  // Skip fully-locked (confirmed) words only, not merely correct ones
   let attempts = 0;
-  while (attempts < words.length && isWordComplete(words[next].num, words[next].dir)) {
+  while (attempts < words.length && isWordLocked(words[next].num, words[next].dir)) {
     next = (next - 1 + words.length) % words.length;
     attempts++;
   }
+  state.direction = words[next].dir;
   jumpToWord(words[next]);
 }
 
@@ -1133,6 +1274,21 @@ function getScopeCells(scope) {
     }
   }
   return cells;
+}
+
+function clearCurrentWord(includeShared = false) {
+  const cells = getCurrentWordCells();
+  if (cells.length === 0) return;
+  pushHistory();
+  for (const { r, c } of cells) {
+    if (state.locked[r][c]) continue;
+    const key = cellKey(r, c);
+    const isShared = state.cellToAcross[key] != null && state.cellToDown[key] != null;
+    if (!includeShared && isShared) continue;
+    state.userGrid[r][c]  = '';
+    state.incorrect[r][c] = false;
+  }
+  fullRedraw();
 }
 
 function doCheck(scope) {
@@ -1411,7 +1567,7 @@ function tryImportFromHash() {
     const payload = JSON.parse(json);
 
     // Re-build grid numbering from solution
-    const { puzzleId, dateStr, author, width, height, solution, circles, acrossClues, downClues } = payload;
+    const { puzzleId, dateStr, author, width, height, solution, circles, shaded, hidden, acrossClues, downClues } = payload;
 
     // acrossClues/downClues already have {num, clue} objects
     // We need acrossCluesRaw and downStarts to pass to initPuzzleFromData
@@ -1427,6 +1583,8 @@ function tryImportFromHash() {
     state.height       = height;
     state.solution     = solution;
     state.circles      = circles;
+    state.shaded       = shaded  ?? Array.from({ length: height }, () => Array(width).fill(false));
+    state.hidden       = hidden  ?? Array.from({ length: height }, () => Array(width).fill(false));
     state.cellNums     = cellNums;
     state.acrossClues  = acrossClues;
     state.downClues    = downClues;
@@ -1556,6 +1714,7 @@ dom.btnGo.addEventListener('click', () => {
 // Lock mode
 dom.chkLock.addEventListener('change', () => {
   state.lockMode = dom.chkLock.checked;
+  localStorage.setItem('xw-lock-mode', state.lockMode ? '1' : '0');
   pushHistory();
   if (state.lockMode) {
     // Lock any already-correct words
@@ -1574,6 +1733,26 @@ dom.chkLock.addEventListener('change', () => {
   }
   fullRedraw();
 });
+
+// Arrow-changes-direction toggle
+dom.chkArrowDir.addEventListener('change', () => {
+  state.arrowDir = dom.chkArrowDir.checked;
+  localStorage.setItem('xw-arrow-dir', state.arrowDir ? '1' : '0');
+});
+if (localStorage.getItem('xw-arrow-dir') === '1') {
+  state.arrowDir = true;
+  dom.chkArrowDir.checked = true;
+}
+
+// Overtype toggle
+dom.chkOvertype.addEventListener('change', () => {
+  state.overtype = dom.chkOvertype.checked;
+  localStorage.setItem('xw-overtype', state.overtype ? '1' : '0');
+});
+if (localStorage.getItem('xw-overtype') === '1') {
+  state.overtype = true;
+  dom.chkOvertype.checked = true;
+}
 
 // Export / Import
 dom.btnExport.addEventListener('click', doExport);
@@ -1662,8 +1841,14 @@ btnThemeToggle.addEventListener('click', () => {
   applyTheme(current === 'light' ? 'dark' : 'light');
 });
 
-// Load saved theme (default: light)
+/// Load saved theme (default: light)
 applyTheme(localStorage.getItem('xw-theme') || 'light');
+
+// Load saved lock-mode setting (default: on)
+if (localStorage.getItem('xw-lock-mode') === '0') {
+  state.lockMode = false;
+  dom.chkLock.checked = false;
+}
 
 // ============================================================
 // STICKY TOP MEASUREMENT
@@ -1684,29 +1869,90 @@ updateHeaderHeight();
 // puzzle fits without scrolling, capped at 36px.
 function fitGrid() {
   if (!state.puzzleId) return;
-  const header    = document.getElementById('app-header');
-  const toolbar   = document.getElementById('toolbar');
-  const clueBar   = document.getElementById('active-clue-bar');
+  const header     = document.getElementById('app-header');
+  const toolbar    = document.getElementById('toolbar');
+  const clueBar    = document.getElementById('active-clue-bar');
   const cluePanels = document.getElementById('clue-panels');
 
-  const usedH = (header?.offsetHeight    ?? 0)
-              + (toolbar?.offsetHeight   ?? 0)
-              + (clueBar?.offsetHeight   ?? 0);
-  const usedW = cluePanels?.offsetWidth ?? 0;
+  const isMobile = window.innerWidth <= 768;
 
-  const availH = window.innerHeight - usedH - 32;
-  const availW = window.innerWidth  - usedW - 32;
+  let usedH, usedW;
+  if (isMobile) {
+    // On mobile the clue panels are below the grid, not beside it.
+    // Only subtract vertically-stacked elements from height; full width is available.
+    usedH = (header?.offsetHeight  ?? 0)
+          + (toolbar?.offsetHeight ?? 0)
+          + (clueBar?.offsetHeight ?? 0)
+          + 16;
+    usedW = 16;
+  } else {
+    usedH = (header?.offsetHeight    ?? 0)
+          + (toolbar?.offsetHeight   ?? 0)
+          + (clueBar?.offsetHeight   ?? 0)
+          + 32;
+    usedW = (cluePanels?.offsetWidth ?? 0) + 32;
+  }
+
+  const availH = window.innerHeight - usedH;
+  const availW = window.innerWidth  - usedW;
 
   if (availW <= 0 || availH <= 0) return;
 
-  const byW = Math.floor(availW / state.width);
-  const byH = Math.floor(availH / state.height);
-  const size = Math.min(byW, byH, 36);
-  document.documentElement.style.setProperty('--cell-size', `${Math.max(size, 12)}px`);
+  // Subtract the grid's own border (2px each side = 4px) and 1px gaps between cells
+  const gridBorderGapW = 4 + (state.width  - 1);
+  const gridBorderGapH = 4 + (state.height - 1);
+
+  const byW = Math.floor((availW - gridBorderGapW) / state.width);
+  const byH = Math.floor((availH - gridBorderGapH) / state.height);
+  const size = Math.min(byW, byH);
+  document.documentElement.style.setProperty('--cell-size', `${Math.max(size, 10)}px`);
 }
 const gridObserver = new ResizeObserver(fitGrid);
 gridObserver.observe(document.getElementById('clue-panels'));
 window.addEventListener('resize', fitGrid);
+// Re-fit when virtual keyboard opens/closes on mobile
+window.visualViewport?.addEventListener('resize', fitGrid);
+
+// ============================================================
+// MOBILE VIRTUAL KEYBOARD INPUT
+// ============================================================
+{
+  const mobileInput = document.getElementById('xw-mobile-input');
+  if (mobileInput) {
+    // Capture letter input from the virtual keyboard
+    mobileInput.addEventListener('input', () => {
+      const val = mobileInput.value;
+      mobileInput.value = ''; // clear immediately so next keypress works
+      if (!val || !state.puzzleId) return;
+      // Take the last typed character (handles IME and autocorrect edge cases)
+      const ch = val.slice(-1).toUpperCase();
+      if (/^[A-Z]$/.test(ch)) handleLetterKey(ch);
+    });
+
+    // Handle special keys from the virtual keyboard
+    mobileInput.addEventListener('keydown', (e) => {
+      if (!state.puzzleId) return;
+      switch (e.key) {
+        case 'Backspace':
+          e.preventDefault();
+          if (e.ctrlKey || e.metaKey) clearCurrentWord(e.shiftKey);
+          else handleBackspace();
+          break;
+        case 'Tab':       e.preventDefault(); e.shiftKey ? goToPrevWord() : goToNextWord(); break;
+        case ' ':         e.preventDefault(); toggleDirection(); break;
+        case 'ArrowLeft':  e.preventDefault(); onKeyDown(e); break;
+        case 'ArrowRight': e.preventDefault(); onKeyDown(e); break;
+        case 'ArrowUp':    e.preventDefault(); onKeyDown(e); break;
+        case 'ArrowDown':  e.preventDefault(); onKeyDown(e); break;
+      }
+    });
+
+    // Keep the hidden input clear and re-focused when blurred unintentionally
+    mobileInput.addEventListener('blur', () => {
+      mobileInput.value = '';
+    });
+  }
+}
 
 // ============================================================
 // LAUNCH

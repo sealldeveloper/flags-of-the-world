@@ -79,6 +79,14 @@
         <input type="checkbox" id="chk-lock" title="Lock correct words" checked>
         Lock correct words
       </label>
+      <label class="toolbar-label lock-label">
+        <input type="checkbox" id="chk-arrow-dir" title="Cross-axis arrows change direction">
+        Arrows change dir
+      </label>
+      <label class="toolbar-label lock-label">
+        <input type="checkbox" id="chk-overtype" title="Advance one cell at a time instead of skipping to next empty">
+        Overtype
+      </label>
       <button id="btn-export" class="btn-sm">Export Progress</button>
       <button id="btn-import" class="btn-sm" title="Import from URL fragment">Import</button>
       <button id="btn-undo" class="btn-sm" title="Undo (Ctrl+Z)">Undo</button>
@@ -141,6 +149,9 @@
               <li><kbd>⇧C</kbd> Check all</li>
               <li><kbd>⇧W</kbd> Check word</li>
               <li><kbd>⇧P</kbd> Partial check word</li>
+              <li class="keys-sep"></li>
+              <li><kbd>Ctrl ⌫</kbd> Clear word</li>
+              <li><kbd>Ctrl ⇧⌫</kbd> Clear word (incl. crosses)</li>
             </ul>
           </div>
         </div>
@@ -168,6 +179,13 @@
       <button id="modal-close" class="btn-primary">OK</button>
     </div>
   </div>
+
+  <!-- Hidden input to capture virtual keyboard on mobile -->
+  <input id="xw-mobile-input"
+    type="text"
+    autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+    inputmode="text" aria-hidden="true" tabindex="-1"
+    style="position:fixed;bottom:0;left:0;width:1px;height:1px;opacity:0;border:none;padding:0;font-size:16px;pointer-events:none;">
 
   <script src="script.js"></script>
 </body>

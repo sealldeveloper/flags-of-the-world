@@ -96,18 +96,33 @@
             <div class="card-icon">✏️</div>
             <div class="card-title">NYT Crossword</div>
         </a>
+        <a class="card" href="/tld/">
+            <div class="card-icon" id="tld-icon" style="font-family:'Courier New',monospace;font-size:1.6rem;font-weight:bold;color:#4299e1"></div>
+            <div class="card-title">Country TLDs</div>
+        </a>
         <!-- Add more game cards here -->
     </div>
 
     <footer>Made by <a href="https://seall.dev" target="_blank">seall.dev</a></footer>
 
     <script>
-        function randomFlagEmoji() {
-            const codes = ['AF','AL','DZ','AD','AO','AG','AR','AM','AU','AT','AZ','BS','BH','BD','BB','BY','BE','BZ','BJ','BT','BO','BA','BW','BR','BN','BG','BF','BI','CV','KH','CM','CA','CF','TD','CL','CN','CO','KM','CG','CD','CR','CI','HR','CU','CY','CZ','DK','DJ','DM','DO','EC','EG','SV','GQ','ER','EE','SZ','ET','FJ','FI','FR','GA','GM','GE','DE','GH','GR','GD','GT','GN','GW','GY','HT','HN','HU','IS','IN','ID','IR','IQ','IE','IL','IT','JM','JP','JO','KZ','KE','KI','KP','KR','KW','KG','LA','LV','LB','LS','LR','LY','LI','LT','LU','MG','MW','MY','MV','ML','MT','MH','MR','MU','MX','FM','MD','MC','MN','ME','MA','MZ','MM','NA','NR','NP','NL','NZ','NI','NE','NG','NO','OM','PK','PW','PA','PG','PY','PE','PH','PL','PT','QA','RO','RU','RW','KN','LC','VC','WS','SM','ST','SA','SN','RS','SC','SL','SG','SK','SI','SB','SO','ZA','SS','ES','LK','SD','SR','SE','CH','SY','TW','TJ','TZ','TH','TL','TG','TO','TT','TN','TR','TM','TV','UG','UA','AE','GB','US','UY','UZ','VU','VE','VN','YE','ZM','ZW'];
-            const code = codes[Math.floor(Math.random() * codes.length)];
-            return String.fromCodePoint(...[...code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
-        }
-        document.getElementById('flags-icon').textContent = randomFlagEmoji();
+        // Pick a random country and show its flag emoji + matching TLD
+        const COUNTRY_TLD_PAIRS = [
+            {code:'FR',tld:'.fr'},{code:'DE',tld:'.de'},{code:'JP',tld:'.jp'},
+            {code:'TV',tld:'.tv'},{code:'ME',tld:'.me'},{code:'LY',tld:'.ly'},
+            {code:'CO',tld:'.co'},{code:'FM',tld:'.fm'},{code:'TO',tld:'.to'},
+            {code:'LA',tld:'.la'},{code:'BR',tld:'.br'},{code:'IN',tld:'.in'},
+            {code:'AU',tld:'.au'},{code:'CA',tld:'.ca'},{code:'IT',tld:'.it'},
+            {code:'ES',tld:'.es'},{code:'RU',tld:'.ru'},{code:'CN',tld:'.cn'},
+            {code:'MX',tld:'.mx'},{code:'NG',tld:'.ng'},{code:'ZA',tld:'.za'},
+            {code:'SE',tld:'.se'},{code:'NO',tld:'.no'},{code:'NZ',tld:'.nz'},
+            {code:'KR',tld:'.kr'},{code:'SG',tld:'.sg'},{code:'CH',tld:'.ch'},
+            {code:'PL',tld:'.pl'},{code:'AR',tld:'.ar'},{code:'EG',tld:'.eg'},
+        ];
+        const pair = COUNTRY_TLD_PAIRS[Math.floor(Math.random() * COUNTRY_TLD_PAIRS.length)];
+        const flagEmoji = String.fromCodePoint(...[...pair.code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+        document.getElementById('flags-icon').textContent = flagEmoji;
+        document.getElementById('tld-icon').textContent = pair.tld;
     </script>
 </body>
 </html>

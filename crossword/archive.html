@@ -75,6 +75,8 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
+      overflow: hidden;
+      min-width: 0;
     }
 
     .puzzle-card:hover {
@@ -85,6 +87,40 @@
 
     .puzzle-date { font-weight: bold; }
     .puzzle-day  { font-size: 0.75rem; color: #9ca3af; }
+
+    .diff-dots {
+      display: flex;
+      gap: 2px;
+      margin-top: 4px;
+    }
+    .diff-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #3a4a61;
+      flex-shrink: 0;
+    }
+    .diff-sun-label {
+      margin-top: 4px;
+      font-size: 0.62rem;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #805ad5;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 24px 14px 32px; }
+      h1 { font-size: 1.4rem; }
+      .puzzle-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+      .puzzle-card { padding: 9px 10px; font-size: 0.8rem; border-radius: 6px; }
+      .back-link { margin-bottom: 20px; }
+      .month-group { margin-bottom: 20px; }
+    }
+
+    @media (max-width: 380px) {
+      .puzzle-grid { grid-template-columns: repeat(3, 1fr); }
+    }
 
     #loading {
       color: #9ca3af;
@@ -116,6 +152,28 @@
   <script>
     const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    const DIFF_LEVEL = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+    const DIFF_COLOR = {
+      1: '#38a169',
+      2: '#68d391',
+      3: '#d69e2e',
+      4: '#ed8936',
+      5: '#e53e3e',
+      6: '#b91c1c',
+    };
+
+    function difficultyHTML(dayName) {
+      if (dayName === 'Sun') {
+        return '<div class="diff-sun-label">big</div>';
+      }
+      const level = DIFF_LEVEL[dayName] ?? 0;
+      const color = DIFF_COLOR[level] ?? '#9ca3af';
+      const dots = Array.from({ length: 6 }, (_, i) =>
+        `<span class="diff-dot" style="${i < level ? `background:${color}` : ''}"></span>`
+      ).join('');
+      return `<div class="diff-dots">${dots}</div>`;
+    }
 
     function formatId(id) {
       const yy = id.slice(0,2), mm = id.slice(2,4), dd = id.slice(4,6);
@@ -163,7 +221,7 @@
             const a = document.createElement('a');
             a.className = 'puzzle-card';
             a.href = `/crossword/?puzzle=${p.id}`;
-            a.innerHTML = `<span class="puzzle-date">${parseInt(p.dd,10)} ${MONTHS[parseInt(p.mm,10)-1]}</span><span class="puzzle-day">${p.dayName}</span>`;
+            a.innerHTML = `<span class="puzzle-date">${parseInt(p.dd,10)} ${MONTHS[parseInt(p.mm,10)-1]}</span><span class="puzzle-day">${p.dayName}</span>${difficultyHTML(p.dayName)}`;
             grid.appendChild(a);
           }
 

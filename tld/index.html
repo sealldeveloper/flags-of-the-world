@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country TLD Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-to-puzzles">&#8592; puzzles</a>
+        <div class="top-right-section">
+            <div class="timer" id="timer">00:00</div>
+            <button id="pause-btn" class="pause-small" title="Pause (Esc)">Pause</button>
+            <button id="give-up-btn" class="give-up-small">Give Up</button>
+        </div>
+        <div class="progress" id="progress">0/0</div>
+
+        <main>
+            <div id="game-screen" class="screen active">
+                <div class="tld-container">
+                    <div class="tld-item prev">
+                        <div class="tld-text" id="prev-tld"></div>
+                    </div>
+                    <div class="tld-item current">
+                        <div class="tld-text" id="current-tld"></div>
+                    </div>
+                    <div class="tld-item next">
+                        <div class="tld-text" id="next-tld"></div>
+                    </div>
+                </div>
+
+                <div class="hint-section">
+                    <button id="hint-btn" class="hint-btn">Show Flag Hint</button>
+                    <div id="hint-area" class="hint-area hidden">
+                        <img id="hint-flag" src="" alt="Flag hint">
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <button id="prev-btn" class="nav-btn">&#8592;</button>
+                    <input type="text" id="country-input" placeholder="Country name..." autocomplete="off" data-form-type="other" data-lpignore="true" data-1p-ignore="true" readonly onfocus="this.removeAttribute('readonly');">
+                    <button id="next-btn" class="nav-btn">&#8594;</button>
+                </div>
+
+                <div id="feedback" class="feedback"></div>
+            </div>
+
+            <div id="results-screen" class="screen">
+                <div class="results-content">
+                    <h2>Results</h2>
+                    <div class="final-stats">
+                        <div class="stat">
+                            <span class="label">Time:</span>
+                            <span id="final-time">00:00</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Correct:</span>
+                            <span id="correct-count">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Hints used:</span>
+                            <span id="hints-count">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Success:</span>
+                            <span id="success-rate">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="missed-flags">
+                        <h3>Missed <span id="missed-count"></span></h3>
+                        <div id="missed-list"></div>
+                    </div>
+
+                    <button id="play-again-btn">Play Again</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            Made by <a href="https://seall.dev" target="_blank">seall.dev</a>
+        </footer>
+    </div>
+
+    <div id="pause-overlay">
+        <div id="pause-message">PAUSED</div>
+        <div id="pause-hint">Press Escape to resume</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

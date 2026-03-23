@@ -956,14 +956,10 @@ document.addEventListener('keydown', (e) => {
             }
         }
 
-        if (!isPaused && document.activeElement !== countryInput) {
-            if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                navigateFlags('prev');
-            } else if (e.key === 'ArrowRight') {
-                e.preventDefault();
-                navigateFlags('next');
-            }
+        if (!isPaused) {
+            const canNav = document.activeElement !== countryInput || e.shiftKey;
+            if (canNav && e.key === 'ArrowLeft')  { e.preventDefault(); navigateFlags('prev'); }
+            if (canNav && e.key === 'ArrowRight') { e.preventDefault(); navigateFlags('next'); }
         }
     }
 });

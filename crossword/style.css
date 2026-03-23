@@ -417,15 +417,36 @@ select, input { font-family: inherit; }
   z-index: 2;
 }
 
-/* Circle indicator */
+/* Circle indicator — z-index above cell-letter (2) so it renders on top of all state backgrounds */
 .xw-cell.circled::after {
   content: '';
   position: absolute;
   inset: 1px;
   border-radius: 50%;
-  border: 1.5px solid #666;
+  border: 1.5px solid #555;
   pointer-events: none;
-  z-index: 0;
+  z-index: 3;
+}
+
+/* Shaded cell (^ prefix) */
+.xw-cell.shaded {
+  background: #c8c8c8;
+}
+[data-theme="dark"] .xw-cell.shaded {
+  background: #4a4a4a;
+}
+
+/* Void/hidden cell (. prefix) — transparent, non-interactive */
+.xw-cell.void {
+  background: transparent !important;
+  border-color: transparent !important;
+  pointer-events: none;
+}
+
+/* Rebus cell (, prefix) — multi-letter, smaller text */
+.xw-cell.rebus .cell-letter {
+  font-size: 0.55em;
+  letter-spacing: 0;
 }
 
 /* Selection states */
@@ -480,10 +501,61 @@ select, input { font-family: inherit; }
 .xw-cell.revealed { background: #ffd6d6; }
 .xw-cell.revealed .cell-letter { color: #111; }
 
+/* Gimmick cells keep their tint even when correct/revealed */
+.xw-cell.shaded.correct-locked { background: #a8dbb8; }
+.xw-cell.shaded.revealed       { background: #ddb8b8; }
+[data-theme="dark"] .xw-cell.shaded.correct-locked { background: #2a5c3a; }
+[data-theme="dark"] .xw-cell.shaded.revealed       { background: #5c2a2a; }
+
 /* Selected / highlights override locked colors */
 .xw-cell.word-highlight { background: var(--word-highlight) !important; }
 .xw-cell.word-highlight-cross { background: var(--word-highlight-cross) !important; }
 .xw-cell.selected { background: var(--accent-dark) !important; }
+
+/* Shaded cells in selection states — diagonal stripe blending gray + highlight color */
+.xw-cell.shaded.word-highlight {
+  background: repeating-linear-gradient(
+    -45deg,
+    #c8c8c8 0px, #c8c8c8 3px,
+    #c4e2ff 3px, #c4e2ff 6px
+  ) !important;
+}
+.xw-cell.shaded.word-highlight-cross {
+  background: repeating-linear-gradient(
+    -45deg,
+    #c8c8c8 0px, #c8c8c8 3px,
+    #dff0d8 3px, #dff0d8 6px
+  ) !important;
+}
+.xw-cell.shaded.selected {
+  background: repeating-linear-gradient(
+    -45deg,
+    #8aaccc 0px, #8aaccc 3px,
+    #1a6fd4 3px, #1a6fd4 6px
+  ) !important;
+}
+
+[data-theme="dark"] .xw-cell.shaded.word-highlight {
+  background: repeating-linear-gradient(
+    -45deg,
+    #4a4a4a 0px, #4a4a4a 3px,
+    #1e4a7a 3px, #1e4a7a 6px
+  ) !important;
+}
+[data-theme="dark"] .xw-cell.shaded.word-highlight-cross {
+  background: repeating-linear-gradient(
+    -45deg,
+    #4a4a4a 0px, #4a4a4a 3px,
+    #2d4a2d 3px, #2d4a2d 6px
+  ) !important;
+}
+[data-theme="dark"] .xw-cell.shaded.selected {
+  background: repeating-linear-gradient(
+    -45deg,
+    #4a4a4a 0px, #4a4a4a 3px,
+    #2b6cb0 3px, #2b6cb0 6px
+  ) !important;
+}
 
 /* Revealed indicator dot */
 .xw-cell.revealed::before {
@@ -499,6 +571,10 @@ select, input { font-family: inherit; }
 }
 
 /* Priority: selected > word-highlight (via JS class management) */
+
+/* Incorrect always wins over word-highlight (higher specificity, declared after) */
+.xw-cell.incorrect.word-highlight,
+.xw-cell.incorrect.word-highlight-cross { background: #fef08a !important; }
 
 /* ============================================================
    CLUE PANELS
@@ -663,40 +739,95 @@ select, input { font-family: inherit; }
    RESPONSIVE / MOBILE
    ============================================================ */
 @media (max-width: 768px) {
+  /* Make the page scrollable on mobile so grid + clues both fit */
+  html { height: auto; overflow: visible; }
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 
-  #app-header { height: auto; flex-wrap: wrap; padding: 8px 12px; gap: 8px; }
-  .header-center { order: -1; flex: 0 0 100%; text-align: left; }
-  #puzzle-title { font-size: 0.95rem; }
+  /* app-main doesn't need to fill height on mobile */
+  #app-main { flex: 0 0 auto; }
 
-  #toolbar { padding: 6px 12px; }
-  .toolbar-group { gap: 6px; }
+  /* Compact header — one row, hide title/selector */
+  #app-header {
+    height: auto;
+    min-height: 44px;
+    padding: 6px 10px;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+  .header-center { display: none; }
+  .puzzle-selector-wrap { display: none; }
+  #btn-timer-toggle { display: none; }
+  .timer-display { font-size: 0.88rem; min-width: 36px; }
+  .timer-wrap { gap: 4px; }
+  .back-link { font-size: 0.8rem; }
 
+  /* Compact toolbar — hide secondary actions */
+  #toolbar {
+    padding: 4px 8px;
+    min-height: 0;
+    gap: 6px;
+    top: var(--header-h); /* keep sticky position right */
+  }
+  .misc-group { display: none; }
+  .toolbar-label { display: none; }
+  #action-select, #scope-select { padding: 3px 5px; font-size: 0.78rem; }
+  #btn-go { padding: 4px 10px; font-size: 0.78rem; }
+  #btn-clear-incorrect { padding: 3px 6px; font-size: 0.72rem; }
+
+  /* Active clue bar */
+  #active-clue-bar { padding: 5px 10px; font-size: 0.82rem; min-height: 30px; }
+
+  /* Puzzle layout: fill naturally */
+  #puzzle-layout { flex: 0 0 auto; min-height: 0; }
+
+  /* Stack grid above clue panels */
   #puzzle-body {
     flex-direction: column;
     overflow: visible;
+    height: auto;
   }
 
-  #grid-wrap { padding: 12px; }
+  /* Grid: full width, centered, natural height */
+  #grid-wrap {
+    flex: 0 0 auto;
+    padding: 8px;
+    width: 100%;
+    overflow: visible;
+  }
 
+  /* Clue panels: stacked below grid, full width */
   #clue-panels {
-    flex-direction: row;
-    max-width: 100%;
+    flex-direction: column;
     border-left: none;
     border-top: 1px solid var(--border);
-    height: 220px;
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+    height: auto;
+    align-self: auto;
   }
 
-  .clue-panel:first-child {
-    border-bottom: none;
-    border-right: 1px solid var(--border);
-  }
+  .clue-panel:first-child { border-bottom: 1px solid var(--border); }
+  .clue-panel:nth-child(2) { border-bottom: none; }
+
+  /* Clue lists: enough height to show ~5 clues each */
+  .clue-list { height: 130px; }
 
   .clue-item { font-size: 0.78rem; padding: 4px 10px; }
+  .clue-panel-header { padding: 6px 12px; }
 
-  .puzzle-selector-wrap { display: none; }
+  /* Hide keyboard shortcuts panel on mobile */
+  #keys-panel { display: none; }
+
+  .modal-box { padding: 28px 24px; }
 }
 
 @media (max-width: 480px) {
-  .xw-cell .cell-letter { font-size: 0.85rem; }
+  .xw-cell .cell-letter { font-size: 0.82rem; }
   .xw-cell .cell-num { font-size: 7px; }
 }
