@@ -1081,11 +1081,7 @@ function advanceAfterEntry() {
         return;
       }
     }
-    // No empty cell ahead — fall back to just the next unlocked cell
-    for (let i = curIdx + 1; i < wordCells.length; i++) {
-      const { r: nr, c: nc } = wordCells[i];
-      if (!state.locked[nr][nc]) { selectCell(nr, nc); return; }
-    }
+    // No empty cell ahead — stay put
   }
 
   // At end of word — stay put

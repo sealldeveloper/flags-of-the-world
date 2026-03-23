@@ -75,16 +75,16 @@
     </div>
 
     <div class="toolbar-group misc-group">
-      <label class="toolbar-label lock-label">
-        <input type="checkbox" id="chk-lock" title="Lock correct words" checked>
+      <label class="toolbar-label lock-label" title="Automatically lock cells green when a full word is entered correctly">
+        <input type="checkbox" id="chk-lock" checked>
         Lock correct words
       </label>
-      <label class="toolbar-label lock-label">
-        <input type="checkbox" id="chk-arrow-dir" title="Cross-axis arrows change direction">
+      <label class="toolbar-label lock-label" title="When enabled, pressing a cross-axis arrow key (e.g. ← while in Down mode) switches direction and moves. When disabled, arrows only move without changing direction.">
+        <input type="checkbox" id="chk-arrow-dir">
         Arrows change dir
       </label>
-      <label class="toolbar-label lock-label">
-        <input type="checkbox" id="chk-overtype" title="Advance one cell at a time instead of skipping to next empty">
+      <label class="toolbar-label lock-label" title="When enabled, typing always advances one cell forward regardless of whether it is empty. When disabled, the cursor skips ahead to the next empty cell.">
+        <input type="checkbox" id="chk-overtype">
         Overtype
       </label>
       <button id="btn-export" class="btn-sm">Export Progress</button>
