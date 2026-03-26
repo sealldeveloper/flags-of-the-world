@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeopardy!</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:100%;height:100%;overflow:hidden;}
+  body{font-family:'Oswald',sans-serif;background:#060614;color:#fff;display:flex;flex-direction:column;}
+
+  /* ══════ SCREEN CONTAINER ══════ */
+  .screen-container{flex:1;position:relative;overflow:hidden;min-height:0;}
+  .screen{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;
+    opacity:0;transform:scale(0.95);
+    transition:opacity 0.6s cubic-bezier(.22,1,.36,1),transform 0.6s cubic-bezier(.22,1,.36,1),visibility 0s 0.6s;
+    visibility:hidden;pointer-events:none;z-index:0;
+  }
+  .screen.active{
+    opacity:1;transform:scale(1);
+    visibility:visible;pointer-events:auto;z-index:1;
+    transition:opacity 0.6s cubic-bezier(.22,1,.36,1),transform 0.6s cubic-bezier(.22,1,.36,1),visibility 0s 0s;
+  }
+
+  /* ══════ LOGO SCREEN ══════ */
+  #screen-logo{align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a1a6e 0%,#060614 70%);}
+  .logo-title{font-size:8vw;font-weight:700;color:#fff;text-shadow:0 0 60px #6a5acd,0 0 120px #4a3aad,3px 3px 0 #1a0a3e;letter-spacing:12px;text-transform:uppercase;animation:logoGlow 2s ease-in-out infinite alternate;}
+  @keyframes logoGlow{
+    from{text-shadow:0 0 40px #6a5acd,0 0 80px #4a3aad,3px 3px 0 #1a0a3e;filter:brightness(1);}
+    to{text-shadow:0 0 80px #8a7aed,0 0 160px #6a5acd,3px 3px 0 #1a0a3e;filter:brightness(1.1);}
+  }
+  .logo-buzzer-code{margin-top:40px;font-size:2vw;color:#c8a832;letter-spacing:6px;text-transform:uppercase;text-align:center;}
+  .logo-buzzer-code span{font-size:3.5vw;color:#fff;display:block;margin-top:8px;letter-spacing:12px;text-shadow:0 0 20px #c8a832;}
+
+  /* ══════ BOARD SCREEN ══════ */
+  #screen-board{padding:10px;background:linear-gradient(180deg,#0a0a2e,#060614);}
+  .board-grid{
+    flex:1;display:grid;
+    grid-template-columns:repeat(5,1fr);
+    grid-template-rows:repeat(6,1fr);
+    gap:5px;min-height:0;
+  }
+  .board-cat{
+    background:linear-gradient(180deg,#1a1a6e,#0a0a3e);
+    border:2px solid #2a2a7e;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    padding:4px 6px;font-size:clamp(14px,2.2vw,36px);font-weight:700;
+    text-transform:uppercase;letter-spacing:1px;
+    text-shadow:1px 1px 4px rgba(0,0,0,0.8);
+    overflow:hidden;word-break:break-word;
+    perspective:800px;
+  }
+  .board-cat .cat-inner{transform-style:preserve-3d;}
+  .board-cat.hidden-cat{background:linear-gradient(180deg,#1a1a3e,#0a0a1e);border-color:#1a1a3e;}
+  .board-cat.hidden-cat .cat-inner{color:#2a2a4e;}
+  .board-cat.revealing .cat-inner{animation:catReveal 0.8s cubic-bezier(.4,0,.2,1) forwards;}
+  @keyframes catReveal{
+    0%{transform:rotateX(90deg) scale(0.8);opacity:0;}
+    50%{transform:rotateX(-10deg) scale(1.05);opacity:1;}
+    100%{transform:rotateX(0deg) scale(1);opacity:1;}
+  }
+  .board-cell{
+    background:linear-gradient(180deg,#1a1a8e,#0a0a4e);
+    border:2px solid #2a2a7e;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:clamp(18px,3.5vw,64px);font-weight:700;
+    color:#c8a832;text-shadow:2px 2px 6px rgba(0,0,0,0.6);
+  }
+  .board-cell.used{
+    background:linear-gradient(180deg,#0a0a1e,#050510);border-color:#1a1a2e;color:transparent;
+    transition:background 0.5s ease,border-color 0.5s ease,color 0.3s ease;
+  }
+
+  /* ══════ CLUE SCREEN ══════ */
+  #screen-clue{align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a8e,#0a0a4e);padding:40px;text-align:center;}
+  .clue-category-label{font-size:1.8vw;color:#c8a832;letter-spacing:4px;text-transform:uppercase;margin-bottom:4px;}
+  .clue-value-label{font-size:2.5vw;color:#c8a832;margin-bottom:10px;}
+  .clue-wager-label{font-size:2vw;color:#ff8c00;margin-bottom:20px;letter-spacing:3px;}
+  .clue-question{font-size:4vw;line-height:1.3;text-shadow:2px 2px 8px rgba(0,0,0,0.5);max-width:85%;}
+  .clue-question.anim{animation:clueTextIn 0.5s cubic-bezier(.22,1,.36,1);}
+  .clue-media{max-width:70%;max-height:50vh;margin:20px auto;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .clue-media img{max-width:100%;max-height:50vh;border-radius:8px;object-fit:contain;}
+  .clue-media video{max-width:100%;max-height:50vh;border-radius:8px;object-fit:contain;background:#000;}
+  @keyframes clueTextIn{from{opacity:0;transform:scale(0.85);}to{opacity:1;transform:scale(1);}}
+  .clue-answer-text{font-size:3vw;color:#44ff44;margin-top:30px;opacity:0;transform:translateY(20px);transition:all 0.5s cubic-bezier(.22,1,.36,1);}
+  .clue-answer-text.show{opacity:1;transform:translateY(0);}
+
+  /* ══════ DAILY DOUBLE ══════ */
+  #screen-dd{overflow:hidden;background:radial-gradient(ellipse at 50% 50%,#5a1a1a 0%,#2a0808 40%,#0a0204 80%,#000 100%);}
+  .dd-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;text-align:center;}
+  .dd-text{font-size:8vw;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:10px;text-shadow:0 0 40px rgba(255,80,80,0.6),0 0 80px rgba(255,40,40,0.3);}
+  .dd-team{font-size:2.2vw;color:#ffcccc;margin-top:24px;letter-spacing:4px;text-transform:uppercase;}
+  .dd-wager{font-size:3vw;color:#ff8c00;margin-top:16px;letter-spacing:6px;text-shadow:0 0 20px #ff8c00;opacity:0;transform:translateY(20px);transition:all 0.5s ease;}
+  .dd-wager.show{opacity:1;transform:translateY(0);}
+  .dd-sparkle-layer{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
+  .dd-sparkle{position:absolute;background:radial-gradient(circle,#fff 0%,rgba(255,200,200,0.6) 40%,transparent 70%);border-radius:50%;pointer-events:none;}
+
+  /* ══════ FINAL JEOPARDY ══════ */
+  #screen-final{background:radial-gradient(ellipse at center,#1a1a6e 0%,#060614 70%);padding:20px;}
+  .final-header{text-align:center;flex-shrink:0;}
+  .final-title{font-size:5vw;font-weight:700;color:#c8a832;text-transform:uppercase;letter-spacing:8px;text-shadow:0 0 40px rgba(200,168,50,0.4);}
+  .final-category{font-size:3vw;color:#fff;margin-top:10px;letter-spacing:4px;text-transform:uppercase;text-shadow:1px 1px 6px rgba(0,0,0,0.6);}
+  .final-category.anim{animation:clueTextIn 0.6s ease;}
+  .final-question{font-size:3.5vw;color:#fff;text-align:center;line-height:1.3;margin:20px auto;max-width:85%;text-shadow:2px 2px 8px rgba(0,0,0,0.5);transition:font-size 0.4s,margin 0.4s;}
+  .final-question.anim{animation:clueTextIn 0.6s cubic-bezier(.22,1,.36,1);}
+  .final-question.shrunk{font-size:1.8vw;margin:6px auto;}
+  .final-timer{font-size:8vw;font-weight:700;color:#c8a832;text-align:center;text-shadow:0 0 30px rgba(200,168,50,0.5);margin:10px 0;font-variant-numeric:tabular-nums;}
+  .final-timer.urgent{color:#ff4444;text-shadow:0 0 30px rgba(255,50,50,0.5);}
+  .final-timer-bar{width:80%;max-width:600px;height:8px;background:#1a1a3e;border-radius:4px;margin:0 auto;overflow:hidden;}
+  .final-timer-fill{height:100%;background:linear-gradient(90deg,#c8a832,#e8d862);border-radius:4px;transition:width 1s linear;}
+  .final-timer-fill.urgent{background:linear-gradient(90deg,#ff4444,#ff6666);}
+  .final-teams{display:flex;gap:2vw;flex:1;min-height:0;justify-content:center;align-items:stretch;padding:1vh 2vw;}
+  .final-team-card{flex:1;max-width:28vw;background:linear-gradient(180deg,#1a1a4e,#0e0e2e);border:3px solid #2a2a5e;border-radius:12px;padding:2vh 2vw;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1.5vh;transition:border-color 0.4s;}
+  .final-team-card.revealed{border-color:#c8a832;}
+  .ftc-name{font-size:3.5vh;color:#c8a832;letter-spacing:0.3vw;text-transform:uppercase;font-weight:700;}
+  .ftc-divider{width:60%;height:1px;background:#2a2a5e;}
+  .ftc-label{font-size:2vh;color:#666;text-transform:uppercase;letter-spacing:2px;}
+  .ftc-wager{font-size:4.5vh;font-weight:700;color:#ff8c00;min-height:1.5em;}
+  .ftc-answer{font-size:3.5vh;color:#fff;min-height:1.5em;line-height:1.3;}
+  .ftc-hidden{color:#2a2a5e;font-style:italic;font-size:2.5vh;}
+  .ftc-result{font-size:6vh;font-weight:700;min-height:1.2em;}
+  .ftc-result.correct{color:#44ff44;}
+  .ftc-result.incorrect{color:#ff4444;}
+  .ftc-newscore{font-size:3.5vh;font-weight:700;color:#c8a832;min-height:1.2em;}
+
+  /* Final reveal animations */
+  .ftc-reveal-in{animation:ftcRevealIn 0.6s cubic-bezier(.22,1,.36,1) both;}
+  @keyframes ftcRevealIn{from{opacity:0;transform:translateY(15px) scale(0.9);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .ftc-card-pop{animation:ftcCardPop 0.5s cubic-bezier(.22,1,.36,1);}
+  @keyframes ftcCardPop{0%{transform:scale(1);}40%{transform:scale(1.04);}100%{transform:scale(1);}}
+  .ftc-result-in{animation:ftcResultIn 0.5s cubic-bezier(.22,1,.36,1) both;}
+  @keyframes ftcResultIn{from{opacity:0;transform:scale(0.3) rotate(-10deg);}to{opacity:1;transform:scale(1) rotate(0);}}
+  .ftc-score-in{animation:ftcScoreIn 0.6s cubic-bezier(.22,1,.36,1) both;}
+  @keyframes ftcScoreIn{from{opacity:0;transform:translateX(-20px);}to{opacity:1;transform:translateX(0);}}
+  .ftc-wager-in{animation:ftcWagerIn 0.5s cubic-bezier(.22,1,.36,1) both;}
+  @keyframes ftcWagerIn{from{opacity:0;transform:scale(0.5);}to{opacity:1;transform:scale(1);}}
+
+  /* ══════ WINNER ══════ */
+  .winner-label{font-size:3vw;color:#c8a832;letter-spacing:8px;text-transform:uppercase;margin-bottom:10px;text-shadow:0 0 20px rgba(200,168,50,.3);}
+  .winner-name{font-size:8vw;font-weight:700;color:#ffd700;text-shadow:0 0 60px rgba(255,215,0,.5),0 0 120px rgba(255,215,0,.2);letter-spacing:6px;animation:winnerGlow 2s ease-in-out infinite alternate;}
+  .winner-score-final{font-size:3.5vw;color:#fff;margin-top:20px;font-weight:700;}
+  @keyframes winnerGlow{from{text-shadow:0 0 40px rgba(255,215,0,.4),0 0 80px rgba(255,215,0,.15);}to{text-shadow:0 0 80px rgba(255,215,0,.6),0 0 160px rgba(255,215,0,.3);}}
+  .winner-all{display:flex;gap:20px;margin-top:40px;justify-content:center;flex-wrap:wrap;}
+  .winner-team{text-align:center;padding:10px 24px;}
+  .winner-team-name{font-size:1.4vw;color:#888;letter-spacing:2px;text-transform:uppercase;}
+  .winner-team-score{font-size:2vw;font-weight:700;color:#aaa;}
+
+  /* ══════ BLANK ══════ */
+  #screen-blank{background:#000;}
+
+  /* ══════ SCOREBOARD ══════ */
+  .scoreboard{display:flex;gap:1vw;padding:1vh 2vw;background:linear-gradient(180deg,#0e0e1e,#0a0a16);border-top:3px solid #c8a832;justify-content:center;flex-wrap:wrap;flex-shrink:0;}
+  .sb-team{background:linear-gradient(135deg,#1a1a4e,#0e0e2e);border:2px solid #2a2a5e;border-radius:8px;padding:1vh 2.5vw;text-align:center;min-width:12vw;transition:border-color 0.3s,box-shadow 0.3s;}
+  .sb-team.active{border-color:#c8a832;box-shadow:0 0 12px rgba(200,168,50,0.4);}
+  .sb-name{font-size:2vh;color:#c8a832;letter-spacing:0.2vw;text-transform:uppercase;}
+  .sb-score{font-size:3.5vh;font-weight:700;}
+  .sb-score.neg{color:#ff4444;}
+
+  /* ══════ BUZZER OVERLAYS ══════ */
+  .buzzer-top-overlay{position:fixed;top:0;left:0;right:0;pointer-events:none;z-index:100;display:flex;justify-content:center;padding-top:12px;}
+  .buzzer-badge{padding:10px 40px;border-radius:50px;font-size:1.8vw;font-weight:700;letter-spacing:4px;text-transform:uppercase;opacity:0;transform:translateY(-30px);transition:all 0.4s cubic-bezier(.22,1,.36,1);}
+  .buzzer-badge.show{opacity:1;transform:translateY(0);}
+  .buzzer-badge.open{background:linear-gradient(135deg,#1a6a1a,#0e3e0e);color:#4f4;border:2px solid #3a9a3a;box-shadow:0 0 30px rgba(50,200,50,0.3);animation:buzzerPulse 1s ease-in-out infinite;}
+  @keyframes buzzerPulse{0%,100%{box-shadow:0 0 20px rgba(50,200,50,0.2);}50%{box-shadow:0 0 40px rgba(50,200,50,0.5);}}
+
+  /* Buzz order list */
+  .buzz-order{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:150;pointer-events:none;display:flex;flex-direction:column;gap:8px;}
+  .buzz-entry{background:rgba(0,0,0,0.85);border:2px solid #3a3a6e;border-radius:10px;padding:8px 20px;display:flex;align-items:center;gap:12px;animation:buzzEntryIn 0.4s cubic-bezier(.22,1,.36,1);}
+  @keyframes buzzEntryIn{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
+  .buzz-entry:first-child{border-color:#ffd700;background:rgba(200,168,50,0.15);box-shadow:0 0 20px rgba(200,168,50,0.2);}
+  .buzz-rank{color:#c8a832;font-size:clamp(12px,1.5vw,26px);font-weight:700;min-width:30px;text-align:center;}
+  .buzz-entry:first-child .buzz-rank{color:#ffd700;}
+  .buzz-player-name{color:#fff;font-size:clamp(12px,1.4vw,24px);font-weight:700;letter-spacing:1px;}
+
+  /* Room code floating */
+  .room-code-float{position:fixed;bottom:70px;right:20px;z-index:50;pointer-events:none;text-align:right;}
+  .room-code-float .label{font-size:clamp(8px,0.7vw,12px);color:#666;letter-spacing:2px;text-transform:uppercase;}
+  .room-code-float .code{font-size:clamp(12px,1.2vw,20px);color:#c8a832;font-weight:700;letter-spacing:4px;}
+</style>
+</head>
+<body>
+
+<div class="screen-container">
+  <div class="screen active" id="screen-logo">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+      <div class="logo-title">Jeopardy!</div>
+      <div class="logo-buzzer-code" id="logo-buzzer"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-board">
+    <div class="board-grid" id="board-grid"></div>
+  </div>
+
+  <div class="screen" id="screen-clue">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+      <div class="clue-category-label" id="clue-cat"></div>
+      <div class="clue-value-label" id="clue-val"></div>
+      <div class="clue-wager-label" id="clue-wager"></div>
+      <div class="clue-media" id="clue-media"></div>
+      <div class="clue-question" id="clue-q"></div>
+      <div class="clue-answer-text" id="clue-a"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-dd">
+    <div class="dd-sparkle-layer" id="dd-sparkle-layer"></div>
+    <div class="dd-content">
+      <div class="dd-text">Daily Double!</div>
+      <div class="dd-team" id="dd-team"></div>
+      <div class="dd-wager" id="dd-wager"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-final">
+    <div class="final-header">
+      <div class="final-title">Final Jeopardy!</div>
+      <div class="final-category" id="final-cat"></div>
+    </div>
+    <div class="final-question" id="final-q" style="display:none;"></div>
+    <div class="final-timer" id="final-timer" style="display:none;"></div>
+    <div class="final-timer-bar" id="final-timer-bar" style="display:none;"><div class="final-timer-fill" id="final-timer-fill"></div></div>
+    <div class="final-teams" id="final-teams"></div>
+  </div>
+
+  <div class="screen" id="screen-winner">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#2a1a00 0%,#0a0a14 70%);">
+      <div id="winner-content" style="text-align:center;"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-blank"></div>
+</div>
+
+<div class="scoreboard" id="scoreboard"></div>
+
+<!-- Buzzer overlays -->
+<div class="buzzer-top-overlay">
+  <div class="buzzer-badge" id="buzzer-badge"></div>
+</div>
+<div class="buzz-order" id="buzz-order"></div>
+<div class="room-code-float" id="room-code-float"></div>
+
+<script>
+var state = null;
+var finalThinkMusic = new Audio('media/jeopardy-think.mp3');
+var sfx = {
+  boardFill: new Audio('media/sfx-board-fill.mp3'),
+  dailyDouble: new Audio('media/sfx-daily-double.mp3'),
+  correct: new Audio('media/sfx-correct.mp3'),
+  incorrect: new Audio('media/sfx-incorrect.mp3'),
+  timesUp: new Audio('media/sfx-times-up.mp3'),
+  clueReveal: new Audio('media/sfx-reveal-chime.mp3')
+};
+sfx.incorrect.volume = 0.4;
+function playSfx(name) {
+  var s = sfx[name]; if (!s) return;
+  s.currentTime = 0;
+  s.play().catch(function(){});
+}
+var prevState = null;
+var prevRevealedStr = '';
+var prevDisplayMode = '';
+var prevClueKey = '';
+var boardFillPlayed = {}; // track per board key so fill only plays once
+
+var channel = new BroadcastChannel('jeopardy');
+channel.onmessage = function(e) {
+  if (e.data.type === 'state') {
+    prevState = state;
+    state = e.data.data;
+    render();
+  }
+};
+channel.postMessage({type:'request_state'});
+setTimeout(function(){ if(!state) channel.postMessage({type:'request_state'}); }, 500);
+setTimeout(function(){ if(!state) channel.postMessage({type:'request_state'}); }, 2000);
+
+function render() {
+  if (!state) return;
+
+  // Handle screen transitions
+  var newMode = state.displayMode || 'logo';
+  if (newMode !== prevDisplayMode) {
+    // Clean up DD sparkles when leaving
+    if (prevDisplayMode === 'daily-double' && newMode !== 'daily-double') {
+      ddSparklesSpawned = false;
+      var layer = document.getElementById('dd-sparkle-layer');
+      while (layer.firstChild) layer.removeChild(layer.firstChild);
+    }
+    showScreen(newMode);
+
+    // SFX on screen transitions
+    if (prevDisplayMode) {
+      if (newMode === 'board') {
+        // Board fill only plays the FIRST time a board is shown
+        var bk = state.board ? state.board.name : 'default';
+        if (!boardFillPlayed[bk]) {
+          boardFillPlayed[bk] = true;
+          playSfx('boardFill');
+        }
+      }
+      if (newMode === 'clue' && prevDisplayMode !== 'clue') playSfx('clueReveal');
+      if (newMode === 'daily-double') playSfx('dailyDouble');
+    }
+
+    prevDisplayMode = newMode;
+  }
+
+  // SFX triggers from control panel
+  if (state.sfx && (!prevState || prevState.sfx !== state.sfx)) {
+    playSfx(state.sfx);
+  }
+
+  renderScoreboard();
+  renderBuzzer();
+  renderRoomCode();
+
+  switch(newMode) {
+    case 'logo': renderLogo(); break;
+    case 'board': renderBoard(); break;
+    case 'clue': renderClue(); break;
+    case 'daily-double': renderDD(); break;
+    case 'final': renderFinal(); break;
+    case 'winner': renderWinner(); break;
+  }
+}
+
+function showScreen(mode) {
+  var screens = document.querySelectorAll('.screen');
+  for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
+  var map = {'logo':'screen-logo','board':'screen-board','clue':'screen-clue','daily-double':'screen-dd','blank':'screen-blank','final':'screen-final','winner':'screen-winner'};
+  var el = document.getElementById(map[mode]);
+  if (el) el.classList.add('active');
+}
+
+/* ══════ LOGO ══════ */
+function renderLogo() {
+  var el = document.getElementById('logo-buzzer');
+  while(el.firstChild) el.removeChild(el.firstChild);
+  if (state.buzzerCode) {
+    el.textContent = 'Join at buzzin.live';
+    var code = document.createElement('span');
+    code.textContent = state.showBuzzerCode ? state.buzzerCode : state.buzzerCode.replace(/./g, 'X');
+    el.appendChild(code);
+  }
+}
+
+/* ══════ BOARD ══════ */
+function renderBoard() {
+  if (!state.board) return;
+  var grid = document.getElementById('board-grid');
+  var cats = state.board.categories;
+  var numCats = cats.length;
+  var newRevealedStr = cats.map(function(c){return c.revealed?'1':'0';}).join('');
+
+  // Detect board change by comparing category names + clue values
+  var boardKey = cats.map(function(c){return c.name+c.clues.map(function(cl){return cl.value;}).join(',');}).join('|');
+  var prevBoardKey = grid.getAttribute('data-board-key') || '';
+  var needsFullRender = grid.children.length !== numCats + (numCats * 5) || boardKey !== prevBoardKey;
+
+  if (needsFullRender) {
+    while(grid.firstChild) grid.removeChild(grid.firstChild);
+    grid.style.gridTemplateColumns = 'repeat('+numCats+',1fr)';
+    grid.style.gridTemplateRows = 'repeat(6,1fr)';
+
+    cats.forEach(function(cat) {
+      var div = document.createElement('div');
+      div.className = 'board-cat' + (cat.revealed ? '' : ' hidden-cat');
+      var inner = document.createElement('div');
+      inner.className = 'cat-inner';
+      inner.textContent = cat.revealed ? cat.name : '???';
+      div.appendChild(inner);
+      grid.appendChild(div);
+    });
+
+    for (var row = 0; row < 5; row++) {
+      for (var col = 0; col < numCats; col++) {
+        var clue = cats[col].clues[row];
+        var div = document.createElement('div');
+        div.className = 'board-cell' + (clue.used ? ' used' : '');
+        div.textContent = clue.used ? '' : ('$' + clue.value);
+        grid.appendChild(div);
+      }
+    }
+    grid.setAttribute('data-board-key', boardKey);
+    prevRevealedStr = newRevealedStr;
+    return;
+  }
+
+  var children = grid.children;
+
+  // Update category headers
+  for (var ci = 0; ci < numCats; ci++) {
+    var catEl = children[ci];
+    var wasHidden = catEl.classList.contains('hidden-cat');
+    var nowRevealed = cats[ci].revealed;
+    if (wasHidden && nowRevealed) {
+      catEl.classList.remove('hidden-cat');
+      catEl.classList.add('revealing');
+      catEl.querySelector('.cat-inner').textContent = cats[ci].name;
+      (function(el){ setTimeout(function(){ el.classList.remove('revealing'); }, 900); })(catEl);
+    } else if (!wasHidden && !nowRevealed) {
+      catEl.classList.add('hidden-cat');
+      catEl.classList.remove('revealing');
+      catEl.querySelector('.cat-inner').textContent = '???';
+    } else if (nowRevealed) {
+      catEl.querySelector('.cat-inner').textContent = cats[ci].name;
+    }
+  }
+
+  // Update cells
+  var idx = numCats;
+  for (var row = 0; row < 5; row++) {
+    for (var col = 0; col < numCats; col++) {
+      var clue = cats[col].clues[row];
+      var cell = children[idx];
+      if (clue.used && !cell.classList.contains('used')) {
+        cell.classList.add('used');
+        cell.textContent = '';
+      } else if (!clue.used && cell.classList.contains('used')) {
+        cell.classList.remove('used');
+        cell.textContent = '$' + clue.value;
+      }
+      idx++;
+    }
+  }
+  prevRevealedStr = newRevealedStr;
+}
+
+/* ══════ CLUE ══════ */
+function renderClue() {
+  if (!state.clue) return;
+  var newKey = state.clue.category + state.clue.value;
+  var isNew = newKey !== prevClueKey;
+  prevClueKey = newKey;
+
+  document.getElementById('clue-cat').textContent = state.clue.category;
+  document.getElementById('clue-val').textContent = '$' + state.clue.value;
+
+  var wagerEl = document.getElementById('clue-wager');
+  if (state.clue.wager) {
+    wagerEl.textContent = 'Wager: $' + state.clue.wager.toLocaleString();
+  } else {
+    wagerEl.textContent = '';
+  }
+
+  // Media (image/video)
+  var mediaEl = document.getElementById('clue-media');
+  var media = state.clue.media;
+  if (media && media.url) {
+    var currentSrc = mediaEl.getAttribute('data-src');
+    if (currentSrc !== media.url) {
+      while (mediaEl.firstChild) mediaEl.removeChild(mediaEl.firstChild);
+      mediaEl.setAttribute('data-src', media.url);
+      if (media.type === 'image') {
+        var img = document.createElement('img');
+        img.src = media.url;
+        img.alt = 'Clue image';
+        mediaEl.appendChild(img);
+      } else if (media.type === 'video') {
+        var vid = document.createElement('video');
+        vid.src = media.url;
+        vid.setAttribute('playsinline', '');
+        vid.volume = 1;
+        mediaEl.appendChild(vid);
+      }
+    }
+    mediaEl.style.display = '';
+    // Video play/pause control
+    if (media.type === 'video') {
+      var vidEl = mediaEl.querySelector('video');
+      if (vidEl) {
+        if (media.playing && vidEl.paused) vidEl.play().catch(function(){});
+        else if (!media.playing && !vidEl.paused) vidEl.pause();
+      }
+    }
+  } else {
+    while (mediaEl.firstChild) mediaEl.removeChild(mediaEl.firstChild);
+    mediaEl.removeAttribute('data-src');
+    mediaEl.style.display = 'none';
+  }
+
+  var qEl = document.getElementById('clue-q');
+  qEl.textContent = state.clue.question;
+  if (isNew) {
+    qEl.classList.remove('anim');
+    void qEl.offsetWidth;
+    qEl.classList.add('anim');
+  }
+
+  var ansEl = document.getElementById('clue-a');
+  ansEl.textContent = state.clue.answer;
+  if (state.clue.showAnswer) ansEl.classList.add('show');
+  else ansEl.classList.remove('show');
+}
+
+/* ══════ DAILY DOUBLE ══════ */
+var ddSparklesSpawned = false;
+function renderDD() {
+  if (!state.clue) return;
+  var teamEl = document.getElementById('dd-team');
+  var wagerEl = document.getElementById('dd-wager');
+
+  if (state.teams && state.activeTeam != null) {
+    teamEl.textContent = state.teams[state.activeTeam] ? state.teams[state.activeTeam].name : '';
+  }
+  if (state.clue.wager) {
+    wagerEl.textContent = 'Wager: $' + state.clue.wager.toLocaleString();
+    wagerEl.classList.add('show');
+  } else { wagerEl.textContent = ''; wagerEl.classList.remove('show'); }
+
+  // Sparkles — spawn into the dedicated layer
+  if (!ddSparklesSpawned) {
+    ddSparklesSpawned = true;
+    var layer = document.getElementById('dd-sparkle-layer');
+    for (var i = 0; i < 50; i++) {
+      var s = document.createElement('div');
+      s.className = 'dd-sparkle';
+      var size = Math.random() * 6 + 3;
+      s.style.width = size + 'px';
+      s.style.height = size + 'px';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      s.style.opacity = '0';
+      layer.appendChild(s);
+      (function(el, sz) {
+        var dur = 1200 + Math.random() * 2000;
+        var delay = Math.random() * 2500;
+        function twinkle() {
+          el.style.left = Math.random() * 100 + '%';
+          el.style.top = Math.random() * 100 + '%';
+          var a = el.animate([
+            {opacity: 0, transform: 'scale(0)'},
+            {opacity: 0.9, transform: 'scale(1.2)', offset: 0.4},
+            {opacity: 0.7, transform: 'scale(0.8)', offset: 0.7},
+            {opacity: 0, transform: 'scale(0)'}
+          ], {duration: dur, delay: delay, easing: 'ease-in-out'});
+          a.onfinish = function() { delay = 0; twinkle(); };
+        }
+        twinkle();
+      })(s, size);
+    }
+  }
+}
+
+/* ══════ FINAL JEOPARDY ══════ */
+function renderFinal() {
+  var f = state.final;
+  if (!f) return;
+
+  var catEl = document.getElementById('final-cat');
+  var prevCat = catEl.textContent;
+  var catText = f.categoryRevealed ? (f.category || '') : '';
+  catEl.textContent = catText;
+  if (catText && catText !== prevCat) { catEl.classList.remove('anim'); void catEl.offsetWidth; catEl.classList.add('anim'); }
+
+  var qEl = document.getElementById('final-q');
+  var timerEl = document.getElementById('final-timer');
+  var timerBar = document.getElementById('final-timer-bar');
+  var timerFill = document.getElementById('final-timer-fill');
+  var teamsEl = document.getElementById('final-teams');
+
+  // Question
+  if (f.phase === 'clue' || f.phase === 'reveal') {
+    var prevQ = qEl.textContent;
+    qEl.style.display = '';
+    qEl.textContent = f.question || '';
+    if (f.phase === 'reveal') qEl.classList.add('shrunk');
+    else qEl.classList.remove('shrunk');
+    if (f.question && f.question !== prevQ) { qEl.classList.remove('anim'); void qEl.offsetWidth; qEl.classList.add('anim'); }
+  } else {
+    qEl.style.display = 'none';
+    qEl.classList.remove('shrunk');
+  }
+
+  // Timer + think music
+  if (f.phase === 'clue') {
+    timerEl.style.display = '';
+    timerBar.style.display = '';
+    timerEl.textContent = f.timer;
+    timerEl.className = 'final-timer' + (f.timer <= 10 ? ' urgent' : '');
+    var pct = (f.timer / 30) * 100;
+    timerFill.style.width = pct + '%';
+    timerFill.className = 'final-timer-fill' + (f.timer <= 10 ? ' urgent' : '');
+    // Think music — play full song once started, don't pause on timer stop
+    if (f.timerRunning && finalThinkMusic.paused) {
+      finalThinkMusic.currentTime = 0;
+      finalThinkMusic.play().catch(function(){});
+    }
+  } else {
+    timerEl.style.display = 'none';
+    timerBar.style.display = 'none';
+  }
+
+  // Team cards (reveal phase)
+  if (f.phase === 'reveal' && f.teams) {
+    if (teamsEl.children.length !== f.teams.length) {
+      while (teamsEl.firstChild) teamsEl.removeChild(teamsEl.firstChild);
+      f.teams.forEach(function() {
+        var card = document.createElement('div');
+        card.className = 'final-team-card';
+        teamsEl.appendChild(card);
+      });
+    }
+
+    // Track previous state for animation triggers
+    var prevFinal = (prevState && prevState.final && prevState.final.phase === 'reveal') ? prevState.final : null;
+
+    f.teams.forEach(function(t, i) {
+      var card = teamsEl.children[i];
+      if (!card) return;
+      var prev = prevFinal && prevFinal.teams ? prevFinal.teams[i] : null;
+      var justRevealed = !prev || prev.answerRevealed !== t.answerRevealed || prev.wagerRevealed !== t.wagerRevealed || prev.result !== t.result;
+
+      card.className = 'final-team-card' + ((t.wagerRevealed || t.answerRevealed) ? ' revealed' : '') + (justRevealed && (t.wagerRevealed||t.answerRevealed) ? ' ftc-card-pop' : '');
+      while (card.firstChild) card.removeChild(card.firstChild);
+
+      var nm = document.createElement('div'); nm.className = 'ftc-name'; nm.textContent = t.name;
+      card.appendChild(nm);
+
+      var d1 = document.createElement('div'); d1.className = 'ftc-divider'; card.appendChild(d1);
+
+      // Answer
+      var al = document.createElement('div'); al.className = 'ftc-label'; al.textContent = 'Answer';
+      var av = document.createElement('div');
+      if (t.answerRevealed) {
+        var justAnswer = prev && !prev.answerRevealed && t.answerRevealed;
+        av.className = 'ftc-answer' + (justAnswer ? ' ftc-reveal-in' : '');
+        av.textContent = t.answer || '(blank)';
+      } else { av.className = 'ftc-hidden'; av.textContent = '???'; }
+      card.appendChild(al); card.appendChild(av);
+
+      // Result
+      var rv = document.createElement('div');
+      if (t.result === 'correct') {
+        var justResult = prev && prev.result !== 'correct';
+        rv.className = 'ftc-result correct' + (justResult ? ' ftc-result-in' : '');
+        rv.textContent = '\u2713';
+      } else if (t.result === 'incorrect') {
+        var justResult2 = prev && prev.result !== 'incorrect';
+        rv.className = 'ftc-result incorrect' + (justResult2 ? ' ftc-result-in' : '');
+        rv.textContent = '\u2717';
+      } else { rv.className = 'ftc-result'; rv.textContent = ''; }
+      card.appendChild(rv);
+
+      var d2 = document.createElement('div'); d2.className = 'ftc-divider'; card.appendChild(d2);
+
+      // Wager
+      var wl = document.createElement('div'); wl.className = 'ftc-label'; wl.textContent = 'Wager';
+      var wv = document.createElement('div');
+      if (t.wagerRevealed) {
+        var justWager = prev && !prev.wagerRevealed && t.wagerRevealed;
+        wv.className = 'ftc-wager' + (justWager ? ' ftc-wager-in' : '');
+        wv.textContent = '$' + (t.wager || 0).toLocaleString();
+      } else { wv.className = 'ftc-hidden'; wv.textContent = '???'; }
+      card.appendChild(wl); card.appendChild(wv);
+
+      // New score
+      if (t.result && t.wagerRevealed) {
+        var justScore = prev && !(prev.result && prev.wagerRevealed);
+        var ns = document.createElement('div');
+        ns.className = 'ftc-newscore' + (justScore ? ' ftc-score-in' : '');
+        var newScore = t.score + (t.result === 'correct' ? (t.wager||0) : -(t.wager||0));
+        ns.textContent = '\u2192 $' + newScore.toLocaleString();
+        card.appendChild(ns);
+      }
+    });
+    teamsEl.style.display = '';
+  } else if (f.phase === 'category') {
+    while (teamsEl.firstChild) teamsEl.removeChild(teamsEl.firstChild);
+    teamsEl.style.display = 'none';
+  } else {
+    teamsEl.style.display = 'none';
+  }
+}
+
+/* ══════ WINNER ══════ */
+function renderWinner() {
+  var el = document.getElementById('winner-content');
+  if (!state.teams || !state.teams.length) return;
+  while (el.firstChild) el.removeChild(el.firstChild);
+
+  // Find winner (highest score)
+  var maxScore = -Infinity, winnerIdx = 0;
+  state.teams.forEach(function(t, i) { if (t.score > maxScore) { maxScore = t.score; winnerIdx = i; } });
+  var winner = state.teams[winnerIdx];
+
+  var lbl = document.createElement('div'); lbl.className = 'winner-label'; lbl.textContent = 'Winner';
+  var nm = document.createElement('div'); nm.className = 'winner-name'; nm.textContent = winner.name;
+  var sc = document.createElement('div'); sc.className = 'winner-score-final'; sc.textContent = '$' + winner.score.toLocaleString();
+  el.appendChild(lbl); el.appendChild(nm); el.appendChild(sc);
+
+  // All teams sorted by score
+  var sorted = state.teams.slice().sort(function(a, b) { return b.score - a.score; });
+  var allDiv = document.createElement('div'); allDiv.className = 'winner-all';
+  sorted.forEach(function(t) {
+    var td = document.createElement('div'); td.className = 'winner-team';
+    var tn = document.createElement('div'); tn.className = 'winner-team-name'; tn.textContent = t.name;
+    var ts = document.createElement('div'); ts.className = 'winner-team-score'; ts.textContent = '$' + t.score.toLocaleString();
+    td.appendChild(tn); td.appendChild(ts); allDiv.appendChild(td);
+  });
+  el.appendChild(allDiv);
+}
+
+/* ══════ SCOREBOARD ══════ */
+function renderScoreboard() {
+  var el = document.getElementById('scoreboard');
+  var teams = state.teams;
+  if (!teams) return;
+
+  if (el.children.length !== teams.length) {
+    while(el.firstChild) el.removeChild(el.firstChild);
+    teams.forEach(function(t, i) {
+      var div = document.createElement('div');
+      div.className = 'sb-team' + (i === state.activeTeam ? ' active' : '');
+      var name = document.createElement('div');
+      name.className = 'sb-name';
+      name.textContent = t.name;
+      var score = document.createElement('div');
+      score.className = 'sb-score' + (t.score < 0 ? ' neg' : '');
+      score.textContent = '$' + t.score.toLocaleString();
+      div.appendChild(name);
+      div.appendChild(score);
+      el.appendChild(div);
+    });
+  } else {
+    for (var i = 0; i < teams.length; i++) {
+      var div = el.children[i];
+      div.className = 'sb-team' + (i === state.activeTeam ? ' active' : '');
+      var nameEl = div.querySelector('.sb-name');
+      var scoreEl = div.querySelector('.sb-score');
+      nameEl.textContent = teams[i].name;
+      scoreEl.className = 'sb-score' + (teams[i].score < 0 ? ' neg' : '');
+
+      if (prevState && prevState.teams[i] && prevState.teams[i].score !== teams[i].score) {
+        scoreEl.style.transition = 'none';
+        scoreEl.style.transform = 'scale(1.3)';
+        scoreEl.style.color = teams[i].score > prevState.teams[i].score ? '#44ff44' : '#ff4444';
+        (function(el, s){
+          setTimeout(function(){
+            el.style.transition = 'transform 0.4s ease, color 0.4s ease';
+            el.style.transform = 'scale(1)';
+            el.style.color = '';
+          }, 50);
+        })(scoreEl, teams[i].score);
+      }
+      scoreEl.textContent = '$' + teams[i].score.toLocaleString();
+    }
+  }
+}
+
+/* ══════ BUZZER ══════ */
+var prevBuzzOrder = [];
+
+function renderBuzzer() {
+  var badge = document.getElementById('buzzer-badge');
+  var orderEl = document.getElementById('buzz-order');
+
+  // Top badge
+  var buzzOrder = state.buzzerOrder || [];
+  if (buzzOrder.length > 0) {
+    badge.className = 'buzzer-badge show';
+    badge.style.background = 'linear-gradient(135deg,#6a5a1a,#3e3a0e)';
+    badge.style.color = '#ffd700';
+    badge.style.border = '2px solid #c8a832';
+    badge.style.boxShadow = '0 0 40px rgba(200,168,50,0.5)';
+    badge.style.animation = '';
+    badge.textContent = buzzOrder[0];
+  } else if (!state.buzzerLocked) {
+    badge.className = 'buzzer-badge open show';
+    badge.style.cssText = '';
+    badge.textContent = 'Buzz In!';
+  } else {
+    badge.className = 'buzzer-badge';
+    badge.style.cssText = '';
+    badge.textContent = '';
+  }
+
+  // Buzz order list — only add new entries, never rebuild existing ones
+  if (buzzOrder.length === 0 && prevBuzzOrder.length > 0) {
+    // Cleared: remove all
+    while(orderEl.firstChild) orderEl.removeChild(orderEl.firstChild);
+  } else if (buzzOrder.length > 0) {
+    // Check how many already rendered are still correct
+    var existingCount = orderEl.children.length;
+    var needsRebuild = false;
+    for (var i = 0; i < existingCount && i < buzzOrder.length; i++) {
+      var nameEl = orderEl.children[i].querySelector('.buzz-player-name');
+      if (!nameEl || nameEl.textContent !== buzzOrder[i]) { needsRebuild = true; break; }
+    }
+    if (needsRebuild) {
+      while(orderEl.firstChild) orderEl.removeChild(orderEl.firstChild);
+      existingCount = 0;
+    }
+    // Append only new entries (no animation replay on existing)
+    for (var j = existingCount; j < buzzOrder.length; j++) {
+      var entry = document.createElement('div');
+      entry.className = 'buzz-entry';
+      var rank = document.createElement('span');
+      rank.className = 'buzz-rank';
+      rank.textContent = '#' + (j+1);
+      var pname = document.createElement('span');
+      pname.className = 'buzz-player-name';
+      pname.textContent = buzzOrder[j];
+      entry.appendChild(rank);
+      entry.appendChild(pname);
+      orderEl.appendChild(entry);
+    }
+  }
+  prevBuzzOrder = buzzOrder.slice();
+}
+
+/* ══════ ROOM CODE ══════ */
+function renderRoomCode() {
+  var el = document.getElementById('room-code-float');
+  while(el.firstChild) el.removeChild(el.firstChild);
+}
+</script>
+</body>
+</html>
