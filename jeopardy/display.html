@@ -176,6 +176,13 @@
   .buzz-player-name{color:#fff;font-size:clamp(12px,1.4vw,24px);font-weight:700;letter-spacing:1px;}
 
   /* Room code floating */
+  .audio-prompt{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity 0.5s;}
+  .audio-prompt.hidden{opacity:0;pointer-events:none;}
+  .audio-prompt-box{text-align:center;color:#fff;font-family:'Oswald',sans-serif;}
+  .audio-prompt-box .icon{font-size:8vw;margin-bottom:20px;}
+  .audio-prompt-box .msg{font-size:2.5vw;letter-spacing:3px;text-transform:uppercase;color:#c8a832;}
+  .audio-prompt-box .sub{font-size:1.2vw;color:#888;margin-top:10px;}
+
   .room-code-float{position:fixed;bottom:70px;right:20px;z-index:50;pointer-events:none;text-align:right;}
   .room-code-float .label{font-size:clamp(8px,0.7vw,12px);color:#666;letter-spacing:2px;text-transform:uppercase;}
   .room-code-float .code{font-size:clamp(12px,1.2vw,20px);color:#c8a832;font-weight:700;letter-spacing:4px;}
@@ -244,6 +251,14 @@
 <div class="buzz-order" id="buzz-order"></div>
 <div class="room-code-float" id="room-code-float"></div>
 
+<div class="audio-prompt" id="audio-prompt">
+  <div class="audio-prompt-box">
+    <div class="icon">&#x1F50A;</div>
+    <div class="msg">Click anywhere to enable sound</div>
+    <div class="sub">Sound effects and music require user interaction</div>
+  </div>
+</div>
+
 <script>
 var state = null;
 var finalThinkMusic = new Audio('media/jeopardy-think.mp3');
@@ -256,7 +271,22 @@ var sfx = {
   clueReveal: new Audio('media/sfx-reveal-chime.mp3')
 };
 sfx.incorrect.volume = 0.4;
+var audioUnlocked = false;
+document.getElementById('audio-prompt').addEventListener('click', function() {
+  audioUnlocked = true;
+  this.classList.add('hidden');
+  // Play a silent buffer to unlock audio context
+  var ctx = new (window.AudioContext || window.webkitAudioContext)();
+  var buf = ctx.createBuffer(1, 1, 22050);
+  var src = ctx.createBufferSource();
+  src.buffer = buf; src.connect(ctx.destination); src.start(0);
+  // Notify control panel
+  channel.postMessage({type:'audio_unlocked'});
+});
 function playSfx(name) {
+  if (!audioUnlocked) return;
+  // Check if this SFX is enabled (controlled from control panel)
+  if (state && state.sfxEnabled && state.sfxEnabled[name] === false) return;
   var s = sfx[name]; if (!s) return;
   s.currentTime = 0;
   s.play().catch(function(){});
@@ -587,7 +617,8 @@ function renderFinal() {
     timerFill.style.width = pct + '%';
     timerFill.className = 'final-timer-fill' + (f.timer <= 10 ? ' urgent' : '');
     // Think music — play full song once started, don't pause on timer stop
-    if (f.timerRunning && finalThinkMusic.paused) {
+    var thinkEnabled = !state.sfxEnabled || state.sfxEnabled.thinkMusic !== false;
+    if (audioUnlocked && thinkEnabled && f.timerRunning && finalThinkMusic.paused) {
       finalThinkMusic.currentTime = 0;
       finalThinkMusic.play().catch(function(){});
     }

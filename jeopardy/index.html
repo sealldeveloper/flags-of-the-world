@@ -131,6 +131,16 @@
 
   .import-area{width:100%;min-height:120px;font-family:monospace;font-size:.75rem;}
 
+  .sfx-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #2a2a3e;}
+  .sfx-row:last-child{border-bottom:none;}
+  .sfx-label{font-size:.8rem;color:#ccc;}
+  .sfx-toggle{position:relative;width:40px;height:22px;cursor:pointer;}
+  .sfx-toggle input{display:none;}
+  .sfx-toggle .slider{position:absolute;inset:0;background:#4a2a2a;border-radius:11px;transition:background .2s;}
+  .sfx-toggle .slider::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#f66;border-radius:50%;transition:transform .2s,background .2s;}
+  .sfx-toggle input:checked+.slider{background:#1a4a1a;}
+  .sfx-toggle input:checked+.slider::before{transform:translateX(18px);background:#6f6;}
+
   .final-team-ctrl{background:#1e1e32;border:1px solid #2a2a4e;border-radius:6px;padding:12px;margin-bottom:8px;}
   .final-team-ctrl h4{color:#c8a832;font-size:.8rem;margin-bottom:8px;}
   .final-team-ctrl .frow{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
@@ -202,6 +212,10 @@
           <button class="btn btn-gray btn-sm" onclick="switchBoard(Math.min(setup.boards.length-1,game.currentBoard+1))">&rarr;</button>
         </div>
       </div>
+      <div class="section" id="sfx-section">
+        <h2 style="cursor:pointer;" onclick="var b=document.getElementById('sfx-controls');b.style.display=b.style.display==='none'?'':'none';">Sound Effects <span id="sfx-audio-status" style="font-size:.65rem;font-weight:400;"></span></h2>
+        <div id="sfx-controls" style="display:none;"></div>
+      </div>
       <div class="section"><h2>Reveal Categories</h2>
         <div class="reveal-btns" id="reveal-btns"></div>
         <div class="btn-group" style="margin-top:8px;"><button class="btn btn-gold btn-sm" onclick="revealNextCategory()">Reveal Next</button><button class="btn btn-gray btn-sm" onclick="revealAllCategories()">Reveal All</button><button class="btn btn-gray btn-sm" onclick="hideAllCategories()">Hide All</button></div>
@@ -270,6 +284,7 @@ function makeDefaultGame(s) {
     buzzerLocked:true, buzzerOrder:[],
     clueResults:null, // {0:'correct', 1:'incorrect', 2:null} per team index
     mediaPlaying:false,
+    sfxEnabled:{boardFill:true,dailyDouble:true,correct:true,incorrect:true,clueReveal:true,thinkMusic:true},
     showBuzzerCode:false
   };
 }
@@ -300,7 +315,10 @@ function saveState() {
    BROADCAST
    ═══════════════════════════════════════════════ */
 var channel = new BroadcastChannel('jeopardy');
-channel.onmessage = function(e){ if(e.data.type==='request_state') broadcast(); };
+channel.onmessage = function(e){
+  if(e.data.type==='request_state') broadcast();
+  if(e.data.type==='audio_unlocked'){displayAudioUnlocked=true;renderSfxControls();}
+};
 
 function broadcast() {
   channel.postMessage({type:'state', data:buildDisplayState()});
@@ -349,6 +367,7 @@ function buildDisplayState() {
     } : null,
     clue: clueData,
     sfx: game._sfx || null,
+    sfxEnabled: game.sfxEnabled || {},
     final: game.final ? {
       phase: game.final.phase,
       categoryRevealed: !!game.final.categoryRevealed,
@@ -1410,7 +1429,36 @@ function renderFinalSetup(){
 function renderGameTab(){
   renderDisplayModes();renderBoardSelect();
   var s=document.getElementById('game-board-select');if(s)s.value=game.currentBoard;
-  renderRevealButtons();renderMiniBoard();renderCluePanel();renderFinalPanel();renderBuzzerUI();renderScoreControls();
+  renderRevealButtons();renderMiniBoard();renderCluePanel();renderFinalPanel();renderBuzzerUI();renderScoreControls();renderSfxControls();
+}
+
+var displayAudioUnlocked=false;
+
+function renderSfxControls(){
+  if(!game.sfxEnabled) game.sfxEnabled={boardFill:true,dailyDouble:true,correct:true,incorrect:true,clueReveal:true,thinkMusic:true};
+  var el=document.getElementById('sfx-controls');if(!el) return;
+  var status=document.getElementById('sfx-audio-status');
+  if(status) status.textContent=displayAudioUnlocked?' \u2014 \u2705 Display audio active':' \u2014 \u26A0 Click display to enable audio';
+  while(el.firstChild) el.removeChild(el.firstChild);
+  var items=[
+    {key:'boardFill',label:'Board Fill'},
+    {key:'clueReveal',label:'Entering Question'},
+    {key:'dailyDouble',label:'Daily Double'},
+    {key:'correct',label:'Correct Answer'},
+    {key:'incorrect',label:'Incorrect Answer'},
+    {key:'thinkMusic',label:'Final Jeopardy Music'}
+  ];
+  items.forEach(function(item){
+    var row=document.createElement('div');row.className='sfx-row';
+    var lbl=document.createElement('span');lbl.className='sfx-label';lbl.textContent=item.label;
+    var toggle=document.createElement('label');toggle.className='sfx-toggle';
+    var inp=document.createElement('input');inp.type='checkbox';inp.checked=game.sfxEnabled[item.key]!==false;
+    inp.addEventListener('change',function(){game.sfxEnabled[item.key]=this.checked;saveState();broadcast();});
+    var slider=document.createElement('span');slider.className='slider';
+    toggle.appendChild(inp);toggle.appendChild(slider);
+    row.appendChild(lbl);row.appendChild(toggle);
+    el.appendChild(row);
+  });
 }
 
 /* ═══════════════════════════════════════════════
