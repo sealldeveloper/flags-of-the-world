@@ -169,8 +169,11 @@
         <div id="buzzer-setup-info"></div>
       </div>
       <div class="section"><h2>Import / Export</h2>
-        <div class="btn-group" style="margin-bottom:10px;"><button class="btn btn-gray btn-sm" onclick="exportSetup()">Export JSON</button><button class="btn btn-gray btn-sm" onclick="importSetup()">Import JSON</button></div>
-        <textarea class="import-area" id="import-area" placeholder="Paste JSON here to import, or click Export to populate..."></textarea>
+        <div class="btn-group">
+          <button class="btn btn-gray btn-sm" onclick="exportSetup()">Export JSON</button>
+          <button class="btn btn-gray btn-sm" onclick="document.getElementById('import-file').click()">Import JSON</button>
+          <input type="file" id="import-file" accept=".json" style="display:none" onchange="importSetup(this)">
+        </div>
       </div>
     </div>
     <div class="col">
@@ -179,7 +182,7 @@
         <div id="board-editor"></div>
       </div>
       <div class="section">
-        <h2 style="cursor:pointer;" onclick="var b=document.getElementById('final-setup-editor');b.style.display=b.style.display==='none'?'':'none';this.querySelector('span').textContent=b.style.display==='none'?'\u25B6':'\u25BC';">Final Jeopardy <span style="font-size:.7rem;color:#888;">\u25B6</span></h2>
+        <h2 style="cursor:pointer;" onclick="var b=document.getElementById('final-setup-editor');b.style.display=b.style.display==='none'?'':'none';this.querySelector('span').textContent=b.style.display==='none'?'&#x25B6;':'&#x25BC;';">Final Jeopardy <span style="font-size:.7rem;color:#888;">&#x25B6;</span></h2>
         <div id="final-setup-editor" style="display:none;"></div>
       </div>
     </div>
@@ -504,13 +507,29 @@ function renderBoardEditor(){
 /* ═══════════════════════════════════════════════
    IMPORT / EXPORT
    ═══════════════════════════════════════════════ */
-function exportSetup(){document.getElementById('import-area').value=JSON.stringify(setup,null,2);}
-function importSetup(){
-  try{
-    var d=JSON.parse(document.getElementById('import-area').value);
-    if(d.teams&&d.boards){setup=d;game=makeDefaultGame(setup);saveState();renderSetupTab();}
-    else alert('Invalid format.');
-  }catch(e){alert('Invalid JSON: '+e.message);}
+function exportSetup(){
+  var name=prompt('File name:','jeopardy-setup');
+  if(!name) return;
+  var blob=new Blob([JSON.stringify(setup,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name.replace(/\.json$/,'')+'.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importSetup(input){
+  var file=input.files[0];
+  if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(){
+    try{
+      var d=JSON.parse(reader.result);
+      if(d.teams&&d.boards){setup=d;game=makeDefaultGame(setup);saveState();renderSetupTab();alert('Imported: '+file.name);}
+      else alert('Invalid format. Must have "teams" and "boards".');
+    }catch(e){alert('Invalid JSON: '+e.message);}
+  };
+  reader.readAsText(file);
+  input.value='';
 }
 
 /* ═══════════════════════════════════════════════
