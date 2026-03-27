@@ -200,6 +200,7 @@ select, input { font-family: inherit; }
   transition: background 0.15s;
 }
 .btn-sm:hover { background: var(--card-hover); }
+.btn-sm.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 .btn-sm.btn-danger { background: #dc2626; color: #fff; border-color: #b91c1c; }
 .btn-sm.btn-danger:hover { background: #b91c1c; }
 .btn-icon { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; }

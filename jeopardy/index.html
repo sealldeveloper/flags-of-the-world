@@ -213,7 +213,7 @@
         </div>
       </div>
       <div class="section" id="sfx-section">
-        <h2 style="cursor:pointer;" onclick="var b=document.getElementById('sfx-controls');b.style.display=b.style.display==='none'?'':'none';">Sound Effects <span id="sfx-audio-status" style="font-size:.65rem;font-weight:400;"></span></h2>
+        <h2 style="cursor:pointer;" onclick="var b=document.getElementById('sfx-controls');b.style.display=b.style.display==='none'?'':'none';this.querySelector('.toggle-arrow').textContent=b.style.display==='none'?'\u25B6':'\u25BC';">Sound Effects <span class="toggle-arrow" style="font-size:.7rem;color:#888;">\u25B6</span> <span id="sfx-audio-status" style="font-size:.65rem;font-weight:400;"></span></h2>
         <div id="sfx-controls" style="display:none;"></div>
       </div>
       <div class="section"><h2>Reveal Categories</h2>

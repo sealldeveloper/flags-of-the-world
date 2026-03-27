@@ -45,6 +45,7 @@ const state = {
   lockMode:    true,
   arrowDir:    false,     // cross-axis arrows change direction
   overtype:    false,     // advance one cell at a time instead of skipping to next empty
+  rebusMode:   false,     // when true, accumulate letters in rebus cells
 
   // Undo/redo history
   history:     [],   // array of { userGrid, revealed, locked, incorrect }
@@ -85,6 +86,7 @@ const dom = {
   btnExport:       $('btn-export'),
   btnImport:       $('btn-import'),
   btnUndo:         $('btn-undo'),
+  btnRebus:        $('rebus-btn'),
   loadingOverlay:  $('loading-overlay'),
   loadingMsg:      $('loading-msg'),
   errorOverlay:    $('error-overlay'),
@@ -623,7 +625,7 @@ function renderGrid() {
         // Circle / shaded / rebus gimmicks
         if (state.circles[r]?.[c]) cell.classList.add('circled');
         if (state.shaded[r]?.[c])  cell.classList.add('shaded');
-        if (isRebus(r, c))         cell.classList.add('rebus');
+        // rebus class is toggled dynamically in updateCellVisual based on actual content
 
         // Capture r/c in closure
         cell.addEventListener('click', ((row, col) => () => onCellClick(row, col))(r, c));
@@ -655,7 +657,13 @@ function updateCellVisual(r, c) {
 
   // Letter
   const letterEl = el.querySelector('.cell-letter');
-  if (letterEl) letterEl.textContent = state.userGrid[r][c] || '';
+  const text = state.userGrid[r][c] || '';
+  if (letterEl) letterEl.textContent = text;
+
+  // Dynamic font sizing: shrink only when multiple chars are actually displayed
+  if (isRebus(r, c)) {
+    el.classList.toggle('rebus', text.length > 1);
+  }
 
   // State classes (order matters — later classes override)
   el.classList.remove('incorrect', 'correct-locked', 'revealed', 'word-highlight', 'selected');
@@ -885,6 +893,19 @@ function toggleDirection() {
   }
 }
 
+function toggleRebusMode() {
+  state.rebusMode = !state.rebusMode;
+  updateRebusButton();
+}
+
+function updateRebusButton() {
+  const btn = document.getElementById('rebus-btn');
+  if (btn) {
+    btn.classList.toggle('active', state.rebusMode);
+    btn.textContent = state.rebusMode ? 'Rebus ON' : 'Rebus';
+  }
+}
+
 document.addEventListener('keydown', onKeyDown);
 
 function onKeyDown(e) {
@@ -904,6 +925,13 @@ function onKeyDown(e) {
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
     e.preventDefault();
     if (e.shiftKey) doRedo(); else doUndo();
+    return;
+  }
+
+  // Insert: toggle rebus mode
+  if (e.key === 'Insert') {
+    e.preventDefault();
+    toggleRebusMode();
     return;
   }
 
@@ -1036,17 +1064,20 @@ function handleLetterKey(letter) {
 
   pushHistory();
 
-  if (isRebus(r, c)) {
+  if (isRebus(r, c) && state.rebusMode) {
+    // Rebus mode: accumulate letters, advance when full
     const rebusLen = state.solution[r][c].length;
     const current  = state.userGrid[r][c];
-    // Append letter; if already full, restart from this letter
     state.userGrid[r][c] = current.length >= rebusLen ? letter : current + letter;
     state.incorrect[r][c] = false;
     updateCellVisual(r, c);
     const el = getCellEl(r, c);
     if (el) el.classList.add('selected');
-    // Only advance once the rebus entry is fully typed
-    if (state.userGrid[r][c].length === rebusLen) advanceAfterEntry();
+    if (state.userGrid[r][c].length === rebusLen) {
+      state.rebusMode = false;
+      updateRebusButton();
+      advanceAfterEntry();
+    }
   } else {
     state.userGrid[r][c]  = letter;
     state.incorrect[r][c] = false;
@@ -1357,8 +1388,25 @@ function doReveal(scope) {
     state.revealed[r][c]  = true;
     state.incorrect[r][c] = false;
   }
-  checkLockWords(cells);
+  // For 'word' scope, only lock the current word, not crossing words
+  if (scope === 'word') {
+    checkLockCurrentWordOnly(cells);
+  } else {
+    checkLockWords(cells);
+  }
   fullRedraw();
+}
+
+function checkLockCurrentWordOnly(cells) {
+  if (!state.lockMode) return;
+  if (cells.length === 0) return;
+  const allCorrect = cells.every(({ r, c }) => state.userGrid[r][c] === state.solution[r][c]);
+  if (allCorrect) {
+    for (const { r, c } of cells) {
+      state.locked[r][c] = true;
+      state.incorrect[r][c] = false;
+    }
+  }
 }
 
 function checkLockWord() {
@@ -1712,14 +1760,7 @@ dom.chkLock.addEventListener('change', () => {
   state.lockMode = dom.chkLock.checked;
   localStorage.setItem('xw-lock-mode', state.lockMode ? '1' : '0');
   pushHistory();
-  if (state.lockMode) {
-    // Lock any already-correct words
-    const allCells = [];
-    for (let r = 0; r < state.height; r++)
-      for (let c = 0; c < state.width; c++)
-        if (!isBlack(r, c)) allCells.push({ r, c });
-    checkLockWords(allCells);
-  } else {
+  if (!state.lockMode) {
     // Unlock everything and clear all highlights
     for (let r = 0; r < state.height; r++)
       for (let c = 0; c < state.width; c++) {
@@ -1727,6 +1768,7 @@ dom.chkLock.addEventListener('change', () => {
         state.incorrect[r][c] = false;
       }
   }
+  // When enabled, don't retroactively lock — only future checks/reveals will lock
   fullRedraw();
 });
 
@@ -1798,6 +1840,7 @@ dom.btnClearIncorrect.addEventListener('click', () => {
 
 // Undo
 dom.btnUndo.addEventListener('click', doUndo);
+if (dom.btnRebus) dom.btnRebus.addEventListener('click', toggleRebusMode);
 
 // Modal close
 dom.modalClose.addEventListener('click', closeModal);
