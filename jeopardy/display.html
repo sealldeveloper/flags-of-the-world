@@ -84,6 +84,7 @@
   .clue-media{max-width:70%;max-height:50vh;margin:20px auto;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
   .clue-media img{max-width:100%;max-height:50vh;border-radius:8px;object-fit:contain;}
   .clue-media video{max-width:100%;max-height:50vh;border-radius:8px;object-fit:contain;background:#000;}
+  .clue-media iframe{width:60vw;height:34vw;max-height:50vh;border:none;border-radius:8px;}
   @keyframes clueTextIn{from{opacity:0;transform:scale(0.85);}to{opacity:1;transform:scale(1);}}
   .clue-answer-text{font-size:3vw;color:#44ff44;margin-top:30px;opacity:0;transform:translateY(20px);transition:all 0.5s cubic-bezier(.22,1,.36,1);}
   .clue-answer-text.show{opacity:1;transform:translateY(0);}
@@ -261,6 +262,11 @@
 
 <script>
 var state = null;
+function extractYouTubeId(url) {
+  if (!url) return null;
+  var m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
 var finalThinkMusic = new Audio('media/jeopardy-think.mp3');
 var sfx = {
   boardFill: new Audio('media/sfx-board-fill.mp3'),
@@ -478,15 +484,23 @@ function renderClue() {
     wagerEl.textContent = '';
   }
 
-  // Media (image/video)
+  // Media (image/video/youtube)
   var mediaEl = document.getElementById('clue-media');
   var media = state.clue.media;
   if (media && media.url) {
     var currentSrc = mediaEl.getAttribute('data-src');
+    var ytId = extractYouTubeId(media.url);
     if (currentSrc !== media.url) {
       while (mediaEl.firstChild) mediaEl.removeChild(mediaEl.firstChild);
       mediaEl.setAttribute('data-src', media.url);
-      if (media.type === 'image') {
+      if (ytId) {
+        var iframe = document.createElement('iframe');
+        iframe.src = 'https://www.youtube.com/embed/' + ytId + '?enablejsapi=1&rel=0&modestbranding=1';
+        iframe.setAttribute('allow', 'autoplay; encrypted-media');
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.id = 'yt-player';
+        mediaEl.appendChild(iframe);
+      } else if (media.type === 'image') {
         var img = document.createElement('img');
         img.src = media.url;
         img.alt = 'Clue image';
@@ -500,8 +514,8 @@ function renderClue() {
       }
     }
     mediaEl.style.display = '';
-    // Video play/pause control
-    if (media.type === 'video') {
+    // Video play/pause control (local video only — YouTube controlled via iframe API)
+    if (media.type === 'video' && !ytId) {
       var vidEl = mediaEl.querySelector('video');
       if (vidEl) {
         if (media.playing && vidEl.paused) vidEl.play().catch(function(){});

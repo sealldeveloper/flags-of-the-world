@@ -1327,7 +1327,7 @@ function doCheck(scope) {
     if (cells.some(({ r, c }) => !state.userGrid[r][c])) return; // incomplete word, do nothing
     const correct = cells.every(({ r, c }) => state.userGrid[r][c] === state.solution[r][c]);
     flashActiveClueBar(correct);
-    if (correct && state.lockMode) { pushHistory(); checkLockWords(cells); fullRedraw(); }
+    if (correct && state.lockMode) { pushHistory(); checkLockCurrentWordOnly(cells); fullRedraw(); }
     return;
   }
 
@@ -1375,7 +1375,8 @@ function doPartialCheck(scope) {
       state.incorrect[r][c] = true;
     }
   }
-  checkLockWords(cells);
+  if (scope === 'word') checkLockCurrentWordOnly(cells);
+  else checkLockWords(cells);
   fullRedraw();
 }
 
@@ -1410,10 +1411,10 @@ function checkLockCurrentWordOnly(cells) {
 }
 
 function checkLockWord() {
-  // Check only the current word
+  // Check only the current word — not crossing words
   if (!state.lockMode) return;
   const cells = getCurrentWordCells();
-  checkLockWords(cells);
+  checkLockCurrentWordOnly(cells);
 }
 
 function checkLockWords(cells) {
