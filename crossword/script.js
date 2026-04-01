@@ -1,6 +1,9 @@
 /**
- * NYT Syndicated Crossword Puzzle Web App
+ * Crossword Puzzle Web App
  * seall.dev — vanilla JS, no frameworks
+ *
+ * Supports pluggable sources via window.XW_SOURCE adapter:
+ *   { loadPuzzleList, loadPuzzle, formatPuzzleId, storagePrefix }
  */
 
 'use strict';
@@ -8,6 +11,7 @@
 // ============================================================
 // CONSTANTS & CONFIG
 // ============================================================
+const SRC = window.XW_SOURCE || null;   // source adapter (null = default Seattle Times proxy)
 const BASE_URL = 'https://nyt-crossword-proxy.my-account-306.workers.dev';
 
 // ============================================================
@@ -21,6 +25,7 @@ const state = {
   width:       0,
   height:      0,
   solution:    [],   // 2D array [row][col] — letter/string or '#'
+  altAnswers:  {},   // "r,c" -> [valid alternatives] (for moreAnswers cells)
   circles:     [],   // 2D array [row][col] — true/false
   shaded:      [],   // 2D array [row][col] — true/false (darker background)
   hidden:      [],   // 2D array [row][col] — true/false (void/transparent cell)
@@ -128,6 +133,14 @@ function isRebus(r, c) {
   return (state.solution[r]?.[c]?.length ?? 0) > 1;
 }
 
+// Check if user entry matches any valid answer for cell
+function isCellCorrect(r, c) {
+  const entered = state.userGrid[r][c];
+  if (entered === state.solution[r][c]) return true;
+  const alts = state.altAnswers[cellKey(r, c)];
+  return alts ? alts.includes(entered) : false;
+}
+
 function inBounds(r, c) {
   return r >= 0 && r < state.height && c >= 0 && c < state.width;
 }
@@ -202,6 +215,13 @@ async function loadManifest() {
 }
 
 async function loadPuzzleList() {
+  if (SRC?.loadPuzzleList) {
+    const all = await SRC.loadPuzzleList();
+    state.puzzleList  = all;
+    state.archivedIds = new Set();
+    return all;
+  }
+
   const [liveRaw, archived] = await Promise.allSettled([
     fetchText(`${BASE_URL}?date=list&get=archivecurrent`),
     loadManifest(),
@@ -223,7 +243,12 @@ async function loadPuzzleList() {
 
 function populatePuzzleSelector(ids) {
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  dom.puzzleSelect.innerHTML = '';
+  while (dom.puzzleSelect.firstChild) dom.puzzleSelect.removeChild(dom.puzzleSelect.firstChild);
+
+  if (SRC?.populateSelector) {
+    SRC.populateSelector(dom.puzzleSelect, ids);
+    return;
+  }
 
   let group = null;
   let groupKey = null;
@@ -253,6 +278,7 @@ function populatePuzzleSelector(ids) {
 }
 
 function formatPuzzleId(id) {
+  if (SRC?.formatPuzzleId) return SRC.formatPuzzleId(id);
   // id like "260318" = year 26, month 03, day 18
   if (id.length === 6) {
     const yy = id.slice(0, 2);
@@ -478,17 +504,24 @@ async function loadPuzzle(id) {
   winShown = false;
 
   try {
-    let raw;
-    if (state.archivedIds.has(String(id))) {
-      // Serve from local archive (same-origin, no proxy needed)
-      const res = await fetch(localPuzzlePath(id));
-      if (!res.ok) throw new Error(`Local fetch failed: ${res.status}`);
-      const buf = await res.arrayBuffer();
-      raw = new TextDecoder('iso-8859-1').decode(buf);
+    let data;
+    if (SRC?.loadPuzzle) {
+      data = await SRC.loadPuzzle(id);
     } else {
-      raw = await fetchText(`${BASE_URL}?date=${id}`);
+      let raw;
+      if (state.archivedIds.has(String(id))) {
+        const res = await fetch(localPuzzlePath(id));
+        if (!res.ok) throw new Error(`Local fetch failed: ${res.status}`);
+        const buf = await res.arrayBuffer();
+        raw = new TextDecoder('iso-8859-1').decode(buf);
+      } else {
+        raw = await fetchText(`${BASE_URL}?date=${id}`);
+      }
+      data = parsePuzzle(raw);
     }
-    const data  = parsePuzzle(raw);
+    // Use the requested ID (selector date) as puzzleId, not the internal ARCHIVE ID,
+    // so export/import and progress storage use the same ID the proxy expects.
+    data.puzzleId = String(id);
     const saved = loadProgressFromStorage(data.puzzleId);
     initPuzzleFromData(data, saved);
   } catch (err) {
@@ -512,6 +545,7 @@ function initPuzzleFromData(data, savedProgress = null) {
   state.width       = width;
   state.height      = height;
   state.solution    = solution;
+  state.altAnswers  = data.altAnswers ?? {};
   state.circles     = circles;
   state.shaded      = shaded  ?? Array.from({ length: height }, () => Array(width).fill(false));
   state.hidden      = hidden  ?? Array.from({ length: height }, () => Array(width).fill(false));
@@ -581,6 +615,14 @@ function initPuzzleFromData(data, savedProgress = null) {
   if (state.puzzleList.includes(String(puzzleId))) {
     dom.puzzleSelect.value = String(puzzleId);
   }
+  // Sync date picker if present
+  const dp = document.getElementById('puzzle-date');
+  if (dp && /^\d{4}-\d{2}-\d{2}$/.test(puzzleId)) dp.value = puzzleId;
+
+  // Persist puzzle ID in URL query param (preserve any existing hash)
+  const url = new URL(window.location);
+  url.searchParams.set('puzzle', puzzleId);
+  history.replaceState(null, '', url);
 }
 
 // ============================================================
@@ -592,6 +634,8 @@ let cellEls = [];
 
 function renderGrid() {
   const grid = dom.grid;
+  // Reset cell size before re-rendering so old grid doesn't inflate layout measurements
+  document.documentElement.style.setProperty('--cell-size', '10px');
   grid.innerHTML = '';
   grid.style.gridTemplateColumns = `repeat(${state.width}, var(--cell-size))`;
   grid.style.gridTemplateRows    = `repeat(${state.height}, var(--cell-size))`;
@@ -1224,7 +1268,7 @@ function getCurrentWordIndex() {
 function isWordComplete(num, dir) {
   const map = dir === 'across' ? state.acrossMap : state.downMap;
   const cells = map[num] ?? [];
-  return cells.length > 0 && cells.every(({ r, c }) => state.userGrid[r][c] === state.solution[r][c]);
+  return cells.length > 0 && cells.every(({ r, c }) => isCellCorrect(r, c));
 }
 
 function isWordLocked(num, dir) {
@@ -1323,7 +1367,7 @@ function doCheck(scope) {
   if (scope === 'word') {
     // Flash bar green/red — no cell highlighting. Requires full word to be filled.
     if (cells.some(({ r, c }) => !state.userGrid[r][c])) return; // incomplete word, do nothing
-    const correct = cells.every(({ r, c }) => state.userGrid[r][c] === state.solution[r][c]);
+    const correct = cells.every(({ r, c }) => isCellCorrect(r, c));
     flashActiveClueBar(correct);
     if (correct && state.lockMode) { pushHistory(); checkLockCurrentWordOnly(cells); fullRedraw(); }
     return;
@@ -1340,7 +1384,7 @@ function doCheck(scope) {
     const wordCells = map[num] ?? [];
     if (wordCells.length === 0) continue;
     const allFilled  = wordCells.every(({ r, c }) => state.userGrid[r][c] !== '');
-    const allCorrect = wordCells.every(({ r, c }) => state.userGrid[r][c] === state.solution[r][c]);
+    const allCorrect = wordCells.every(({ r, c }) => isCellCorrect(r, c));
     if (allFilled && allCorrect && state.lockMode) {
       for (const { r, c } of wordCells) {
         state.locked[r][c]    = true;
@@ -1399,7 +1443,7 @@ function doReveal(scope) {
 function checkLockCurrentWordOnly(cells) {
   if (!state.lockMode) return;
   if (cells.length === 0) return;
-  const allCorrect = cells.every(({ r, c }) => state.userGrid[r][c] === state.solution[r][c]);
+  const allCorrect = cells.every(({ r, c }) => isCellCorrect(r, c));
   if (allCorrect) {
     for (const { r, c } of cells) {
       state.locked[r][c] = true;
@@ -1431,7 +1475,7 @@ function checkLockWords(cells) {
     const map = dir === 'across' ? state.acrossMap : state.downMap;
     const wordCells = map[num] ?? [];
     if (wordCells.length === 0) continue;
-    const allCorrect = wordCells.every(({ r, c }) => state.userGrid[r][c] === state.solution[r][c]);
+    const allCorrect = wordCells.every(({ r, c }) => isCellCorrect(r, c));
     if (allCorrect) {
       for (const { r, c } of wordCells) {
         state.locked[r][c] = true;
@@ -1483,7 +1527,7 @@ function doRedo() {
 // ============================================================
 // PERSIST TO LOCAL STORAGE
 // ============================================================
-function storageKey(id) { return `xw-progress-${id}`; }
+function storageKey(id) { return `${SRC?.storagePrefix ?? 'xw'}-progress-${id}`; }
 
 function saveProgressToStorage() {
   if (!state.puzzleId) return;
@@ -1514,16 +1558,16 @@ function loadProgressFromStorage(id) {
 let winShown = false;
 
 function checkWin() {
-  if (!state.puzzleId || winShown) return;
+  if (!state.puzzleId) return;
   for (let r = 0; r < state.height; r++) {
     for (let c = 0; c < state.width; c++) {
       if (isBlack(r, c)) continue;
-      if (state.userGrid[r][c] !== state.solution[r][c]) return;
+      if (!isCellCorrect(r, c)) return;
     }
   }
   // All cells correct!
+  if (!winShown) stopTimer();
   winShown = true;
-  stopTimer();
   showWin();
 }
 
@@ -1626,7 +1670,9 @@ function parseCompactHash() {
   if (dot === -1) return null;
   const puzzleId = rest.slice(0, dot);
   const b64      = rest.slice(dot + 1);
-  if (!/^\d{6}$/.test(puzzleId) || !b64) return null;
+  if (!puzzleId || !b64) return null;
+  // Accept 6-digit YYMMDD or YYYY-MM-DD date IDs
+  if (!/^(\d{6}|\d{4}-\d{2}-\d{2})$/.test(puzzleId)) return null;
   return { puzzleId, b64 };
 }
 
@@ -1909,7 +1955,7 @@ dom.btnClearIncorrect.addEventListener('click', () => {
     for (let c = 0; c < state.width; c++) {
       if (isBlack(r, c) || state.locked[r][c]) continue;
       const entered = state.userGrid[r][c];
-      if (entered && entered !== state.solution[r][c]) {
+      if (entered && !isCellCorrect(r, c)) {
         wrongCells.push({ r, c });
       }
     }
@@ -2036,18 +2082,19 @@ function fitGrid() {
 
   if (availW <= 0 || availH <= 0) return;
 
-  // Subtract the grid's own border (2px each side = 4px) and 1px gaps between cells
-  const gridBorderGapW = 4 + (state.width  - 1);
-  const gridBorderGapH = 4 + (state.height - 1);
+  // Grid has 1px outer border on each side (2px total) + each cell has 1px right/bottom border
+  const gridBorderGapW = 2 + state.width;
+  const gridBorderGapH = 2 + state.height;
 
   const byW = Math.floor((availW - gridBorderGapW) / state.width);
   const byH = Math.floor((availH - gridBorderGapH) / state.height);
-  const size = Math.min(byW, byH);
+  const size = Math.min(byW, byH, 120);
   document.documentElement.style.setProperty('--cell-size', `${Math.max(size, 10)}px`);
 }
 const gridObserver = new ResizeObserver(fitGrid);
 gridObserver.observe(document.getElementById('clue-panels'));
 window.addEventListener('resize', fitGrid);
+window.addEventListener('load', () => requestAnimationFrame(fitGrid));
 // Re-fit when virtual keyboard opens/closes on mobile
 window.visualViewport?.addEventListener('resize', fitGrid);
 

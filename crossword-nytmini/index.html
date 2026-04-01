@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NYT Mini Crossword — seall.dev</title>
+  <link rel="stylesheet" href="../crossword/style.css">
+</head>
+<body>
+  <!-- ===== HEADER ===== -->
+  <header id="app-header">
+    <div class="header-left">
+      <a href="/crossword/" class="back-link">&#8592; crosswords</a>
+      <div class="puzzle-selector-wrap">
+        <label for="puzzle-select">Puzzle:</label>
+        <select id="puzzle-select" title="Select puzzle"></select>
+        <input type="date" id="puzzle-date" title="Pick any date">
+      </div>
+    </div>
+
+    <div class="header-center">
+      <h1 id="puzzle-title">NYT Mini Crossword</h1>
+      <div id="puzzle-author" class="puzzle-author"></div>
+    </div>
+
+    <div class="header-right">
+      <button id="btn-theme-toggle" class="btn-sm btn-icon" title="Toggle theme">
+        <svg id="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg id="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg" style="display:none">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <div class="timer-wrap">
+        <span id="timer-display" class="timer-display">0:00</span>
+        <div class="timer-controls">
+          <button id="btn-timer-toggle" class="btn-sm" title="Hide/Show timer">Hide</button>
+          <button id="btn-timer-pause" class="btn-sm btn-icon" title="Pause/Resume">
+            <svg id="icon-pause" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="1" width="3" height="10" rx="1"/><rect x="7" y="1" width="3" height="10" rx="1"/></svg>
+            <svg id="icon-play" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="display:none"><polygon points="2,1 11,6 2,11"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== TOOLBAR ===== -->
+  <div id="toolbar">
+    <div class="toolbar-group check-group">
+      <label class="toolbar-label">Action:</label>
+      <select id="action-select" title="Check/Reveal action">
+        <option value="check">Check</option>
+        <option value="partial">Partial Check</option>
+        <option value="reveal">Reveal</option>
+      </select>
+      <label class="toolbar-label">Scope:</label>
+      <select id="scope-select" title="Scope">
+        <option value="letter">Letter</option>
+        <option value="word">Word</option>
+        <option value="all">All</option>
+      </select>
+      <button id="btn-go" class="btn-primary">Go</button>
+      <button id="btn-clear-incorrect" class="btn-sm btn-danger" title="Clear all incorrect letters from the entire board">&#9888; Clear All Incorrect</button>
+    </div>
+    <div class="toolbar-group misc-group">
+      <label class="toolbar-label lock-label" title="Automatically lock cells green when a full word is entered correctly">
+        <input type="checkbox" id="chk-lock" checked> Lock correct words
+      </label>
+      <label class="toolbar-label lock-label" title="Cross-axis arrows switch direction">
+        <input type="checkbox" id="chk-arrow-dir"> Arrows change dir
+      </label>
+      <label class="toolbar-label lock-label" title="Always advance one cell forward">
+        <input type="checkbox" id="chk-overtype"> Overtype
+      </label>
+      <button id="rebus-btn" class="btn-sm" title="Toggle rebus mode (Insert key)">Rebus</button>
+      <button id="btn-export" class="btn-sm">Export Progress</button>
+      <button id="btn-import" class="btn-sm" title="Import from URL fragment">Import</button>
+      <button id="btn-undo" class="btn-sm" title="Undo (Ctrl+Z)">Undo</button>
+    </div>
+  </div>
+
+  <!-- ===== MAIN AREA ===== -->
+  <main id="app-main">
+    <div id="loading-overlay" class="overlay">
+      <div class="overlay-box"><div class="spinner"></div><div id="loading-msg">Loading puzzle...</div></div>
+    </div>
+    <div id="error-overlay" class="overlay hidden">
+      <div class="overlay-box error-box"><div id="error-msg">Failed to load puzzle.</div><button id="btn-retry" class="btn-primary">Retry</button></div>
+    </div>
+    <div id="puzzle-layout" class="hidden">
+      <div id="active-clue-bar">
+        <span id="active-clue-num" class="clue-num-badge"></span>
+        <span id="active-clue-text"></span>
+        <span id="active-clue-len" class="clue-len-badge"></span>
+      </div>
+      <div id="puzzle-body">
+        <div id="grid-wrap"><div id="crossword-grid"></div></div>
+        <div id="clue-panels">
+          <div class="clue-panel" id="across-panel"><div class="clue-panel-header">Across</div><ul id="across-list" class="clue-list"></ul></div>
+          <div class="clue-panel" id="down-panel"><div class="clue-panel-header">Down</div><ul id="down-list" class="clue-list"></ul></div>
+          <div class="clue-panel" id="keys-panel">
+            <div class="clue-panel-header">Keys</div>
+            <ul class="keys-list">
+              <li><kbd>Space</kbd> Toggle direction</li><li><kbd>Tab</kbd> Next word</li>
+              <li><kbd>&#8679;Tab</kbd> Prev word</li><li><kbd>&#8593;&#8595;&#8592;&#8594;</kbd> Move / switch dir</li>
+              <li><kbd>&#9003;</kbd> Delete letter</li><li><kbd>Ctrl Z</kbd> Undo</li><li><kbd>Ctrl &#8679;Z</kbd> Redo</li>
+              <li class="keys-sep"></li>
+              <li><kbd>&#8679;C</kbd> Check all</li><li><kbd>&#8679;W</kbd> Check word</li><li><kbd>&#8679;P</kbd> Partial check word</li>
+              <li class="keys-sep"></li>
+              <li><kbd>Ctrl &#9003;</kbd> Clear word</li><li><kbd>Ctrl &#8679;&#9003;</kbd> Clear word (incl. crosses)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== WIN OVERLAY ===== -->
+  <div id="win-overlay" class="modal-overlay hidden">
+    <div class="modal-box win-box">
+      <div class="win-icon">&#10003;</div><div class="modal-title">Puzzle Complete!</div>
+      <div class="win-puzzle" id="win-puzzle"></div>
+      <div class="win-time-wrap">Time: <span id="win-time" class="win-time"></span></div>
+      <button id="win-close" class="btn-primary">Close</button>
+    </div>
+  </div>
+
+  <!-- ===== MODAL ===== -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div id="modal-box" class="modal-box">
+      <div id="modal-icon" class="modal-icon"></div><div id="modal-title" class="modal-title"></div>
+      <div id="modal-body" class="modal-body"></div><button id="modal-close" class="btn-primary">OK</button>
+    </div>
+  </div>
+
+  <input id="xw-mobile-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+    inputmode="text" aria-hidden="true" tabindex="-1"
+    style="position:fixed;bottom:0;left:0;width:1px;height:1px;opacity:0;border:none;padding:0;font-size:16px;pointer-events:none;">
+
+  <!-- NYT source adapter — must be defined BEFORE the shared script -->
+  <script>
+  'use strict';
+
+  const NYT_API = 'https://nyt-crossword-proxy.my-account-306.workers.dev/nyt/mini';
+
+  // Generate date IDs for the last N days
+  function recentDates(n) {
+    const ids = [];
+    const d = new Date();
+    for (let i = 0; i < n; i++) {
+      ids.push(d.toISOString().slice(0, 10)); // YYYY-MM-DD
+      d.setDate(d.getDate() - 1);
+    }
+    return ids;
+  }
+
+  // Parse NYT JSON into the standard puzzle format consumed by script.js
+  function parseNYTPuzzle(json, dateId) {
+    const body   = json.body[0];
+    const cells  = body.cells;
+    const dims   = body.dimensions;
+    const cluesList = body.clueLists;
+    const cluesArr  = body.clues;
+    const width  = dims.width;
+    const height = dims.height;
+
+    const pubDate = json.publicationDate || dateId;
+    const constructors = (json.constructors || []).join(', ');
+    const editor = json.editor || '';
+    const dateStr = pubDate + (constructors ? ' \u2014 ' + constructors : '') + (editor ? ' / ' + editor : '');
+    const puzzleId = pubDate;  // "YYYY-MM-DD"
+
+    // Build 2D grids
+    const solution = Array.from({ length: height }, () => Array(width).fill('#'));
+    const circles  = Array.from({ length: height }, () => Array(width).fill(false));
+    const shaded   = Array.from({ length: height }, () => Array(width).fill(false));
+    const hidden   = Array.from({ length: height }, () => Array(width).fill(false));
+    const altAnswers = {};
+
+    for (let i = 0; i < cells.length; i++) {
+      const cell = cells[i];
+      const r = Math.floor(i / width);
+      const c = i % width;
+
+      if (!cell || !cell.answer) {
+        solution[r][c] = '#';
+        continue;
+      }
+
+      // Answer: may contain "/" for rebus (e.g. "KIT/KAT") — strip separators
+      let answer = cell.answer.replace(/\//g, '').trim();
+
+      // For cells where answer is empty/space but moreAnswers has a letter, use the letter
+      if ((!answer || answer === ' ') && cell.moreAnswers && cell.moreAnswers.valid) {
+        const letterAlt = cell.moreAnswers.valid.find(a => {
+          const cleaned = a.replace(/\//g, '').trim();
+          return cleaned.length === 1 && /[A-Z]/i.test(cleaned);
+        });
+        if (letterAlt) answer = letterAlt.replace(/\//g, '').trim().toUpperCase();
+      }
+
+      solution[r][c] = answer.toUpperCase() || '#';
+
+      // Cell types: 1=normal, 2=circled, 3=shaded
+      if (cell.type === 2) circles[r][c] = true;
+      if (cell.type === 3) shaded[r][c] = true;
+
+      // Alternative answers (all valid forms besides the primary)
+      if (cell.moreAnswers && cell.moreAnswers.valid) {
+        const alts = cell.moreAnswers.valid
+          .map(a => a.replace(/\//g, '').trim().toUpperCase())
+          .filter(a => a !== solution[r][c]);
+        // Also accept empty for cells that can be blank
+        if (cell.answer.trim() === '' || cell.answer === ' ') alts.push('');
+        if (alts.length > 0) {
+          altAnswers[r + ',' + c] = alts;
+        }
+      }
+    }
+
+    // Build clue arrays in the same order as buildNumbering would produce
+    // The NYT clues already have label (number) and cell references
+    const acrossIndices = cluesList.find(function(l) { return l.name === 'Across'; }).clues;
+    const downIndices   = cluesList.find(function(l) { return l.name === 'Down'; }).clues;
+
+    const acrossCluesRaw = acrossIndices.map(function(idx) {
+      const cl = cluesArr[idx];
+      return cl.text.map(function(t) { return t.plain; }).join(' ');
+    });
+    const downCluesRaw = downIndices.map(function(idx) {
+      const cl = cluesArr[idx];
+      return cl.text.map(function(t) { return t.plain; }).join(' ');
+    });
+
+    return {
+      puzzleId: puzzleId,
+      dateStr: dateStr,
+      author: constructors + (editor ? ' / ' + editor : ''),
+      width: width,
+      height: height,
+      solution: solution,
+      circles: circles,
+      shaded: shaded,
+      hidden: hidden,
+      altAnswers: altAnswers,
+      acrossCluesRaw: acrossCluesRaw,
+      downCluesRaw: downCluesRaw,
+    };
+  }
+
+  window.XW_SOURCE = {
+    storagePrefix: 'nyt-mini-xw',
+
+    formatPuzzleId: function(id) {
+      // id = "YYYY-MM-DD"
+      if (id.length === 10 && id[4] === '-') {
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var parts = id.split('-');
+        var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        var d = new Date(parts[0], parseInt(parts[1],10)-1, parseInt(parts[2],10));
+        return days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + parseInt(parts[2],10) + ', ' + parts[0];
+      }
+      return id;
+    },
+
+    loadPuzzleList: async function() {
+      return recentDates(90);
+    },
+
+    populateSelector: function(selectEl, ids) {
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      var group = null, groupKey = null;
+
+      ids.forEach(function(id) {
+        var parts = id.split('-');
+        var yyyy = parts[0], mm = parts[1], dd = parts[2];
+        var key = yyyy + '-' + mm;
+        if (key !== groupKey) {
+          group = document.createElement('optgroup');
+          group.label = months[parseInt(mm,10)-1] + ' ' + yyyy;
+          selectEl.appendChild(group);
+          groupKey = key;
+        }
+        var d = new Date(parseInt(yyyy), parseInt(mm,10)-1, parseInt(dd,10));
+        var opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = days[d.getDay()] + ' ' + parseInt(dd,10) + ' ' + months[parseInt(mm,10)-1] + ', ' + yyyy;
+        group.appendChild(opt);
+      });
+    },
+
+    loadPuzzle: async function(id) {
+      var url = NYT_API + '/' + id;
+      var res = await fetch(url);
+      if (!res.ok) throw new Error('NYT API returned ' + res.status);
+      var json = await res.json();
+      return parseNYTPuzzle(json, id);
+    },
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var dp = document.getElementById('puzzle-date');
+    if (!dp) return;
+    dp.max = new Date().toISOString().slice(0, 10);
+    dp.addEventListener('change', function() {
+      if (this.value && typeof loadPuzzle === 'function') loadPuzzle(this.value);
+    });
+  });
+  </script>
+  <script src="../crossword/script.js"></script>
+</body>
+</html>

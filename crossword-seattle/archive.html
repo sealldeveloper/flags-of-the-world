@@ -140,7 +140,7 @@
   </style>
 </head>
 <body>
-  <a class="back-link" href="/crossword/">← Back to Crossword</a>
+  <a class="back-link" href="/crossword-seattle/">← Back to Crossword</a>
   <h1>Crossword Archive</h1>
   <p class="subtitle">Locally stored puzzles</p>
 
@@ -220,7 +220,7 @@
           for (const p of g.puzzles) {
             const a = document.createElement('a');
             a.className = 'puzzle-card';
-            a.href = `/crossword/?puzzle=${p.id}`;
+            a.href = `/crossword-seattle/?puzzle=${p.id}`;
             a.innerHTML = `<span class="puzzle-date">${parseInt(p.dd,10)} ${MONTHS[parseInt(p.mm,10)-1]}</span><span class="puzzle-day">${p.dayName}</span>${difficultyHTML(p.dayName)}`;
             grid.appendChild(a);
           }

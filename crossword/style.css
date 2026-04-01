@@ -115,7 +115,7 @@ select, input { font-family: inherit; }
 }
 .puzzle-selector-wrap label { color: var(--text-muted); white-space: nowrap; }
 
-#puzzle-select {
+#puzzle-select, #puzzle-date {
   background: var(--bg);
   color: var(--text);
   border: 1px solid var(--border);
@@ -123,6 +123,11 @@ select, input { font-family: inherit; }
   padding: 4px 8px;
   font-size: 0.85rem;
   max-width: 200px;
+  color-scheme: light;
+}
+[data-theme="dark"] #puzzle-select,
+[data-theme="dark"] #puzzle-date {
+  color-scheme: dark;
 }
 
 .header-center {
@@ -369,9 +374,8 @@ select, input { font-family: inherit; }
 
 #crossword-grid {
   display: grid;
-  border: 2px solid var(--border-strong);
-  background: var(--border-strong);
-  gap: 1px;
+  border: 1px solid var(--border-strong);
+  gap: 0;
   user-select: none;
   outline: none;
 }
@@ -382,6 +386,8 @@ select, input { font-family: inherit; }
   width: var(--cell-size);
   height: var(--cell-size);
   background: #ffffff;
+  border-right: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-strong);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -398,7 +404,7 @@ select, input { font-family: inherit; }
 
 .xw-cell .cell-letter {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 1rem;
+  font-size: calc(var(--cell-size, 28px) * 0.52);
   font-weight: bold;
   color: #111;
   line-height: 1;
@@ -409,7 +415,7 @@ select, input { font-family: inherit; }
   position: absolute;
   top: 1px;
   left: 2px;
-  font-size: 9px;
+  font-size: calc(var(--cell-size, 28px) * 0.3);
   line-height: 1;
   color: #333;
   font-family: 'Segoe UI', sans-serif;
@@ -446,7 +452,7 @@ select, input { font-family: inherit; }
 
 /* Rebus cell (, prefix) — multi-letter, smaller text */
 .xw-cell.rebus .cell-letter {
-  font-size: 0.55em;
+  font-size: calc(var(--cell-size, 28px) * 0.28);
   letter-spacing: 0;
 }
 
@@ -828,7 +834,4 @@ select, input { font-family: inherit; }
   .modal-box { padding: 28px 24px; }
 }
 
-@media (max-width: 480px) {
-  .xw-cell .cell-letter { font-size: 0.82rem; }
-  .xw-cell .cell-num { font-size: 7px; }
-}
+/* cell-letter and cell-num font sizes now scale via calc(--cell-size * factor) */

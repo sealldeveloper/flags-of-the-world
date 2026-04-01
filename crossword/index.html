@@ -1,193 +1,48 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NYT Syndicated Crossword — seall.dev</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Crosswords — seall.dev</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#1a1f2e;min-height:100vh;color:#e0e6ed;display:flex;flex-direction:column;align-items:center;padding:60px 20px 40px;}
+    .back-link{color:#4299e1;text-decoration:none;font-size:.88rem;align-self:flex-start;margin-bottom:32px;}
+    .back-link:hover{text-decoration:underline;}
+    h1{font-size:1.8rem;font-weight:bold;margin-bottom:48px;color:#e0e6ed;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;width:100%;max-width:900px;}
+    .card{background:#2d3748;border-radius:12px;padding:28px 24px;text-decoration:none;color:#e0e6ed;display:flex;flex-direction:column;gap:8px;border:2px solid transparent;transition:border-color .2s,transform .15s,background .2s;}
+    .card:hover{border-color:#4299e1;background:#3a4a61;transform:translateY(-3px);}
+    .card-icon{font-size:2.5rem;line-height:1;}
+    .card-title{font-size:1.1rem;font-weight:bold;}
+    .card-desc{font-size:.82rem;color:#9ca3af;line-height:1.4;}
+    footer{margin-top:auto;padding-top:48px;font-family:'Courier New',Courier,monospace;font-size:12px;color:#9ca3af;}
+    footer a{color:#4299e1;text-decoration:none;}
+    footer a:hover{text-decoration:underline;}
+  </style>
 </head>
 <body>
-  <!-- ===== HEADER ===== -->
-  <header id="app-header">
-    <div class="header-left">
-      <a href="/" class="back-link">&#8592; puzzles</a>
-      <a href="/crossword/archive.html" class="back-link">archive</a>
-      <div class="puzzle-selector-wrap">
-        <label for="puzzle-select">Puzzle:</label>
-        <select id="puzzle-select" title="Select puzzle"></select>
-      </div>
-    </div>
+  <a href="/" class="back-link">&#8592; home</a>
+  <h1>crosswords</h1>
 
-    <div class="header-center">
-      <h1 id="puzzle-title">NYT Crossword</h1>
-      <div id="puzzle-author" class="puzzle-author"></div>
-    </div>
-
-    <div class="header-right">
-      <!-- Theme toggle -->
-      <button id="btn-theme-toggle" class="btn-sm btn-icon" title="Toggle theme">
-        <svg id="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/>
-          <line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/>
-          <line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-        <svg id="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg" style="display:none">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-      </button>
-      <!-- Timer -->
-      <div class="timer-wrap">
-        <span id="timer-display" class="timer-display">0:00</span>
-        <div class="timer-controls">
-          <button id="btn-timer-toggle" class="btn-sm" title="Hide/Show timer">Hide</button>
-          <button id="btn-timer-pause" class="btn-sm btn-icon" title="Pause/Resume">
-            <svg id="icon-pause" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="1" width="3" height="10" rx="1"/><rect x="7" y="1" width="3" height="10" rx="1"/></svg>
-            <svg id="icon-play" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="display:none"><polygon points="2,1 11,6 2,11"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- ===== TOOLBAR ===== -->
-  <div id="toolbar">
-    <div class="toolbar-group check-group">
-      <label class="toolbar-label">Action:</label>
-      <select id="action-select" title="Check/Reveal action">
-        <option value="check">Check</option>
-        <option value="partial">Partial Check</option>
-        <option value="reveal">Reveal</option>
-      </select>
-      <label class="toolbar-label">Scope:</label>
-      <select id="scope-select" title="Scope">
-        <option value="letter">Letter</option>
-        <option value="word">Word</option>
-        <option value="all">All</option>
-      </select>
-      <button id="btn-go" class="btn-primary">Go</button>
-      <button id="btn-clear-incorrect" class="btn-sm btn-danger" title="Clear all incorrect letters from the entire board">⚠ Clear All Incorrect</button>
-    </div>
-
-    <div class="toolbar-group misc-group">
-      <label class="toolbar-label lock-label" title="Automatically lock cells green when a full word is entered correctly">
-        <input type="checkbox" id="chk-lock" checked>
-        Lock correct words
-      </label>
-      <label class="toolbar-label lock-label" title="When enabled, pressing a cross-axis arrow key (e.g. ← while in Down mode) switches direction and moves. When disabled, arrows only move without changing direction.">
-        <input type="checkbox" id="chk-arrow-dir">
-        Arrows change dir
-      </label>
-      <label class="toolbar-label lock-label" title="When enabled, typing always advances one cell forward regardless of whether it is empty. When disabled, the cursor skips ahead to the next empty cell.">
-        <input type="checkbox" id="chk-overtype">
-        Overtype
-      </label>
-      <button id="rebus-btn" class="btn-sm" title="Toggle rebus mode (Insert key) — type multiple letters in one cell">Rebus</button>
-      <button id="btn-export" class="btn-sm">Export Progress</button>
-      <button id="btn-import" class="btn-sm" title="Import from URL fragment">Import</button>
-      <button id="btn-undo" class="btn-sm" title="Undo (Ctrl+Z)">Undo</button>
-    </div>
+  <div class="grid">
+    <a class="card" href="/crossword-nyt/">
+      <div class="card-icon">🗽</div>
+      <div class="card-title">NYT Daily</div>
+      <div class="card-desc">Today's New York Times crossword and the full archive.</div>
+    </a>
+    <a class="card" href="/crossword-nytmini/">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">NYT Mini</div>
+      <div class="card-desc">Today's NYT Mini and the full archive. Quick 5x5 puzzles.</div>
+    </a>
+    <a class="card" href="/crossword-seattle/">
+      <div class="card-icon">🌲</div>
+      <div class="card-title">Seattle Times</div>
+      <div class="card-desc">NYT-syndicated puzzles published on a delay via the Seattle Times.</div>
+    </a>
   </div>
 
-  <!-- ===== MAIN AREA ===== -->
-  <main id="app-main">
-    <!-- Loading / error states -->
-    <div id="loading-overlay" class="overlay">
-      <div class="overlay-box">
-        <div class="spinner"></div>
-        <div id="loading-msg">Loading puzzle...</div>
-      </div>
-    </div>
-
-    <div id="error-overlay" class="overlay hidden">
-      <div class="overlay-box error-box">
-        <div id="error-msg">Failed to load puzzle.</div>
-        <button id="btn-retry" class="btn-primary">Retry</button>
-      </div>
-    </div>
-
-    <!-- Puzzle layout -->
-    <div id="puzzle-layout" class="hidden">
-      <!-- Active clue bar (mobile-friendly) -->
-      <div id="active-clue-bar">
-        <span id="active-clue-num" class="clue-num-badge"></span>
-        <span id="active-clue-text"></span>
-        <span id="active-clue-len" class="clue-len-badge"></span>
-      </div>
-
-      <div id="puzzle-body">
-        <!-- Grid -->
-        <div id="grid-wrap">
-          <div id="crossword-grid"></div>
-        </div>
-
-        <!-- Clue panels -->
-        <div id="clue-panels">
-          <div class="clue-panel" id="across-panel">
-            <div class="clue-panel-header">Across</div>
-            <ul id="across-list" class="clue-list"></ul>
-          </div>
-          <div class="clue-panel" id="down-panel">
-            <div class="clue-panel-header">Down</div>
-            <ul id="down-list" class="clue-list"></ul>
-          </div>
-          <div class="clue-panel" id="keys-panel">
-            <div class="clue-panel-header">Keys</div>
-            <ul class="keys-list">
-              <li><kbd>Space</kbd> Toggle direction</li>
-              <li><kbd>Tab</kbd> Next word</li>
-              <li><kbd>⇧Tab</kbd> Prev word</li>
-              <li><kbd>↑↓←→</kbd> Move / switch dir</li>
-              <li><kbd>⌫</kbd> Delete letter</li>
-              <li><kbd>Ctrl Z</kbd> Undo</li>
-              <li><kbd>Ctrl ⇧Z</kbd> Redo</li>
-              <li class="keys-sep"></li>
-              <li><kbd>⇧C</kbd> Check all</li>
-              <li><kbd>⇧W</kbd> Check word</li>
-              <li><kbd>⇧P</kbd> Partial check word</li>
-              <li class="keys-sep"></li>
-              <li><kbd>Ctrl ⌫</kbd> Clear word</li>
-              <li><kbd>Ctrl ⇧⌫</kbd> Clear word (incl. crosses)</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ===== WIN OVERLAY ===== -->
-  <div id="win-overlay" class="modal-overlay hidden">
-    <div class="modal-box win-box">
-      <div class="win-icon">✓</div>
-      <div class="modal-title">Puzzle Complete!</div>
-      <div class="win-puzzle" id="win-puzzle"></div>
-      <div class="win-time-wrap">Time: <span id="win-time" class="win-time"></span></div>
-      <button id="win-close" class="btn-primary">Close</button>
-    </div>
-  </div>
-
-  <!-- ===== MODAL ===== -->
-  <div id="modal-overlay" class="modal-overlay hidden">
-    <div id="modal-box" class="modal-box">
-      <div id="modal-icon" class="modal-icon"></div>
-      <div id="modal-title" class="modal-title"></div>
-      <div id="modal-body" class="modal-body"></div>
-      <button id="modal-close" class="btn-primary">OK</button>
-    </div>
-  </div>
-
-  <!-- Hidden input to capture virtual keyboard on mobile -->
-  <input id="xw-mobile-input"
-    type="text"
-    autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
-    inputmode="text" aria-hidden="true" tabindex="-1"
-    style="position:fixed;bottom:0;left:0;width:1px;height:1px;opacity:0;border:none;padding:0;font-size:16px;pointer-events:none;">
-
-  <script src="script.js"></script>
+  <footer>Made by <a href="https://seall.dev" target="_blank">seall.dev</a></footer>
 </body>
 </html>
