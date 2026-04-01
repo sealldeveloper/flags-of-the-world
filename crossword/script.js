@@ -521,6 +521,8 @@ async function loadPuzzle(id) {
     }
     // Use the requested ID (selector date) as puzzleId, not the internal ARCHIVE ID,
     // so export/import and progress storage use the same ID the proxy expects.
+    // Preserve original NYT date for cross-linking.
+    data.nytDate = data.puzzleId;
     data.puzzleId = String(id);
     const saved = loadProgressFromStorage(data.puzzleId);
     initPuzzleFromData(data, saved);
@@ -540,6 +542,7 @@ function initPuzzleFromData(data, savedProgress = null) {
 
   // Assign to state
   state.puzzleId    = puzzleId;
+  state.nytDate     = data.nytDate ?? null;
   state.dateStr     = dateStr;
   state.author      = author;
   state.width       = width;

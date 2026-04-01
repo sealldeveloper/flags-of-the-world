@@ -56,6 +56,9 @@
       <button id="btn-undo" class="btn-sm" title="Undo (Ctrl+Z)">Undo</button>
     </div>
   </div>
+  <div id="seattle-note" style="background:#2d3748;color:#9ca3af;font-size:.75rem;padding:4px 20px;text-align:center;border-bottom:1px solid #3d4f6a;">
+    Seattle Times uses a syndicated text format that can misparse special puzzles (rebus, shaded cells, etc). For full accuracy, use <a href="/crossword-nyt/" id="nyt-note-link" style="color:#4299e1;">NYT Daily</a>.
+  </div>
   <main id="app-main">
     <div id="loading-overlay" class="overlay"><div class="overlay-box"><div class="spinner"></div><div id="loading-msg">Loading puzzle...</div></div></div>
     <div id="error-overlay" class="overlay hidden"><div class="overlay-box error-box"><div id="error-msg">Failed to load puzzle.</div><button id="btn-retry" class="btn-primary">Retry</button></div></div>
@@ -77,5 +80,57 @@
   <div id="modal-overlay" class="modal-overlay hidden"><div id="modal-box" class="modal-box"><div id="modal-icon" class="modal-icon"></div><div id="modal-title" class="modal-title"></div><div id="modal-body" class="modal-body"></div><button id="modal-close" class="btn-primary">OK</button></div></div>
   <input id="xw-mobile-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" inputmode="text" aria-hidden="true" tabindex="-1" style="position:fixed;bottom:0;left:0;width:1px;height:1px;opacity:0;border:none;padding:0;font-size:16px;pointer-events:none;">
   <script src="../crossword/script.js"></script>
+  <script>
+  // NYT Daily note link: carries over filled letters via compact export hash
+  (function() {
+    var link = document.getElementById('nyt-note-link');
+    if (!link) return;
+
+    function nytDateStr() {
+      if (!state.nytDate || !/^\d{6}$/.test(state.nytDate)) return null;
+      return '20' + state.nytDate.slice(0,2) + '-' + state.nytDate.slice(2,4) + '-' + state.nytDate.slice(4,6);
+    }
+
+    function buildCompactHash(nytId) {
+      var bytes = [];
+      var timer = Math.min(state.timerSec || 0, 65535);
+      bytes.push((timer >> 8) & 0xFF, timer & 0xFF);
+      bytes.push(state.selRow || 0);
+      bytes.push(state.selCol || 0);
+      bytes.push(state.direction === 'down' ? 1 : 0);
+      for (var r = 0; r < state.height; r++) {
+        for (var c = 0; c < state.width; c++) {
+          if (isBlack(r, c)) continue;
+          var val = state.userGrid[r][c] || '';
+          if (val.length > 1) {
+            bytes.push(27);
+            bytes.push(val.length);
+            for (var i = 0; i < val.length; i++) bytes.push(val.charCodeAt(i) & 0x7F);
+          } else if (val.length === 1) {
+            var code = val.toUpperCase().charCodeAt(0) - 64;
+            bytes.push(code >= 1 && code <= 26 ? code : 0);
+          } else {
+            bytes.push(0);
+          }
+        }
+      }
+      return '#save=' + nytId + '.' + btoa(String.fromCharCode.apply(null, new Uint8Array(bytes)));
+    }
+
+    function updateLink() {
+      var nytId = nytDateStr();
+      if (!nytId) { link.href = '/crossword-nyt/'; return; }
+      link.href = '/crossword-nyt/?puzzle=' + nytId + buildCompactHash(nytId);
+    }
+
+    var orig = initPuzzleFromData;
+    initPuzzleFromData = function(data, saved) {
+      orig(data, saved);
+      updateLink();
+    };
+    link.addEventListener('mouseenter', updateLink);
+    link.addEventListener('focus', updateLink);
+  })();
+  </script>
 </body>
 </html>
