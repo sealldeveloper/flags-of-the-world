@@ -660,10 +660,8 @@ function updateCellVisual(r, c) {
   const text = state.userGrid[r][c] || '';
   if (letterEl) letterEl.textContent = text;
 
-  // Dynamic font sizing: shrink only when multiple chars are actually displayed
-  if (isRebus(r, c)) {
-    el.classList.toggle('rebus', text.length > 1);
-  }
+  // Dynamic font sizing: shrink when multiple chars are displayed in any cell
+  el.classList.toggle('rebus', text.length > 1);
 
   // State classes (order matters — later classes override)
   el.classList.remove('incorrect', 'correct-locked', 'revealed', 'word-highlight', 'selected');
@@ -1064,16 +1062,16 @@ function handleLetterKey(letter) {
 
   pushHistory();
 
-  if (isRebus(r, c) && state.rebusMode) {
-    // Rebus mode: accumulate letters, advance when full
-    const rebusLen = state.solution[r][c].length;
-    const current  = state.userGrid[r][c];
-    state.userGrid[r][c] = current.length >= rebusLen ? letter : current + letter;
+  if (state.rebusMode) {
+    // Rebus mode: accumulate letters in any cell
+    const current = state.userGrid[r][c];
+    state.userGrid[r][c] = current + letter;
     state.incorrect[r][c] = false;
     updateCellVisual(r, c);
     const el = getCellEl(r, c);
     if (el) el.classList.add('selected');
-    if (state.userGrid[r][c].length === rebusLen) {
+    // Auto-advance only for known rebus cells when reaching solution length
+    if (isRebus(r, c) && state.userGrid[r][c].length >= state.solution[r][c].length) {
       state.rebusMode = false;
       updateRebusButton();
       advanceAfterEntry();
@@ -1130,8 +1128,8 @@ function handleBackspace() {
 
   if (state.userGrid[r][c] !== '') {
     pushHistory();
-    // For rebus cells, remove just the last typed character
-    if (isRebus(r, c) && state.userGrid[r][c].length > 1) {
+    // Multi-char cells: remove last character; single-char: clear
+    if (state.userGrid[r][c].length > 1) {
       state.userGrid[r][c] = state.userGrid[r][c].slice(0, -1);
     } else {
       state.userGrid[r][c] = '';
@@ -1152,8 +1150,8 @@ function handleDelete() {
   if (isBlack(r, c) || state.locked[r][c]) return;
 
   pushHistory();
-  // For rebus cells, remove the last typed character; otherwise clear the cell
-  if (isRebus(r, c) && state.userGrid[r][c].length > 1) {
+  // Multi-char cells: remove last character; single-char: clear
+  if (state.userGrid[r][c].length > 1) {
     state.userGrid[r][c] = state.userGrid[r][c].slice(0, -1);
   } else {
     state.userGrid[r][c] = '';
@@ -1576,33 +1574,113 @@ function updateTimerDisplay() {
 }
 
 // ============================================================
-// EXPORT / IMPORT
+// EXPORT / IMPORT  (compact binary format: puzzleId + board state)
 // ============================================================
+
 function doExport() {
   if (!state.puzzleId) return;
-  const payload = {
-    puzzleId:    state.puzzleId,
-    dateStr:     state.dateStr,
-    author:      state.author,
-    width:       state.width,
-    height:      state.height,
-    solution:    state.solution,
-    circles:     state.circles,
-    acrossClues: state.acrossClues,
-    downClues:   state.downClues,
-    userGrid:    state.userGrid,
-    revealed:    state.revealed,
-    locked:      state.locked,
-    timerSec:    state.timerSec,
-    selRow:      state.selRow,
-    selCol:      state.selCol,
-    direction:   state.direction,
-  };
-  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  history.replaceState(null, '', `#data=${b64}`);
+
+  const bytes = [];
+
+  // Header: timer (2 bytes BE), selRow, selCol, direction
+  const timer = Math.min(state.timerSec || 0, 65535);
+  bytes.push((timer >> 8) & 0xFF, timer & 0xFF);
+  bytes.push(state.selRow || 0);
+  bytes.push(state.selCol || 0);
+  bytes.push(state.direction === 'down' ? 1 : 0);
+
+  // Grid: one byte per non-black cell, row-major
+  // Bits 7-6 = flags (revealed, locked), bits 5-0 = char (0=empty, 1-26=A-Z, 27=rebus)
+  for (let r = 0; r < state.height; r++) {
+    for (let c = 0; c < state.width; c++) {
+      if (isBlack(r, c)) continue;
+      let flags = 0;
+      if (state.revealed[r][c]) flags |= 0x80;
+      if (state.locked[r][c])   flags |= 0x40;
+
+      const val = state.userGrid[r][c] || '';
+      if (val.length > 1) {
+        bytes.push(flags | 27);          // rebus marker
+        bytes.push(val.length);
+        for (let i = 0; i < val.length; i++) bytes.push(val.charCodeAt(i) & 0x7F);
+      } else if (val.length === 1) {
+        const code = val.toUpperCase().charCodeAt(0) - 64;
+        bytes.push(flags | (code >= 1 && code <= 26 ? code : 0));
+      } else {
+        bytes.push(flags);               // empty
+      }
+    }
+  }
+
+  const b64 = btoa(String.fromCharCode(...new Uint8Array(bytes)));
+  history.replaceState(null, '', `#save=${state.puzzleId}.${b64}`);
   showModal('✓', 'Exported!', 'URL updated with your progress. Copy the URL to save or share.');
 }
 
+// Parse compact hash: #save=PUZZLEID.BASE64
+function parseCompactHash() {
+  const hash = window.location.hash;
+  if (!hash.startsWith('#save=')) return null;
+  const rest = hash.slice(6);
+  const dot  = rest.indexOf('.');
+  if (dot === -1) return null;
+  const puzzleId = rest.slice(0, dot);
+  const b64      = rest.slice(dot + 1);
+  if (!/^\d{6}$/.test(puzzleId) || !b64) return null;
+  return { puzzleId, b64 };
+}
+
+// Apply compact binary state after puzzle is loaded
+function applyCompactState(b64) {
+  try {
+    const raw   = atob(b64);
+    const bytes = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+
+    let o = 0;
+    state.timerSec = (bytes[o] << 8) | bytes[o + 1]; o += 2;
+    const sr = bytes[o++], sc = bytes[o++];
+    state.direction = bytes[o++] ? 'down' : 'across';
+
+    for (let r = 0; r < state.height; r++) {
+      for (let c = 0; c < state.width; c++) {
+        if (isBlack(r, c)) continue;
+        if (o >= bytes.length) break;
+        const b = bytes[o++];
+        state.revealed[r][c] = !!(b & 0x80);
+        state.locked[r][c]   = !!(b & 0x40);
+        const v = b & 0x3F;
+        if (v === 27) {
+          const len = bytes[o++];
+          let s = '';
+          for (let i = 0; i < len; i++) s += String.fromCharCode(bytes[o++]);
+          state.userGrid[r][c] = s;
+        } else if (v >= 1 && v <= 26) {
+          state.userGrid[r][c] = String.fromCharCode(v + 64);
+        } else {
+          state.userGrid[r][c] = '';
+        }
+      }
+    }
+
+    // Validate selection
+    if (!isBlack(sr, sc) && inBounds(sr, sc)) {
+      state.selRow = sr; state.selCol = sc;
+    }
+
+    updateTimerDisplay();
+    updateAllCellVisuals();
+    applySelectionHighlights();
+    updateClueHighlights();
+    saveProgressToStorage();
+    return true;
+  } catch (e) {
+    console.error('Compact import failed:', e);
+    return false;
+  }
+}
+
+// Legacy import: #data=BASE64 (full JSON payload, kept for backward compatibility)
 function tryImportFromHash() {
   const hash = window.location.hash;
   if (!hash.startsWith('#data=')) return false;
@@ -1611,12 +1689,8 @@ function tryImportFromHash() {
     const json = decodeURIComponent(escape(atob(b64)));
     const payload = JSON.parse(json);
 
-    // Re-build grid numbering from solution
     const { puzzleId, dateStr, author, width, height, solution, circles, shaded, hidden, acrossClues, downClues } = payload;
 
-    // acrossClues/downClues already have {num, clue} objects
-    // We need acrossCluesRaw and downStarts to pass to initPuzzleFromData
-    // Instead, reconstruct directly
     const { cellNums, acrossStarts, downStarts } = buildNumbering(solution, width, height);
     const { acrossMap, downMap, cellToAcross, cellToDown } =
       buildWordMaps(solution, width, height, acrossStarts, downStarts);
@@ -1649,7 +1723,6 @@ function tryImportFromHash() {
     state.timerPaused  = false;
     state.timerHidden  = false;
 
-    // Restore or find first selectable cell
     if (payload.selRow != null && !isBlack(payload.selRow, payload.selCol)) {
       state.selRow    = payload.selRow;
       state.selCol    = payload.selCol;
@@ -1672,7 +1745,7 @@ function tryImportFromHash() {
 
     dom.puzzleTitle.textContent  = dateStr || `Puzzle ${puzzleId}`;
     dom.puzzleAuthor.textContent = author || '';
-    renderGrid();   // builds cellEls + calls updateAllCellVisuals
+    renderGrid();
     renderClues();
     applySelectionHighlights();
     updateClueHighlights();
@@ -1695,17 +1768,26 @@ function closeModal() {
 // BOOT & EVENT LISTENERS
 // ============================================================
 async function boot() {
-  // Try import from URL hash first
+  // Try legacy full-JSON import first
   if (tryImportFromHash()) {
     loadPuzzleList().then(ids => populatePuzzleSelector(ids)).catch(() => {});
     return;
   }
 
-  showLoading('Loading puzzle list...');
+  // Check for compact format: #save=PUZZLEID.BASE64
+  const compactData = parseCompactHash();
+
+  showLoading(compactData ? 'Loading puzzle...' : 'Loading puzzle list...');
 
   try {
     const ids = await loadPuzzleList();
     populatePuzzleSelector(ids);
+
+    if (compactData) {
+      await loadPuzzle(compactData.puzzleId);
+      applyCompactState(compactData.b64);
+      return;
+    }
 
     if (ids.length === 0) throw new Error('No puzzles available');
 
@@ -1796,9 +1878,25 @@ if (localStorage.getItem('xw-overtype') === '1') {
 // Export / Import
 dom.btnExport.addEventListener('click', doExport);
 dom.btnImport.addEventListener('click', () => {
-  const hash = prompt('Paste the exported URL fragment (starting with #data=):');
-  if (!hash) return;
-  window.location.hash = hash.startsWith('#') ? hash : `#${hash}`;
+  const input = prompt('Paste the exported URL or hash fragment:');
+  if (!input) return;
+  // Extract hash from full URL or raw fragment
+  let hash = input;
+  if (input.includes('#')) hash = '#' + input.split('#').pop();
+  else if (!input.startsWith('#')) hash = `#${input}`;
+  window.location.hash = hash;
+
+  // Try compact format first
+  const compactData = parseCompactHash();
+  if (compactData) {
+    loadPuzzle(compactData.puzzleId).then(() => {
+      if (!applyCompactState(compactData.b64)) {
+        showModal('✗', 'Import Failed', 'Could not parse the save data.');
+      }
+    });
+    return;
+  }
+  // Fall back to legacy format
   if (!tryImportFromHash()) showModal('✗', 'Import Failed', 'Could not parse the exported data.');
 });
 

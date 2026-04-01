@@ -607,13 +607,14 @@ function endGame() {
     }
     
     // Save personal best (either time-based for 100% or flag count-based for <100%)
-    let isNewRecord = false;
+    // Returns 'time', 'flags', or null
+    let newRecordType = null;
     if (startTime) {
         const totalTime = Date.now() - startTime - totalPausedTime;
-        isNewRecord = savePersonalBest(totalTime, successRate, correctAnswers);
+        newRecordType = savePersonalBest(totalTime, successRate, correctAnswers);
     } else {
         // No timer started, just save flag count
-        isNewRecord = savePersonalBest(0, successRate, correctAnswers);
+        newRecordType = savePersonalBest(0, successRate, correctAnswers);
     }
     
     // Collect all missed flags (flags that were not guessed)
@@ -656,8 +657,14 @@ function endGame() {
     }
     
     // Show personal best if available
-    displayPersonalBest(isNewRecord);
-    
+    displayPersonalBest(newRecordType);
+
+    // Clear stale flag PB after display - 100% supersedes any partial completion record
+    if (successRate === 100) {
+        localStorage.removeItem('flagGameFlagPB');
+        localStorage.removeItem('flagGamePreviousFlagPB');
+    }
+
     // Switch screens
     gameScreen.classList.remove('active');
     resultsScreen.classList.add('active');
@@ -675,11 +682,10 @@ function endGame() {
 
 function savePersonalBest(time, successRate, flagCount) {
     const totalFlags = FLAGS_DATA.length;
-    let isNewRecord = false;
 
     // Don't save PB if 0% completion
     if (successRate === 0) {
-        return false;
+        return null;
     }
 
     if (successRate === 100) {
@@ -700,7 +706,7 @@ function savePersonalBest(time, successRate, flagCount) {
                 localStorage.setItem('flagGamePreviousTimePB', existingTimePB);
             }
             localStorage.setItem('flagGameTimePB', JSON.stringify(newTimePB));
-            isNewRecord = true;
+            return 'time';
         }
     } else {
         // For <100% completion, use flag count-based PB
@@ -720,11 +726,11 @@ function savePersonalBest(time, successRate, flagCount) {
                 localStorage.setItem('flagGamePreviousFlagPB', existingFlagPB);
             }
             localStorage.setItem('flagGameFlagPB', JSON.stringify(newFlagPB));
-            isNewRecord = true;
+            return 'flags';
         }
     }
 
-    return isNewRecord;
+    return null;
 }
 
 function celebrate() {
@@ -784,7 +790,7 @@ function stopCelebration() {
     confettiElements.forEach(el => el.remove());
 }
 
-function displayPersonalBest(isNewRecord = false) {
+function displayPersonalBest(newRecordType = null) {
     const timePB = localStorage.getItem('flagGameTimePB');
     const flagPB = localStorage.getItem('flagGameFlagPB');
     const previousTimePB = localStorage.getItem('flagGamePreviousTimePB');
@@ -800,36 +806,58 @@ function displayPersonalBest(isNewRecord = false) {
         finalStats.appendChild(pbElement);
     }
 
-    let content = `<span class="label">Personal Best:</span>`;
+    // If no PB exists, don't show anything
+    if (!timePB && !flagPB) {
+        pbElement.style.display = 'none';
+        return;
+    }
 
-    // Check if this is first 100% completion (new time PB but flag PB was <100%)
-    const isFirst100Percent = timePB && isNewRecord && !previousTimePB && flagPB && JSON.parse(flagPB).successRate < 100;
+    // Build display using DOM methods
+    pbElement.textContent = '';
+    const label = document.createElement('span');
+    label.className = 'label';
+    label.textContent = 'Personal Best:';
+    pbElement.appendChild(label);
+
+    function formatTime(ms) {
+        const m = Math.floor(ms / 60000);
+        const s = Math.floor((ms % 60000) / 1000);
+        return m.toString().padStart(2, '0') + ':' + s.toString().padStart(2, '0');
+    }
 
     // Show time-based PB if it exists (100% completion records)
     if (timePB) {
         const personalBest = JSON.parse(timePB);
-        const minutes = Math.floor(personalBest.time / 60000);
-        const seconds = Math.floor((personalBest.time % 60000) / 1000);
-        const pbTimeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        const pbTimeString = formatTime(personalBest.time);
 
-        if (isNewRecord && personalBest.type === 'time' && previousTimePB) {
-            // Show previous time PB with strikethrough
+        if (newRecordType === 'time' && previousTimePB) {
+            // New time record with a previous one to show strikethrough
             const prevPB = JSON.parse(previousTimePB);
-            const prevMinutes = Math.floor(prevPB.time / 60000);
-            const prevSeconds = Math.floor((prevPB.time % 60000) / 1000);
-            const prevTimeString = `${prevMinutes.toString().padStart(2, '0')}:${prevSeconds.toString().padStart(2, '0')}`;
+            const prevTimeString = formatTime(prevPB.time);
 
-            content += `
-                <div>
-                    <span class="previous-pb">${prevTimeString} (100%)</span><br>
-                    <span class="gradient-text">${pbTimeString} (100%) - NEW BEST!</span>
-                </div>
-            `;
-        } else if (isFirst100Percent) {
+            const div = document.createElement('div');
+            const prevSpan = document.createElement('span');
+            prevSpan.className = 'previous-pb';
+            prevSpan.textContent = prevTimeString + ' (100%)';
+            div.appendChild(prevSpan);
+            div.appendChild(document.createElement('br'));
+            const newSpan = document.createElement('span');
+            newSpan.className = 'gradient-text';
+            newSpan.textContent = pbTimeString + ' (100%) - NEW BEST!';
+            div.appendChild(newSpan);
+            pbElement.appendChild(div);
+        } else if (newRecordType === 'time') {
             // First 100% completion - show with gradient
-            content += `<br><span class="gradient-text">⏱️ ${pbTimeString} (100%) - NEW BEST!</span>`;
+            pbElement.appendChild(document.createElement('br'));
+            const span = document.createElement('span');
+            span.className = 'gradient-text';
+            span.textContent = '\u23F1\uFE0F ' + pbTimeString + ' (100%) - NEW BEST!';
+            pbElement.appendChild(span);
         } else {
-            content += `<br><span>⏱️ ${pbTimeString} (100%)</span>`;
+            pbElement.appendChild(document.createElement('br'));
+            const span = document.createElement('span');
+            span.textContent = '\u23F1\uFE0F ' + pbTimeString + ' (100%)';
+            pbElement.appendChild(span);
         }
     }
 
@@ -837,42 +865,44 @@ function displayPersonalBest(isNewRecord = false) {
     if (flagPB) {
         const flagPersonalBest = JSON.parse(flagPB);
         const totalFlags = FLAGS_DATA.length;
+        const pct = Math.round((flagPersonalBest.flagCount / totalFlags) * 100);
+        const flagText = '\uD83D\uDEA9 ' + flagPersonalBest.flagCount + '/' + totalFlags + ' flags (' + pct + '%)';
 
-        if (timePB) content += '<br>'; // Add line break if showing both
+        if (timePB) pbElement.appendChild(document.createElement('br'));
 
-        if (isFirst100Percent) {
-            // Show previous flag PB (non-100%) with strikethrough when achieving first 100%
-            content += `
-                <div>
-                    <span class="previous-pb">🚩 ${flagPersonalBest.flagCount}/${totalFlags} flags (${Math.round((flagPersonalBest.flagCount / totalFlags) * 100)}%)</span>
-                </div>
-            `;
-        } else if (isNewRecord && flagPersonalBest.type === 'flags' && previousFlagPB) {
-            // Show previous flag PB with strikethrough
+        if (newRecordType === 'time' && flagPersonalBest.successRate < 100) {
+            // 100% completion supersedes partial record - show with strikethrough
+            const span = document.createElement('span');
+            span.className = 'previous-pb';
+            span.textContent = flagText;
+            pbElement.appendChild(span);
+        } else if (newRecordType === 'flags' && previousFlagPB) {
+            // New flag record with a previous one to show strikethrough
             const prevFlagPB = JSON.parse(previousFlagPB);
-
-            content += `
-                <div>
-                    <span class="previous-pb">🚩 ${prevFlagPB.flagCount}/${totalFlags} flags (${Math.round((prevFlagPB.flagCount / totalFlags) * 100)}%)</span><br>
-                    <span class="gradient-text">🚩 ${flagPersonalBest.flagCount}/${totalFlags} flags (${Math.round((flagPersonalBest.flagCount / totalFlags) * 100)}%) NEW BEST!</span>
-                </div>
-            `;
-        } else if (!isFirst100Percent) {
-            // Only show flag PB if it's not being superseded by first 100%
-            const flagClass = isNewRecord && flagPersonalBest.type === 'flags' ? 'gradient-text' : '';
-            const newText = isNewRecord && flagPersonalBest.type === 'flags' ? ' NEW BEST!' : '';
-            content += `<span class="${flagClass}">🚩 ${flagPersonalBest.flagCount}/${totalFlags} flags (${Math.round((flagPersonalBest.flagCount / totalFlags) * 100)}%)${newText}</span>`;
+            const prevPct = Math.round((prevFlagPB.flagCount / totalFlags) * 100);
+            const prevSpan = document.createElement('span');
+            prevSpan.className = 'previous-pb';
+            prevSpan.textContent = '\uD83D\uDEA9 ' + prevFlagPB.flagCount + '/' + totalFlags + ' flags (' + prevPct + '%)';
+            pbElement.appendChild(prevSpan);
+            pbElement.appendChild(document.createElement('br'));
+            const newSpan = document.createElement('span');
+            newSpan.className = 'gradient-text';
+            newSpan.textContent = flagText + ' NEW BEST!';
+            pbElement.appendChild(newSpan);
+        } else {
+            // Show flag PB (with NEW BEST only if this game set a new flag record)
+            const span = document.createElement('span');
+            if (newRecordType === 'flags') {
+                span.className = 'gradient-text';
+                span.textContent = flagText + ' NEW BEST!';
+            } else {
+                span.textContent = flagText;
+            }
+            pbElement.appendChild(span);
         }
     }
 
-    // If no PB exists, don't show anything
-    if (!timePB && !flagPB) {
-        pbElement.style.display = 'none';
-        return;
-    }
-
     pbElement.style.display = 'flex';
-    pbElement.innerHTML = content;
 }
 
 function restartGame() {

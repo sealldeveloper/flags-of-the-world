@@ -79,15 +79,15 @@
   .clue-category-label{font-size:1.8vw;color:#c8a832;letter-spacing:4px;text-transform:uppercase;margin-bottom:4px;}
   .clue-value-label{font-size:2.5vw;color:#c8a832;margin-bottom:10px;}
   .clue-wager-label{font-size:2vw;color:#ff8c00;margin-bottom:20px;letter-spacing:3px;}
-  .clue-question{font-size:4vw;line-height:1.3;text-shadow:2px 2px 8px rgba(0,0,0,0.5);max-width:85%;}
+  .clue-question{font-size:4vw;line-height:1.3;text-shadow:2px 2px 8px rgba(0,0,0,0.5);max-width:85%;max-height:60vh;overflow:hidden;}
   .clue-question.anim{animation:clueTextIn 0.5s cubic-bezier(.22,1,.36,1);}
   .clue-media{max-width:70%;max-height:50vh;margin:20px auto;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
   .clue-media img{max-width:100%;max-height:50vh;border-radius:8px;object-fit:contain;}
   .clue-media video{max-width:100%;max-height:50vh;border-radius:8px;object-fit:contain;background:#000;}
   .clue-media iframe{width:60vw;height:34vw;max-height:50vh;border:none;border-radius:8px;}
   @keyframes clueTextIn{from{opacity:0;transform:scale(0.85);}to{opacity:1;transform:scale(1);}}
-  .clue-answer-text{font-size:3vw;color:#44ff44;margin-top:30px;opacity:0;transform:translateY(20px);transition:all 0.5s cubic-bezier(.22,1,.36,1);}
-  .clue-answer-text.show{opacity:1;transform:translateY(0);}
+  .clue-answer-text{font-size:3vw;color:#44ff44;margin-top:30px;opacity:0;visibility:hidden;transform:translateY(20px);transition:opacity 0.5s cubic-bezier(.22,1,.36,1),transform 0.5s cubic-bezier(.22,1,.36,1),visibility 0s 0.5s;}
+  .clue-answer-text.show{opacity:1;visibility:visible;transform:translateY(0);transition:opacity 0.5s cubic-bezier(.22,1,.36,1),transform 0.5s cubic-bezier(.22,1,.36,1),visibility 0s 0s;}
 
   /* ══════ DAILY DOUBLE ══════ */
   #screen-dd{overflow:hidden;background:radial-gradient(ellipse at 50% 50%,#5a1a1a 0%,#2a0808 40%,#0a0204 80%,#000 100%);}
@@ -103,11 +103,11 @@
   #screen-final{background:radial-gradient(ellipse at center,#1a1a6e 0%,#060614 70%);padding:20px;}
   .final-header{text-align:center;flex-shrink:0;}
   .final-title{font-size:5vw;font-weight:700;color:#c8a832;text-transform:uppercase;letter-spacing:8px;text-shadow:0 0 40px rgba(200,168,50,0.4);}
-  .final-category{font-size:3vw;color:#fff;margin-top:10px;letter-spacing:4px;text-transform:uppercase;text-shadow:1px 1px 6px rgba(0,0,0,0.6);}
+  .final-category{font-size:3vw;color:#fff;margin-top:10px;letter-spacing:4px;text-transform:uppercase;text-shadow:1px 1px 6px rgba(0,0,0,0.6);max-width:90%;overflow:hidden;word-break:break-word;}
   .final-category.anim{animation:clueTextIn 0.6s ease;}
-  .final-question{font-size:3.5vw;color:#fff;text-align:center;line-height:1.3;margin:20px auto;max-width:85%;text-shadow:2px 2px 8px rgba(0,0,0,0.5);transition:font-size 0.4s,margin 0.4s;}
+  .final-question{font-size:3.5vw;color:#fff;text-align:center;line-height:1.3;margin:20px auto;max-width:85%;max-height:45vh;overflow:hidden;text-shadow:2px 2px 8px rgba(0,0,0,0.5);transition:font-size 0.4s,margin 0.4s;}
   .final-question.anim{animation:clueTextIn 0.6s cubic-bezier(.22,1,.36,1);}
-  .final-question.shrunk{font-size:1.8vw;margin:6px auto;}
+  .final-question.shrunk{font-size:1.8vw;margin:6px auto;max-height:15vh;}
   .final-timer{font-size:8vw;font-weight:700;color:#c8a832;text-align:center;text-shadow:0 0 30px rgba(200,168,50,0.5);margin:10px 0;font-variant-numeric:tabular-nums;}
   .final-timer.urgent{color:#ff4444;text-shadow:0 0 30px rgba(255,50,50,0.5);}
   .final-timer-bar{width:80%;max-width:600px;height:8px;background:#1a1a3e;border-radius:4px;margin:0 auto;overflow:hidden;}
@@ -465,6 +465,50 @@ function renderBoard() {
     }
   }
   prevRevealedStr = newRevealedStr;
+  fitCategoryText();
+}
+
+/* ══════ TEXT FITTING ══════ */
+function fitTextToParent(el, minPx) {
+  if (!el || !el.parentElement) return;
+  el.style.fontSize = '';
+  var parent = el.parentElement;
+  var size = parseFloat(getComputedStyle(el).fontSize);
+  var safety = 40;
+  while (safety-- > 0 && size > (minPx || 10) && (el.scrollHeight > parent.clientHeight + 2 || el.scrollWidth > parent.clientWidth + 2)) {
+    size -= 1;
+    el.style.fontSize = size + 'px';
+  }
+}
+
+function fitCategoryText() {
+  var inners = document.querySelectorAll('.board-cat:not(.hidden-cat) .cat-inner');
+  for (var i = 0; i < inners.length; i++) fitTextToParent(inners[i], 10);
+}
+
+function fitFinalQuestion(el) {
+  if (!el || el.style.display === 'none') return;
+  var size = parseFloat(getComputedStyle(el).fontSize);
+  var safety = 40;
+  while (safety-- > 0 && size > 12 && el.scrollHeight > el.clientHeight + 2) {
+    size -= 1;
+    el.style.fontSize = size + 'px';
+  }
+}
+
+function fitFinalTeamCards() {
+  var answers = document.querySelectorAll('.ftc-answer');
+  for (var i = 0; i < answers.length; i++) {
+    var el = answers[i];
+    var size = parseFloat(getComputedStyle(el).fontSize);
+    var card = el.closest('.final-team-card');
+    if (!card) continue;
+    var safety = 20;
+    while (safety-- > 0 && size > 10 && el.scrollWidth > card.clientWidth - 20) {
+      size -= 1;
+      el.style.fontSize = size + 'px';
+    }
+  }
 }
 
 /* ══════ CLUE ══════ */
@@ -529,12 +573,14 @@ function renderClue() {
   }
 
   var qEl = document.getElementById('clue-q');
+  qEl.style.fontSize = '';
   qEl.textContent = state.clue.question;
   if (isNew) {
     qEl.classList.remove('anim');
     void qEl.offsetWidth;
     qEl.classList.add('anim');
   }
+  fitFinalQuestion(qEl);
 
   var ansEl = document.getElementById('clue-a');
   ansEl.textContent = state.clue.answer;
@@ -612,10 +658,13 @@ function renderFinal() {
   if (f.phase === 'clue' || f.phase === 'reveal') {
     var prevQ = qEl.textContent;
     qEl.style.display = '';
+    qEl.style.fontSize = '';
     qEl.textContent = f.question || '';
     if (f.phase === 'reveal') qEl.classList.add('shrunk');
     else qEl.classList.remove('shrunk');
     if (f.question && f.question !== prevQ) { qEl.classList.remove('anim'); void qEl.offsetWidth; qEl.classList.add('anim'); }
+    // Shrink font if text overflows
+    fitFinalQuestion(qEl);
   } else {
     qEl.style.display = 'none';
     qEl.classList.remove('shrunk');
@@ -715,6 +764,7 @@ function renderFinal() {
       }
     });
     teamsEl.style.display = '';
+    fitFinalTeamCards();
   } else if (f.phase === 'category') {
     while (teamsEl.firstChild) teamsEl.removeChild(teamsEl.firstChild);
     teamsEl.style.display = 'none';
