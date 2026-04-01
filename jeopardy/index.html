@@ -517,6 +517,34 @@ function renderBoardEditor(){
   mRow.appendChild(mLabel);mRow.appendChild(mSel);
   el.appendChild(mRow);
 
+  // Daily Double placement
+  var ddRow=document.createElement('div');ddRow.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:12px;';
+  var ddLabel=document.createElement('label');ddLabel.textContent='Daily Double';ddLabel.style.margin='0';
+  var ddSel=document.createElement('select');ddSel.style.width='auto';
+  var ddRandom=document.createElement('option');ddRandom.value='random';ddRandom.textContent='Random';ddSel.appendChild(ddRandom);
+  board.categories.forEach(function(cat,ci2){
+    cat.clues.forEach(function(clue,ri){
+      var o=document.createElement('option');o.value=ci2+'-'+ri;o.textContent=cat.name+' \u2014 $'+clue.value;ddSel.appendChild(o);
+    });
+  });
+  // Set current value
+  var dds=game.dailyDoubles[bi]||[];
+  if(dds.length>0&&dds[0]!=='random'){ddSel.value=dds[0];}
+  else{ddSel.value='random';}
+  ddSel.addEventListener('change',function(){
+    if(this.value==='random'){
+      game.dailyDoubles[bi]=[Math.floor(Math.random()*5)+'-'+Math.floor(Math.random()*5)];
+    } else {
+      game.dailyDoubles[bi]=[this.value];
+    }
+    // Store whether it's rigged so we can preserve it
+    game.ddRigged=game.ddRigged||{};
+    game.ddRigged[bi]=this.value!=='random';
+    saveState();renderMiniBoard();
+  });
+  ddRow.appendChild(ddLabel);ddRow.appendChild(ddSel);
+  el.appendChild(ddRow);
+
   board.categories.forEach(function(cat,ci){
     var ed=document.createElement('div');ed.className='cat-editor';
     var hd=document.createElement('div');hd.className='cat-header';
@@ -731,7 +759,8 @@ function renderCluePanel(){
 
     var wr=document.createElement('div');wr.className='wager-row';
     var wi=document.createElement('input');wi.type='number';wi.id='wager-input';
-    wi.value=game.wager||'';wi.placeholder='Enter wager';
+    wi.value=game.wager||'';wi.placeholder='Enter wager';wi.min='0';wi.inputMode='numeric';
+    wi.addEventListener('keydown',function(e){if(['e','E','+','-','.'].indexOf(e.key)!==-1)e.preventDefault();});
     var ws=document.createElement('button');ws.className='btn btn-gold btn-sm';ws.textContent='Set';
     ws.addEventListener('click',function(){
       var v=+(document.getElementById('wager-input').value);
@@ -1140,8 +1169,9 @@ function renderFinalPanel(){
     // Wager input
     var wr=document.createElement('div');wr.className='frow';
     var wl=document.createElement('label');wl.textContent='Wager';
-    var wi=document.createElement('input');wi.type='number';wi.value=ft.wager||'';wi.placeholder='0';
-    wi.addEventListener('input',function(){ft.wager=+(this.value)||0;});
+    var wi=document.createElement('input');wi.type='number';wi.value=ft.wager||'';wi.placeholder='0';wi.min='0';wi.inputMode='numeric';
+    wi.addEventListener('keydown',function(e){if(['e','E','+','-','.'].indexOf(e.key)!==-1)e.preventDefault();});
+    wi.addEventListener('input',function(){ft.wager=Math.max(0,+(this.value)||0);});
     wi.addEventListener('change',function(){saveState();});
     var wrv=document.createElement('button');wrv.className='btn btn-sm '+(ft.wagerRevealed?'btn-green':'btn-gray');
     wrv.textContent=ft.wagerRevealed?'Wager Shown':'Reveal Wager';
@@ -1439,7 +1469,7 @@ function resetBoard(){
   var bi=game.currentBoard;
   game.revealedCategories[bi]=setup.boards[bi].categories.map(function(){return false;});
   game.usedClues[bi]=[];
-  game.dailyDoubles[bi]=[Math.floor(Math.random()*5)+"-"+Math.floor(Math.random()*5)];
+  if(!game.ddRigged||!game.ddRigged[bi]) game.dailyDoubles[bi]=[Math.floor(Math.random()*5)+"-"+Math.floor(Math.random()*5)];
   game.currentClue=null;game.answerRevealed=false;game.wager=null;previewClue=null;
   game.displayMode='board';broadcast();renderGameTab();
 }

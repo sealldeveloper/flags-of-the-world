@@ -120,7 +120,7 @@
   .ftc-divider{width:60%;height:1px;background:#2a2a5e;}
   .ftc-label{font-size:2vh;color:#666;text-transform:uppercase;letter-spacing:2px;}
   .ftc-wager{font-size:4.5vh;font-weight:700;color:#ff8c00;min-height:1.5em;}
-  .ftc-answer{font-size:3.5vh;color:#fff;min-height:1.5em;line-height:1.3;white-space:pre-line;}
+  .ftc-answer{font-size:3.5vh;color:#fff;min-height:1.5em;line-height:1.3;white-space:pre-line;word-break:break-word;overflow:hidden;}
   .ftc-hidden{color:#2a2a5e;font-style:italic;font-size:2.5vh;}
   .ftc-result{font-size:6vh;font-weight:700;min-height:1.2em;}
   .ftc-result.correct{color:#44ff44;}
@@ -500,11 +500,14 @@ function fitFinalTeamCards() {
   var answers = document.querySelectorAll('.ftc-answer');
   for (var i = 0; i < answers.length; i++) {
     var el = answers[i];
+    el.style.fontSize = '';
     var size = parseFloat(getComputedStyle(el).fontSize);
     var card = el.closest('.final-team-card');
     if (!card) continue;
-    var safety = 20;
-    while (safety-- > 0 && size > 10 && el.scrollWidth > card.clientWidth - 20) {
+    var maxW = card.clientWidth - 20;
+    var maxH = card.clientHeight * 0.35;
+    var safety = 30;
+    while (safety-- > 0 && size > 8 && (el.scrollWidth > maxW || el.scrollHeight > maxH)) {
       size -= 1;
       el.style.fontSize = size + 'px';
     }
@@ -752,16 +755,6 @@ function renderFinal() {
         wv.textContent = '$' + (t.wager || 0).toLocaleString();
       } else { wv.className = 'ftc-hidden'; wv.textContent = '???'; }
       card.appendChild(wl); card.appendChild(wv);
-
-      // New score
-      if (t.result && t.wagerRevealed) {
-        var justScore = prev && !(prev.result && prev.wagerRevealed);
-        var ns = document.createElement('div');
-        ns.className = 'ftc-newscore' + (justScore ? ' ftc-score-in' : '');
-        var newScore = t.score + (t.result === 'correct' ? (t.wager||0) : -(t.wager||0));
-        ns.textContent = '\u2192 $' + newScore.toLocaleString();
-        card.appendChild(ns);
-      }
     });
     teamsEl.style.display = '';
     fitFinalTeamCards();
