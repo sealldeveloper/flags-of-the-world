@@ -95,8 +95,8 @@
   .preview-card.on-display{border-color:#c8a832;box-shadow:0 0 10px rgba(200,168,50,.2);}
   .preview-label{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
   .preview-cat{color:#c8a832;font-weight:700;font-size:.9rem;}
-  .preview-q{color:#fff;font-size:1rem;margin:10px 0;line-height:1.4;}
-  .preview-a{color:#4f4;font-size:.95rem;margin:10px 0;}
+  .preview-q{color:#fff;font-size:1rem;margin:10px 0;line-height:1.4;white-space:pre-line;}
+  .preview-a{color:#4f4;font-size:.95rem;margin:10px 0;white-space:pre-line;}
   .preview-dd{color:#f80;font-weight:700;margin:6px 0;}
   .wager-row{display:flex;gap:6px;align-items:center;margin:8px 0;flex-wrap:wrap;}
   .wager-row input{width:100px;}
@@ -143,9 +143,9 @@
 
   .final-team-ctrl{background:#1e1e32;border:1px solid #2a2a4e;border-radius:6px;padding:12px;margin-bottom:8px;}
   .final-team-ctrl h4{color:#c8a832;font-size:.8rem;margin-bottom:8px;}
-  .final-team-ctrl .frow{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
-  .final-team-ctrl .frow label{margin:0;min-width:60px;white-space:nowrap;}
-  .final-team-ctrl .frow input{flex:1;}
+  .final-team-ctrl .frow{display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;}
+  .final-team-ctrl .frow label{margin:0;min-width:60px;white-space:nowrap;padding-top:8px;}
+  .final-team-ctrl .frow input,.final-team-ctrl .frow textarea{flex:1;}
   .final-revealed{color:#6f6;font-size:.7rem;font-weight:600;}
 </style>
 </head>
@@ -531,9 +531,9 @@ function renderBoardEditor(){
       var r=document.createElement('div');r.className='clue-row';
       var vs=document.createElement('div');vs.className='val';vs.textContent='$'+clue.value;
       var fs=document.createElement('div');fs.className='clue-fields';
-      var qi=document.createElement('input');qi.type='text';qi.value=clue.question;qi.placeholder='Clue';
+      var qi=document.createElement('textarea');qi.value=clue.question;qi.placeholder='Clue';qi.rows=2;
       qi.addEventListener('input',function(){clue.question=this.value;saveState();});
-      var ai=document.createElement('input');ai.type='text';ai.value=clue.answer;ai.placeholder='Answer';
+      var ai=document.createElement('textarea');ai.value=clue.answer;ai.placeholder='Answer';ai.rows=2;
       ai.addEventListener('input',function(){clue.answer=this.value;saveState();});
       var vi=document.createElement('input');vi.type='number';vi.value=clue.value;vi.style.width='80px';
       vi.addEventListener('input',function(){clue.value=+this.value;vs.textContent='$'+clue.value;saveState();});
@@ -1165,7 +1165,7 @@ function renderFinalPanel(){
     // Answer input
     var ar=document.createElement('div');ar.className='frow';
     var al=document.createElement('label');al.textContent='Answer';
-    var ai=document.createElement('input');ai.type='text';ai.value=ft.answer||'';ai.placeholder='Their answer';
+    var ai=document.createElement('textarea');ai.value=ft.answer||'';ai.placeholder='Their answer';ai.rows=2;
     ai.addEventListener('input',function(){ft.answer=this.value;});
     ai.addEventListener('change',function(){saveState();});
     var arv=document.createElement('button');arv.className='btn btn-sm '+(ft.answerRevealed?'btn-green':'btn-gray');
@@ -1461,7 +1461,11 @@ function renderFinalSetup(){
   var fj=setup.finalJeopardy;
   [['Category',fj.category,'category'],['Question',fj.question,'question'],['Correct Answer',fj.answer,'answer']].forEach(function(f){
     var lb=document.createElement('label');lb.textContent=f[0];
-    var inp=document.createElement('input');inp.type='text';inp.value=f[1];inp.placeholder='Enter '+f[0].toLowerCase();
+    var isMultiline=f[2]==='question'||f[2]==='answer';
+    var inp=document.createElement(isMultiline?'textarea':'input');
+    if(!isMultiline) inp.type='text';
+    else inp.rows=3;
+    inp.value=f[1];inp.placeholder='Enter '+f[0].toLowerCase();
     inp.style.marginBottom='8px';
     inp.addEventListener('input',function(){fj[f[2]]=this.value;saveState();});
     el.appendChild(lb);el.appendChild(inp);

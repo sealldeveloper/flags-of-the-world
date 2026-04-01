@@ -79,14 +79,14 @@
   .clue-category-label{font-size:1.8vw;color:#c8a832;letter-spacing:4px;text-transform:uppercase;margin-bottom:4px;}
   .clue-value-label{font-size:2.5vw;color:#c8a832;margin-bottom:10px;}
   .clue-wager-label{font-size:2vw;color:#ff8c00;margin-bottom:20px;letter-spacing:3px;}
-  .clue-question{font-size:4vw;line-height:1.3;text-shadow:2px 2px 8px rgba(0,0,0,0.5);max-width:85%;max-height:60vh;overflow:hidden;}
+  .clue-question{font-size:4vw;line-height:1.3;text-shadow:2px 2px 8px rgba(0,0,0,0.5);max-width:85%;max-height:60vh;overflow:hidden;white-space:pre-line;}
   .clue-question.anim{animation:clueTextIn 0.5s cubic-bezier(.22,1,.36,1);}
   .clue-media{max-width:70%;max-height:50vh;margin:20px auto;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
   .clue-media img{max-width:100%;max-height:50vh;border-radius:8px;object-fit:contain;}
   .clue-media video{max-width:100%;max-height:50vh;border-radius:8px;object-fit:contain;background:#000;}
   .clue-media iframe{width:60vw;height:34vw;max-height:50vh;border:none;border-radius:8px;}
   @keyframes clueTextIn{from{opacity:0;transform:scale(0.85);}to{opacity:1;transform:scale(1);}}
-  .clue-answer-text{font-size:3vw;color:#44ff44;margin-top:30px;opacity:0;visibility:hidden;transform:translateY(20px);transition:opacity 0.5s cubic-bezier(.22,1,.36,1),transform 0.5s cubic-bezier(.22,1,.36,1),visibility 0s 0.5s;}
+  .clue-answer-text{font-size:3vw;color:#44ff44;margin-top:30px;opacity:0;visibility:hidden;transform:translateY(20px);transition:opacity 0.5s cubic-bezier(.22,1,.36,1),transform 0.5s cubic-bezier(.22,1,.36,1),visibility 0s 0.5s;white-space:pre-line;}
   .clue-answer-text.show{opacity:1;visibility:visible;transform:translateY(0);transition:opacity 0.5s cubic-bezier(.22,1,.36,1),transform 0.5s cubic-bezier(.22,1,.36,1),visibility 0s 0s;}
 
   /* ══════ DAILY DOUBLE ══════ */
@@ -105,7 +105,7 @@
   .final-title{font-size:5vw;font-weight:700;color:#c8a832;text-transform:uppercase;letter-spacing:8px;text-shadow:0 0 40px rgba(200,168,50,0.4);}
   .final-category{font-size:3vw;color:#fff;margin-top:10px;letter-spacing:4px;text-transform:uppercase;text-shadow:1px 1px 6px rgba(0,0,0,0.6);max-width:90%;overflow:hidden;word-break:break-word;}
   .final-category.anim{animation:clueTextIn 0.6s ease;}
-  .final-question{font-size:3.5vw;color:#fff;text-align:center;line-height:1.3;margin:20px auto;max-width:85%;max-height:45vh;overflow:hidden;text-shadow:2px 2px 8px rgba(0,0,0,0.5);transition:font-size 0.4s,margin 0.4s;}
+  .final-question{font-size:3.5vw;color:#fff;text-align:center;line-height:1.3;margin:20px auto;max-width:85%;max-height:45vh;overflow:hidden;text-shadow:2px 2px 8px rgba(0,0,0,0.5);transition:font-size 0.4s,margin 0.4s;white-space:pre-line;}
   .final-question.anim{animation:clueTextIn 0.6s cubic-bezier(.22,1,.36,1);}
   .final-question.shrunk{font-size:1.8vw;margin:6px auto;max-height:15vh;}
   .final-timer{font-size:8vw;font-weight:700;color:#c8a832;text-align:center;text-shadow:0 0 30px rgba(200,168,50,0.5);margin:10px 0;font-variant-numeric:tabular-nums;}
@@ -120,7 +120,7 @@
   .ftc-divider{width:60%;height:1px;background:#2a2a5e;}
   .ftc-label{font-size:2vh;color:#666;text-transform:uppercase;letter-spacing:2px;}
   .ftc-wager{font-size:4.5vh;font-weight:700;color:#ff8c00;min-height:1.5em;}
-  .ftc-answer{font-size:3.5vh;color:#fff;min-height:1.5em;line-height:1.3;}
+  .ftc-answer{font-size:3.5vh;color:#fff;min-height:1.5em;line-height:1.3;white-space:pre-line;}
   .ftc-hidden{color:#2a2a5e;font-style:italic;font-size:2.5vh;}
   .ftc-result{font-size:6vh;font-weight:700;min-height:1.2em;}
   .ftc-result.correct{color:#44ff44;}
