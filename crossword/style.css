@@ -442,6 +442,12 @@ select, input { font-family: inherit; }
 [data-theme="dark"] .xw-cell.shaded {
   background: #4a4a4a;
 }
+[data-theme="dark"] .xw-cell.shaded .cell-letter {
+  color: #e0e0e0;
+}
+[data-theme="dark"] .xw-cell.shaded .cell-num {
+  color: #bbb;
+}
 
 /* Void/hidden cell (. prefix) — transparent, non-interactive */
 .xw-cell.void {
@@ -763,11 +769,14 @@ select, input { font-family: inherit; }
     height: auto;
     min-height: 44px;
     padding: 6px 10px;
-    flex-wrap: nowrap;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
   }
   .header-center { display: none; }
-  .puzzle-selector-wrap { display: none; }
+  .puzzle-selector-wrap { font-size: 0.78rem; gap: 4px; }
+  .puzzle-selector-wrap label { display: none; }
+  #puzzle-select { max-width: 140px; font-size: 0.75rem; padding: 2px 4px; }
+  #puzzle-date { font-size: 0.75rem; padding: 2px 4px; }
   #btn-timer-toggle { display: none; }
   .timer-display { font-size: 0.88rem; min-width: 36px; }
   .timer-wrap { gap: 4px; }
@@ -780,7 +789,9 @@ select, input { font-family: inherit; }
     gap: 6px;
     top: var(--header-h); /* keep sticky position right */
   }
-  .misc-group { display: none; }
+  .misc-group .toolbar-label { display: none; }
+  .misc-group { gap: 4px; flex-wrap: wrap; }
+  #rebus-btn, #btn-undo, #btn-export, #btn-import { font-size: 0.72rem; padding: 3px 6px; }
   .toolbar-label { display: none; }
   #action-select, #scope-select { padding: 3px 5px; font-size: 0.78rem; }
   #btn-go { padding: 4px 10px; font-size: 0.78rem; }
