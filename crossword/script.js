@@ -29,6 +29,7 @@ const state = {
   circles:     [],   // 2D array [row][col] — true/false
   shaded:      [],   // 2D array [row][col] — true/false (darker background)
   hidden:      [],   // 2D array [row][col] — true/false (void/transparent cell)
+  overlayAssets: [],  // overlay image URIs from API (thick bars, gimmick marks)
   acrossClues: [],   // array of { num, clue }
   downClues:   [],   // array of { num, clue }
   cellNums:    [],   // 2D array of numbers (or null)
@@ -552,6 +553,7 @@ function initPuzzleFromData(data, savedProgress = null) {
   state.circles     = circles;
   state.shaded      = shaded  ?? Array.from({ length: height }, () => Array(width).fill(false));
   state.hidden      = hidden  ?? Array.from({ length: height }, () => Array(width).fill(false));
+  state.overlayAssets = data.overlayAssets ?? [];
   state.cellNums    = cellNums;
   state.acrossClues = acrossClues;
   state.downClues   = downClues;
@@ -683,6 +685,39 @@ function renderGrid() {
   }
 
   updateAllCellVisuals();
+  renderBoardOverlays();
+}
+
+// Overlay asset PNGs on the grid to render thick lines, bars, and visual gimmicks.
+// Placed inside #grid-wrap (not the CSS Grid itself) and positioned via JS in fitGrid.
+function renderBoardOverlays() {
+  document.getElementById('board-overlays')?.remove();
+  if (!state.overlayAssets.length) return;
+
+  const container = document.createElement('div');
+  container.id = 'board-overlays';
+
+  for (const uri of state.overlayAssets) {
+    const img = document.createElement('img');
+    img.src = uri;
+    img.draggable = false;
+    img.alt = '';
+    container.appendChild(img);
+  }
+
+  document.getElementById('grid-wrap').appendChild(container);
+}
+
+function positionBoardOverlays() {
+  const overlays = document.getElementById('board-overlays');
+  if (!overlays) return;
+  const wrap = document.getElementById('grid-wrap');
+  const wrapRect = wrap.getBoundingClientRect();
+  const gridRect = dom.grid.getBoundingClientRect();
+  overlays.style.left   = (gridRect.left - wrapRect.left) + 'px';
+  overlays.style.top    = (gridRect.top  - wrapRect.top)  + 'px';
+  overlays.style.width  = gridRect.width  + 'px';
+  overlays.style.height = gridRect.height + 'px';
 }
 
 // Update all cell visual contents (letters + state classes)
@@ -2093,6 +2128,9 @@ function fitGrid() {
   const byH = Math.floor((availH - gridBorderGapH) / state.height);
   const size = Math.min(byW, byH, 120);
   document.documentElement.style.setProperty('--cell-size', `${Math.max(size, 10)}px`);
+
+  // Position overlay container to match the grid after cell-size reflow
+  requestAnimationFrame(() => positionBoardOverlays());
 }
 const gridObserver = new ResizeObserver(fitGrid);
 gridObserver.observe(document.getElementById('clue-panels'));

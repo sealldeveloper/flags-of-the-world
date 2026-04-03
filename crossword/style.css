@@ -380,6 +380,20 @@ select, input { font-family: inherit; }
   outline: none;
 }
 
+/* Overlay container — sits in #grid-wrap, positioned over the grid via JS */
+#grid-wrap { position: relative; }
+#board-overlays {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+}
+#board-overlays img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
 /* Individual cell */
 .xw-cell {
   position: relative;

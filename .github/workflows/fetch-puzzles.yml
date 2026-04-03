@@ -1,4 +1,4 @@
-name: Fetch NYT Crossword Puzzles
+name: Fetch Crossword Puzzles
 
 on:
   schedule:
@@ -15,12 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch and store new puzzles
+      # ── Seattle Times (syndicated ARCHIVE format) ──
+      - name: Fetch Seattle Times puzzles
         run: |
           WORKER="https://nyt-crossword-proxy.my-account-306.workers.dev"
-          PUZZLE_DIR="crossword/puzzles"
+          PUZZLE_DIR="crossword-seattle/puzzles"
 
-          # Fetch live list
           PUZZLES=$(curl -sf "${WORKER}?date=list&get=archivecurrent") || {
             echo "Failed to fetch puzzle list"
             exit 1
@@ -35,37 +35,194 @@ jobs:
             file="${dir}/${id}.txt"
             if [ ! -f "$file" ]; then
               mkdir -p "$dir"
-              curl -sf "${WORKER}?date=${id}" -o "$file" && echo "Downloaded $id" || echo "Failed $id"
+              curl -sf "${WORKER}?date=${id}" -o "$file" && echo "Downloaded Seattle $id" || echo "Failed Seattle $id"
               NEW=$((NEW + 1))
             fi
           done <<< "$PUZZLES"
 
-          echo "NEW=$NEW" >> "$GITHUB_ENV"
+          echo "SEATTLE_NEW=$NEW" >> "$GITHUB_ENV"
 
-      - name: Regenerate manifest
+      - name: Regenerate Seattle Times manifest
         run: |
           python3 - <<'EOF'
           import json, glob, os
 
           puzzles = []
-          for f in glob.glob('crossword/puzzles/**/*.txt', recursive=True):
+          for f in glob.glob('crossword-seattle/puzzles/**/*.txt', recursive=True):
               pid = os.path.basename(f)[:-4]
               if pid.isdigit() and len(pid) == 6:
                   puzzles.append(pid)
 
           puzzles.sort(reverse=True)
 
-          with open('crossword/puzzles/manifest.json', 'w') as f:
+          with open('crossword-seattle/puzzles/manifest.json', 'w') as f:
               json.dump(puzzles, f)
 
-          print(f"Manifest: {len(puzzles)} puzzles")
+          print(f"Seattle manifest: {len(puzzles)} puzzles")
           EOF
 
+      # ── NYT Daily ──
+      - name: Fetch NYT Daily puzzles
+        run: |
+          WORKER="https://nyt-crossword-proxy.my-account-306.workers.dev"
+          PUZZLE_DIR="crossword-nyt/puzzles"
+          NEW=0
+
+          # Fetch last 7 days to catch any gaps
+          for i in $(seq 0 6); do
+            DATE=$(date -u -d "$i days ago" +%Y-%m-%d 2>/dev/null || date -u -v-${i}d +%Y-%m-%d)
+            YYYY="${DATE:0:4}"
+            MM="${DATE:5:2}"
+            dir="${PUZZLE_DIR}/${YYYY}/${MM}"
+            file="${dir}/${DATE}.json"
+            if [ ! -f "$file" ]; then
+              mkdir -p "$dir"
+              if curl -sf "${WORKER}/nyt/daily/${DATE}" -o "$file"; then
+                echo "Downloaded NYT Daily $DATE"
+                NEW=$((NEW + 1))
+                # Download overlay assets and rewrite URIs to local paths
+                python3 - "$file" "$dir" "crossword-nyt" <<'PYEOF'
+import json, sys, os, urllib.request
+json_path, out_dir, base_dir = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(json_path) as f:
+    data = json.load(f)
+assets = data.get('assets', [])
+if not assets:
+    sys.exit(0)
+date_id = os.path.basename(json_path).replace('.json', '')
+modified = False
+for i, asset in enumerate(assets):
+    uri = asset.get('uri', '')
+    if not uri:
+        continue
+    ext = os.path.splitext(uri)[1] or '.png'
+    local_name = f"{date_id}.overlay-{i}{ext}"
+    local_path = os.path.join(out_dir, local_name)
+    try:
+        urllib.request.urlretrieve(uri, local_path)
+        rel = out_dir.replace(base_dir + '/', './')
+        asset['uri'] = f"{rel}/{local_name}"
+        modified = True
+        print(f"  Downloaded overlay: {local_name}")
+    except Exception as e:
+        print(f"  Failed overlay {uri}: {e}")
+if modified:
+    with open(json_path, 'w') as f:
+        json.dump(data, f, separators=(',', ':'))
+PYEOF
+              else
+                echo "Failed NYT Daily $DATE (may not exist yet)"
+                rm -f "$file"
+              fi
+            fi
+          done
+
+          echo "NYT_NEW=$NEW" >> "$GITHUB_ENV"
+
+      - name: Regenerate NYT Daily manifest
+        run: |
+          python3 - <<'EOF'
+          import json, glob, os
+
+          puzzles = []
+          for f in glob.glob('crossword-nyt/puzzles/**/*.json', recursive=True):
+              pid = os.path.basename(f)[:-5]
+              if len(pid) == 10 and pid[4] == '-':
+                  puzzles.append(pid)
+
+          puzzles.sort(reverse=True)
+
+          os.makedirs('crossword-nyt/puzzles', exist_ok=True)
+          with open('crossword-nyt/puzzles/manifest.json', 'w') as f:
+              json.dump(puzzles, f)
+
+          print(f"NYT Daily manifest: {len(puzzles)} puzzles")
+          EOF
+
+      # ── NYT Mini ──
+      - name: Fetch NYT Mini puzzles
+        run: |
+          WORKER="https://nyt-crossword-proxy.my-account-306.workers.dev"
+          PUZZLE_DIR="crossword-nytmini/puzzles"
+          NEW=0
+
+          # Fetch last 7 days to catch any gaps
+          for i in $(seq 0 6); do
+            DATE=$(date -u -d "$i days ago" +%Y-%m-%d 2>/dev/null || date -u -v-${i}d +%Y-%m-%d)
+            YYYY="${DATE:0:4}"
+            MM="${DATE:5:2}"
+            dir="${PUZZLE_DIR}/${YYYY}/${MM}"
+            file="${dir}/${DATE}.json"
+            if [ ! -f "$file" ]; then
+              mkdir -p "$dir"
+              if curl -sf "${WORKER}/nyt/mini/${DATE}" -o "$file"; then
+                echo "Downloaded NYT Mini $DATE"
+                NEW=$((NEW + 1))
+                # Download overlay assets and rewrite URIs to local paths
+                python3 - "$file" "$dir" "crossword-nytmini" <<'PYEOF'
+import json, sys, os, urllib.request
+json_path, out_dir, base_dir = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(json_path) as f:
+    data = json.load(f)
+assets = data.get('assets', [])
+if not assets:
+    sys.exit(0)
+date_id = os.path.basename(json_path).replace('.json', '')
+modified = False
+for i, asset in enumerate(assets):
+    uri = asset.get('uri', '')
+    if not uri:
+        continue
+    ext = os.path.splitext(uri)[1] or '.png'
+    local_name = f"{date_id}.overlay-{i}{ext}"
+    local_path = os.path.join(out_dir, local_name)
+    try:
+        urllib.request.urlretrieve(uri, local_path)
+        rel = out_dir.replace(base_dir + '/', './')
+        asset['uri'] = f"{rel}/{local_name}"
+        modified = True
+        print(f"  Downloaded overlay: {local_name}")
+    except Exception as e:
+        print(f"  Failed overlay {uri}: {e}")
+if modified:
+    with open(json_path, 'w') as f:
+        json.dump(data, f, separators=(',', ':'))
+PYEOF
+              else
+                echo "Failed NYT Mini $DATE (may not exist yet)"
+                rm -f "$file"
+              fi
+            fi
+          done
+
+          echo "MINI_NEW=$NEW" >> "$GITHUB_ENV"
+
+      - name: Regenerate NYT Mini manifest
+        run: |
+          python3 - <<'EOF'
+          import json, glob, os
+
+          puzzles = []
+          for f in glob.glob('crossword-nytmini/puzzles/**/*.json', recursive=True):
+              pid = os.path.basename(f)[:-5]
+              if len(pid) == 10 and pid[4] == '-':
+                  puzzles.append(pid)
+
+          puzzles.sort(reverse=True)
+
+          os.makedirs('crossword-nytmini/puzzles', exist_ok=True)
+          with open('crossword-nytmini/puzzles/manifest.json', 'w') as f:
+              json.dump(puzzles, f)
+
+          print(f"NYT Mini manifest: {len(puzzles)} puzzles")
+          EOF
+
+      # ── Commit all ──
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add crossword/puzzles/
+          git add crossword-seattle/puzzles/ crossword-nyt/puzzles/ crossword-nytmini/puzzles/
           git diff --cached --quiet && echo "Nothing to commit" && exit 0
           git commit -m "feat(crossword): archive puzzles $(date +%Y-%m-%d)"
           git push

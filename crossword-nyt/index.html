@@ -250,6 +250,7 @@
       altAnswers: altAnswers,
       acrossCluesRaw: acrossCluesRaw,
       downCluesRaw: downCluesRaw,
+      overlayAssets: (json.assets || []).map(function(a) { return a.uri; }),
     };
   }
 
@@ -269,7 +270,19 @@
     },
 
     loadPuzzleList: async function() {
-      return recentDates(90);
+      // Merge archived puzzles with recent dates
+      var archived = [];
+      try {
+        var res = await fetch('./puzzles/manifest.json');
+        if (res.ok) archived = await res.json();
+      } catch(e) {}
+      var recent = recentDates(90);
+      var all = [].concat(recent);
+      archived.forEach(function(id) { if (all.indexOf(id) === -1) all.push(id); });
+      all.sort(function(a, b) { return b.localeCompare(a); });
+      // Store archived set for local-first loading
+      window._nytArchived = new Set(archived);
+      return all;
     },
 
     populateSelector: function(selectEl, ids) {
@@ -296,10 +309,20 @@
     },
 
     loadPuzzle: async function(id) {
-      var url = NYT_API + '/' + id;
-      var res = await fetch(url);
+      var json;
+      // Try local archive first
+      if (window._nytArchived && window._nytArchived.has(id)) {
+        var parts = id.split('-');
+        var localUrl = './puzzles/' + parts[0] + '/' + parts[1] + '/' + id + '.json';
+        try {
+          var localRes = await fetch(localUrl);
+          if (localRes.ok) { json = await localRes.json(); return parseNYTPuzzle(json, id); }
+        } catch(e) {}
+      }
+      // Fall back to proxy
+      var res = await fetch(NYT_API + '/' + id);
       if (!res.ok) throw new Error('NYT API returned ' + res.status);
-      var json = await res.json();
+      json = await res.json();
       return parseNYTPuzzle(json, id);
     },
   };
