@@ -1,0 +1,293 @@
+:root {
+  --ink: #171717;
+  --paper: #f2efe8;
+  --surface: #ffffff;
+  --accent: #f2c94c;
+  --muted: #686868;
+  --success: #28784b;
+  --danger: #b83f3f;
+  --border: #171717;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--paper);
+}
+
+body {
+  display: grid;
+  min-height: 100vh;
+  margin: 0;
+  grid-template-rows: auto 1fr auto;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+a:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.site-header,
+main,
+footer {
+  width: min(1120px, calc(100% - 40px));
+  margin-inline: auto;
+}
+
+.site-header {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--border);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.back-link {
+  text-decoration: none;
+}
+
+main {
+  display: grid;
+  align-items: center;
+  padding-block: 32px;
+}
+
+.launcher {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.75fr);
+  border: 3px solid var(--border);
+  background: var(--surface);
+  box-shadow: 8px 8px 0 var(--ink);
+}
+
+.launcher-copy,
+.fallback-note {
+  min-width: 0;
+  padding: clamp(28px, 5vw, 64px);
+}
+
+.fallback-note {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-left: 3px solid var(--border);
+  background: var(--accent);
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.fallback-note .eyebrow {
+  color: var(--ink);
+  opacity: 0.68;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: -0.025em;
+}
+
+h1 {
+  max-width: 15ch;
+  margin-bottom: 20px;
+  font-size: clamp(2.7rem, 6vw, 5.4rem);
+  line-height: 0.94;
+}
+
+h2 {
+  margin-bottom: 14px;
+  font-size: 2rem;
+  line-height: 1.05;
+}
+
+.summary,
+.fallback-note p {
+  max-width: 62ch;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.fallback-note p {
+  color: var(--ink);
+}
+
+.fallback-note > a {
+  align-self: flex-start;
+  font-weight: 900;
+}
+
+.status {
+  display: flex;
+  min-height: 48px;
+  margin: 28px 0 20px;
+  align-items: center;
+  gap: 12px;
+  border-block: 1px solid color-mix(in srgb, var(--border) 28%, transparent);
+  font-weight: 800;
+}
+
+.status-mark {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  border: 2px solid var(--muted);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+.status[data-state="available"] .status-mark,
+.status[data-state="fallback"] .status-mark {
+  border: 0;
+  border-radius: 0;
+  animation: none;
+}
+
+.status[data-state="available"] .status-mark {
+  background: var(--success);
+}
+
+.status[data-state="fallback"] .status-mark {
+  background: var(--danger);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border: 2px solid var(--border);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.button.primary {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.button.secondary {
+  background: var(--surface);
+}
+
+.button:hover {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+footer {
+  display: flex;
+  min-height: 72px;
+  padding-block: 20px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-top: 2px solid var(--border);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.noscript {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  max-width: 360px;
+  padding: 12px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 760px) {
+  .site-header,
+  main,
+  footer {
+    width: min(100% - 20px, 1120px);
+  }
+
+  .site-header {
+    min-height: 58px;
+  }
+
+  main {
+    align-items: start;
+    padding-block: 12px 28px;
+  }
+
+  .launcher {
+    grid-template-columns: 1fr;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+
+  .launcher-copy,
+  .fallback-note {
+    padding: 24px 20px;
+  }
+
+  .fallback-note {
+    border-top: 3px solid var(--border);
+    border-left: 0;
+  }
+
+  h1 {
+    font-size: clamp(2.55rem, 13vw, 4rem);
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  footer {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-mark {
+    animation-duration: 1.8s;
+  }
+}

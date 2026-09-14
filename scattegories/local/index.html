@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A self-hosted Scattergories-style list generator, preserving the experience created by Swellgarfo.">
+  <title>Scattegories — seall.dev</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css?v=7">
+</head>
+<body>
+  <header class="site-header">
+    <a class="back-link" href="/">← puzzles</a>
+    <div class="header-credit">
+      <span>Self-hosted fallback for</span>
+      <a href="https://swellgarfo.com/scattergories/" target="_blank" rel="noreferrer">Swellgarfo’s original ↗</a>
+    </div>
+  </header>
+
+  <main class="game-shell" aria-labelledby="page-title">
+    <h1 id="page-title" class="sr-only">Scattergories List Generator</h1>
+
+    <section class="game-board">
+      <div class="control-column">
+        <section class="control-panel letter-panel" aria-labelledby="letter-label">
+          <div class="panel-heading">
+            <h2 id="letter-label">Letter</h2>
+            <button id="reroll-letter" class="text-button" type="button">Re-roll</button>
+          </div>
+          <div id="current-letter" class="current-letter" aria-live="polite">A</div>
+        </section>
+
+        <div class="control-row">
+          <section class="control-panel timer-panel" aria-labelledby="timer-label">
+            <div class="panel-heading">
+              <h2 id="timer-label">Time</h2>
+              <button id="edit-time" class="text-button" type="button">Change</button>
+            </div>
+            <div id="timer-display" class="timer-display" aria-live="polite">150 s</div>
+            <form id="time-form" class="time-form hidden">
+              <label for="time-seconds">Seconds</label>
+              <input id="time-seconds" type="number" min="10" max="3600" inputmode="numeric" value="150">
+              <button type="submit">Set</button>
+            </form>
+          </section>
+
+          <section class="control-panel play-panel" aria-labelledby="play-label">
+            <h2 id="play-label">Play</h2>
+            <button id="play-toggle" class="play-toggle" type="button" aria-label="Start timer">
+              <span class="play-icon" aria-hidden="true"></span>
+              <span id="play-state">Start</span>
+            </button>
+          </section>
+        </div>
+      </div>
+
+      <section class="categories-panel" aria-labelledby="categories-heading">
+        <div class="categories-header">
+          <div>
+            <p class="eyebrow">Round list</p>
+            <h2 id="categories-heading">Categories</h2>
+          </div>
+          <div class="category-actions">
+            <button id="open-list-editor" class="text-button" type="button">Edit list</button>
+            <div class="stepper" aria-label="Number of categories">
+              <button id="decrease-count" type="button" aria-label="Show fewer categories">−</button>
+              <output id="category-count" aria-live="polite">12</output>
+              <button id="increase-count" type="button" aria-label="Show more categories">+</button>
+            </div>
+          </div>
+        </div>
+
+        <p id="categories-concealed" class="sr-only">The categories are concealed until the timer starts.</p>
+        <div id="times-up-panel" class="times-up-panel" role="alert" hidden>
+          <strong>Time’s up!</strong>
+          <p>Categories stay visible for scoring.</p>
+        </div>
+        <ol id="category-list" class="category-list is-concealed" aria-live="polite" aria-hidden="true"></ol>
+      </section>
+    </section>
+
+    <section class="restart-section">
+      <button id="restart-game" class="restart-button" type="button">
+        <span class="restart-symbol" aria-hidden="true">↻</span>
+        <span>Restart</span>
+      </button>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-links">
+      <a href="https://swellgarfo.com/scattergories/" target="_blank" rel="noreferrer">Original by Swellgarfo ↗</a>
+      <button id="open-about" class="footer-button" type="button">About this copy</button>
+    </div>
+    <div class="display-actions">
+      <button id="invert-colors" class="footer-button" type="button">Invert colours</button>
+      <button id="change-colors" class="footer-button" type="button">Change colours</button>
+    </div>
+  </footer>
+
+  <dialog id="list-dialog" class="app-dialog">
+    <form id="list-form" method="dialog" class="dialog-card">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">Round setup</p>
+          <h2>Edit category list</h2>
+        </div>
+        <button class="dialog-close" value="cancel" aria-label="Close category editor">×</button>
+      </div>
+      <p class="dialog-help">Enter one category per line. Your list is stored only in this browser.</p>
+      <label for="category-editor">Categories</label>
+      <textarea id="category-editor" rows="14" spellcheck="true"></textarea>
+      <div class="dialog-secondary-actions">
+        <button id="kid-friendly" type="button">Child-friendly</button>
+        <button id="restore-defaults" type="button">Restore defaults</button>
+        <button id="copy-list-link" type="button">Copy share link</button>
+      </div>
+      <div class="dialog-primary-actions">
+        <button value="cancel">Cancel</button>
+        <button class="primary-button" value="default">Save list</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="about-dialog" class="app-dialog">
+    <form method="dialog" class="dialog-card about-card">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">Attribution</p>
+          <h2>About this copy</h2>
+        </div>
+        <button class="dialog-close" value="cancel" aria-label="Close about dialog">×</button>
+      </div>
+      <p>
+        The original <a href="https://swellgarfo.com/scattergories/" target="_blank" rel="noreferrer">Scattergories List Generator</a>
+        was designed and created by Swellgarfo. Full credit for the original experience belongs to Swellgarfo.
+      </p>
+      <p>
+        This is an independent, dependency-free reimplementation maintained as a fallback in case the original becomes unavailable.
+      </p>
+      <div class="dialog-primary-actions">
+        <a class="primary-button button-link" href="https://swellgarfo.com/scattergories/" target="_blank" rel="noreferrer">Visit the original</a>
+        <button value="cancel">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="./script.js?v=7"></script>
+</body>
+</html>

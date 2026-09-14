@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A Deadlock Guess Who elimination board with hero details and ability guides.">
+  <title>Deadlock Guess Who — seall.dev</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./style.css?v=4">
+</head>
+<body class="deadlock-mode">
+  <header class="app-header">
+    <div class="header-side header-left">
+      <a class="back-link" href="/">&#8592; puzzles</a>
+    </div>
+    <div class="header-title">
+      <h1>Deadlock Guess Who</h1>
+      <p id="header-subtitle">Hero roster</p>
+    </div>
+    <div class="header-side header-right" aria-hidden="true"></div>
+  </header>
+
+  <main class="app-main">
+    <section id="loading-view" class="state-view" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Loading board…</p>
+    </section>
+
+    <section id="error-view" class="state-view error-view hidden" role="alert">
+      <h2>Couldn’t load this board</h2>
+      <p id="error-message">The preset data could not be read.</p>
+      <button id="retry-button" class="btn btn-primary" type="button">Retry</button>
+    </section>
+
+    <section id="game-view" class="game-view hidden" aria-labelledby="board-title">
+      <div class="game-toolbar">
+        <div class="board-identity">
+          <span class="board-identity-label">Hero board</span>
+          <strong>Deadlock roster</strong>
+        </div>
+
+        <div class="board-progress" aria-live="polite">
+          <strong id="remaining-count">0</strong>
+          <span id="remaining-label">remaining</span>
+        </div>
+
+        <div class="toolbar-actions">
+          <button id="reset-board" class="btn btn-danger" type="button">Reset board</button>
+        </div>
+      </div>
+
+      <aside id="secret-dock" class="secret-dock hidden" aria-label="Your secret character">
+        <div>
+          <p class="eyebrow">Your secret</p>
+          <p>Press and hold to peek.</p>
+        </div>
+        <button id="secret-peek" class="secret-peek" type="button" aria-label="Hold to reveal your secret character">
+          <span class="secret-cover">?</span>
+          <span id="secret-content" class="secret-content" aria-hidden="true"></span>
+        </button>
+        <button id="clear-secret" class="btn btn-quiet" type="button">Change</button>
+      </aside>
+
+      <div id="board-workspace" class="board-workspace">
+        <section class="roster-pane" aria-labelledby="board-title">
+          <div class="board-heading">
+            <div>
+              <p class="eyebrow" id="board-kicker">Select hero</p>
+              <h2 id="board-title">Deadlock roster</h2>
+            </div>
+            <p id="board-instructions">Hover or focus to inspect. Click a portrait to avoid or restore that hero.</p>
+          </div>
+
+          <div id="character-board" class="character-board" role="list" aria-label="Guess Who characters"></div>
+
+          <p id="deadlock-credit" class="source-note">
+            Deadlock game data and card assets via
+            <a href="https://deadlock-api.com" target="_blank" rel="noreferrer">Deadlock API</a>,
+            selected ability descriptions from the <a href="https://deadlock.wiki/Heroes" target="_blank" rel="noreferrer">Deadlock Wiki</a>,
+            and hero artwork by <a href="https://lockbuilds.com" target="_blank" rel="noreferrer">Lockbuilds</a>.
+            Deadlock is a trademark of Valve Corporation.
+          </p>
+        </section>
+
+        <aside id="hero-panel" class="hero-panel hidden" aria-label="Hero details" aria-live="polite">
+          <button id="close-hero-panel" class="hero-panel-close" type="button" aria-label="Close hero details">×</button>
+          <div class="hero-showcase">
+            <img id="hero-background" class="hero-background" alt="">
+            <img id="hero-body" alt="">
+            <div class="hero-identity">
+              <h2 id="hero-name"></h2>
+              <div id="hero-tags" class="hero-tags" aria-label="Hero traits"></div>
+            </div>
+          </div>
+
+          <div class="hero-intel">
+            <p id="hero-playstyle" class="hero-playstyle"></p>
+            <section aria-labelledby="abilities-heading">
+              <div class="ability-heading-row">
+                <h3 id="abilities-heading">Abilities</h3>
+              </div>
+              <div id="ability-list" class="ability-list"></div>
+            </section>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <section id="secret-setup" class="secret-setup hidden" role="dialog" aria-modal="true" aria-labelledby="secret-setup-title">
+    <div class="secret-setup-panel">
+      <div class="secret-setup-heading">
+        <p class="eyebrow">Before you begin</p>
+        <h2 id="secret-setup-title">Choose your secret hero</h2>
+        <p>Pick a hero below, or let fate choose one for you.</p>
+      </div>
+      <div class="secret-setup-actions">
+        <button id="secret-random-start" class="btn btn-primary" type="button">Pick a random hero</button>
+        <p id="secret-picker-label" aria-live="polite">Select a portrait to begin</p>
+      </div>
+      <div id="secret-picker-grid" class="secret-picker-grid" role="group" aria-label="Choose your secret hero"></div>
+    </div>
+  </section>
+
+  <button id="hero-panel-scrim" class="hero-panel-scrim hidden" type="button" aria-label="Close hero details"></button>
+
+  <script src="./script.js?v=4"></script>
+</body>
+</html>

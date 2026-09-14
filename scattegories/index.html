@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Open Swellgarfo's original Scattergories List Generator, with a self-hosted fallback if it is unavailable.">
+  <title>Scattegories — seall.dev</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css?v=2">
+</head>
+<body>
+  <header class="site-header">
+    <a class="back-link" href="/">← puzzles</a>
+    <span>Scattegories</span>
+  </header>
+
+  <main>
+    <section class="launcher" aria-labelledby="page-title">
+      <div class="launcher-copy">
+        <p class="eyebrow">Original game</p>
+        <h1 id="page-title">Swellgarfo’s Scattergories</h1>
+        <p class="summary">
+          You can open Swellgarfo’s original game whenever it is available. Full credit for the game and its design belongs to Swellgarfo.
+        </p>
+
+        <div id="remote-status" class="status" data-state="checking" role="status" aria-live="polite">
+          <span class="status-mark" aria-hidden="true"></span>
+          <span id="status-copy">Checking the original site…</span>
+        </div>
+
+        <div class="actions">
+          <a id="open-original" class="button primary" href="https://swellgarfo.com/scattergories/">Open the original</a>
+          <a class="button secondary" href="./local/">Use self-hosted backup</a>
+        </div>
+      </div>
+
+      <aside class="fallback-note">
+        <p class="eyebrow">Availability fallback</p>
+        <h2>The local copy is staying here</h2>
+        <p>
+          If the availability check cannot reach the original, use the retained local implementation. Nothing on this page redirects automatically.
+        </p>
+        <a href="https://swellgarfo.com/scattergories/">Visit Swellgarfo’s original ↗</a>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <span>Original by <a href="https://swellgarfo.com/" target="_blank" rel="noreferrer">Swellgarfo ↗</a></span>
+    <a href="./ATTRIBUTION.md">Attribution</a>
+  </footer>
+
+  <noscript>
+    <div class="noscript">JavaScript is disabled. Use the original or self-hosted backup buttons above.</div>
+  </noscript>
+
+  <script src="./script.js?v=2"></script>
+</body>
+</html>
