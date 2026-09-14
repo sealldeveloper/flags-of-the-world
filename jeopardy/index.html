@@ -54,9 +54,19 @@
   .cat-header .toggle{color:#888;font-size:.8rem;min-width:20px;text-align:center;}
   .cat-body{display:none;padding:10px 12px;background:#16162a;}
   .cat-body.open{display:block;}
-  .clue-row{display:flex;gap:6px;align-items:flex-start;margin-bottom:8px;padding:8px;background:#1a1a30;border-radius:4px;}
-  .clue-row .val{min-width:50px;color:#c8a832;font-weight:700;padding-top:8px;font-size:.85rem;}
-  .clue-fields{flex:1;display:flex;flex-direction:column;gap:4px;}
+  .clue-row{display:grid;grid-template-columns:32px 50px minmax(0,1fr);gap:6px;align-items:start;margin-bottom:8px;padding:8px;background:#1a1a30;border:1px solid transparent;border-radius:4px;transition:border-color .15s,background .15s,opacity .15s;}
+  .clue-row.dragging{opacity:.45;}
+  .clue-row.drop-target{background:#242442;border-color:#c8a832;}
+  .clue-drag-handle{width:32px;min-height:38px;border:1px solid #3a3a5e;border-radius:4px;background:#22223a;color:#aaa;cursor:grab;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;user-select:none;}
+  .clue-drag-handle:hover,.clue-drag-handle:focus{color:#fff;border-color:#c8a832;outline:none;}
+  .clue-drag-handle:active{cursor:grabbing;}
+  .clue-row .val{min-width:0;color:#c8a832;font-weight:700;padding-top:10px;font-size:.85rem;}
+  .clue-fields{min-width:0;display:flex;flex-direction:column;gap:4px;}
+  .clue-editor-help{font-size:.72rem;color:#888;line-height:1.45;margin:-2px 0 12px;}
+  .media-row{display:grid;grid-template-columns:80px minmax(140px,1fr) auto;gap:4px;align-items:center;}
+  .media-upload-input{display:none;}
+  .media-embedded-note{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 8px;background:#111126;border:1px solid #2a2a4e;border-radius:4px;color:#aaa;font-size:.7rem;min-width:0;}
+  .media-embedded-note span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
   .mini-board{display:grid;gap:3px;}
   .mini-cat{background:#1a1a6e;color:#fff;text-align:center;padding:6px 2px;font-size:.6rem;font-weight:700;text-transform:uppercase;border-radius:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -147,6 +157,24 @@
   .final-team-ctrl .frow label{margin:0;min-width:60px;white-space:nowrap;padding-top:8px;}
   .final-team-ctrl .frow input,.final-team-ctrl .frow textarea{flex:1;}
   .final-revealed{color:#6f6;font-size:.7rem;font-weight:600;}
+
+  @media (max-width:700px){
+    .topbar{padding:10px 12px;gap:10px;}
+    .topbar-right{width:100%;margin-left:0;}
+    .container{padding:12px;}
+    .row{display:block;}
+    .col{min-width:0;width:100%;max-width:none!important;}
+    .section{padding:12px;}
+    .btn-sm{min-height:36px;}
+    .board-select{flex-wrap:wrap;}
+    .board-select select{min-width:0;}
+    .board-control-row{flex-wrap:wrap;}
+    .clue-row{grid-template-columns:32px 44px minmax(0,1fr);padding:6px;}
+    .media-row{grid-template-columns:80px minmax(0,1fr);}
+    .media-upload-btn{grid-column:1/-1;justify-self:start;}
+    .final-team-ctrl .frow{flex-wrap:wrap;}
+    .final-team-ctrl .frow label{width:100%;padding-top:0;}
+  }
 </style>
 </head>
 <body>
@@ -318,6 +346,25 @@ function makeDefaultGame(s) {
   };
 }
 
+function makeFinalTeamState() {
+  return {wager:0,answer:'',wagerRevealed:false,answerRevealed:false,result:null};
+}
+
+function syncFinalTeams() {
+  if(!game.final) return;
+  if(!Array.isArray(game.final.teams)) game.final.teams=[];
+  while(game.final.teams.length<setup.teams.length) game.final.teams.push(makeFinalTeamState());
+  if(game.final.teams.length>setup.teams.length) game.final.teams.length=setup.teams.length;
+}
+
+function syncFinalContent() {
+  if(!game.final) return;
+  var fj=setup.finalJeopardy||{};
+  game.final.category=fj.category||'';
+  game.final.question=fj.question||'';
+  game.final.answer=fj.answer||'';
+}
+
 /* ═══════════════════════════════════════════════
    STATE
    ═══════════════════════════════════════════════ */
@@ -332,6 +379,7 @@ function loadState() {
     if (!setup.buzzerCode) setup.buzzerCode = "";
     if (!game.buzzerOrder) game.buzzerOrder = [];
     if (!game.wager) game.wager = null;
+    if(game.final){syncFinalTeams();syncFinalContent();}
   } catch(e){ setup = makeDefaultSetup(); game = makeDefaultGame(setup); }
 }
 
@@ -404,9 +452,10 @@ function buildDisplayState() {
       question: game.final.question,
       timer: game.final.timer,
       timerRunning: game.final.timerRunning,
-      teams: game.final.teams.map(function(ft,i){
+      teams: setup.teams.map(function(_,i){
+        var ft=game.final.teams[i]||makeFinalTeamState();
         return {
-          name: setup.teams[i] ? setup.teams[i].name : 'Team '+(i+1),
+          name: setup.teams[i].name,
           score: game.scores[i]||0,
           wager: ft.wagerRevealed ? ft.wager : null,
           answer: ft.answerRevealed ? ft.answer : null,
@@ -435,8 +484,18 @@ function openDisplay(){ window.open('display.html','jeopardy_display',''); }
 /* ═══════════════════════════════════════════════
    SETUP: TEAMS
    ═══════════════════════════════════════════════ */
-function addTeam(){ setup.teams.push({name:"Team "+(setup.teams.length+1)}); game.scores.push(0); saveState(); renderTeamList(); }
-function removeTeam(i){ if(setup.teams.length<=1) return; setup.teams.splice(i,1); game.scores.splice(i,1); if(game.activeTeam>=setup.teams.length) game.activeTeam=0; saveState(); renderTeamList(); }
+function addTeam(){
+  setup.teams.push({name:"Team "+(setup.teams.length+1)});game.scores.push(0);
+  if(game.final) game.final.teams.push(makeFinalTeamState());
+  saveState();broadcast();renderTeamList();
+}
+function removeTeam(i){
+  if(setup.teams.length<=1) return;
+  setup.teams.splice(i,1);game.scores.splice(i,1);
+  if(game.final&&Array.isArray(game.final.teams)) game.final.teams.splice(i,1);
+  if(game.activeTeam>=setup.teams.length) game.activeTeam=0;
+  saveState();broadcast();renderTeamList();
+}
 function renderTeamList() {
   var el = document.getElementById('team-list');
   while(el.firstChild) el.removeChild(el.firstChild);
@@ -453,6 +512,41 @@ function renderTeamList() {
 /* ═══════════════════════════════════════════════
    SETUP: BOARD EDITOR
    ═══════════════════════════════════════════════ */
+var draggedClue=null;
+
+function moveClueWithinCategory(boardIndex,categoryIndex,fromIndex,toIndex){
+  var board=setup.boards[boardIndex];
+  var cat=board&&board.categories[categoryIndex];
+  if(!cat||fromIndex===toIndex||fromIndex<0||toIndex<0||fromIndex>=cat.clues.length||toIndex>=cat.clues.length) return;
+  // Values belong to board positions; the clue content moves to a new value.
+  var slotValues=cat.clues.map(function(clue){return clue.value;});
+  var moved=cat.clues.splice(fromIndex,1)[0];
+  cat.clues.splice(toIndex,0,moved);
+  cat.clues.forEach(function(clue,index){clue.value=slotValues[index];});
+  saveState();
+  renderBoardEditor(categoryIndex,toIndex);
+}
+
+function setClueImageFromFile(file,clue,categoryIndex,rowIndex){
+  if(!file) return;
+  if(!file.type||file.type.indexOf('image/')!==0){alert('Please choose an image file.');return;}
+  var previousMedia=clue.media;
+  var reader=new FileReader();
+  reader.onerror=function(){alert('The image could not be read. Please try another file.');};
+  reader.onload=function(){
+    clue.media={type:'image',url:String(reader.result),fileName:file.name,fileSize:file.size};
+    try{
+      saveState();
+    }catch(e){
+      clue.media=previousMedia;
+      alert('That image is too large to save in this browser. Try a smaller image.');
+      return;
+    }
+    renderBoardEditor(categoryIndex,rowIndex);
+  };
+  reader.readAsDataURL(file);
+}
+
 function getSelectedBoardIndex(){ var s=document.getElementById('board-select'); return s?+s.value:0; }
 function addBoard(){
   var num=setup.boards.length+1;
@@ -477,7 +571,7 @@ function renderBoardSelect(){
     else sel.value=id==='game-board-select'?game.currentBoard:0;
   });
 }
-function renderBoardEditor(){
+function renderBoardEditor(openCategoryIndex,focusRowIndex){
   var bi=getSelectedBoardIndex(), board=setup.boards[bi]; if(!board) return;
   var el=document.getElementById('board-editor'); while(el.firstChild) el.removeChild(el.firstChild);
   var nl=document.createElement('label');nl.textContent='Board Name';
@@ -486,7 +580,7 @@ function renderBoardEditor(){
   el.appendChild(nl);el.appendChild(ni);
 
   // Multiplier control
-  var mRow=document.createElement('div');mRow.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:12px;';
+  var mRow=document.createElement('div');mRow.className='board-control-row';mRow.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:12px;';
   var mLabel=document.createElement('label');mLabel.textContent='Values';mLabel.style.margin='0';
   var mSel=document.createElement('select');mSel.style.width='auto';
   var presets=[
@@ -518,7 +612,7 @@ function renderBoardEditor(){
   el.appendChild(mRow);
 
   // Daily Double placement
-  var ddRow=document.createElement('div');ddRow.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:12px;';
+  var ddRow=document.createElement('div');ddRow.className='board-control-row';ddRow.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:12px;';
   var ddLabel=document.createElement('label');ddLabel.textContent='Daily Double';ddLabel.style.margin='0';
   var ddSel=document.createElement('select');ddSel.style.width='auto';
   var ddRandom=document.createElement('option');ddRandom.value='random';ddRandom.textContent='Random';ddSel.appendChild(ddRandom);
@@ -545,44 +639,91 @@ function renderBoardEditor(){
   ddRow.appendChild(ddLabel);ddRow.appendChild(ddSel);
   el.appendChild(ddRow);
 
+  var help=document.createElement('div');help.className='clue-editor-help';
+  help.textContent='Drag a clue by its handle to move it to a different value in the same category. With the handle focused, the Up and Down arrow keys also move it.';
+  el.appendChild(help);
+
   board.categories.forEach(function(cat,ci){
-    var ed=document.createElement('div');ed.className='cat-editor';
+    var ed=document.createElement('div');ed.className='cat-editor';ed.setAttribute('data-category-index',ci);
     var hd=document.createElement('div');hd.className='cat-header';
-    var tg=document.createElement('span');tg.className='toggle';tg.textContent='\u25B6';
+    var tg=document.createElement('span');tg.className='toggle';tg.textContent=ci===openCategoryIndex?'\u25BC':'\u25B6';
     var ci2=document.createElement('input');ci2.type='text';ci2.value=cat.name;
     ci2.addEventListener('input',function(){cat.name=this.value;saveState();});
     ci2.addEventListener('click',function(e){e.stopPropagation();});
     hd.appendChild(tg);hd.appendChild(ci2);
     hd.addEventListener('click',function(){var b=ed.querySelector('.cat-body');b.classList.toggle('open');tg.textContent=b.classList.contains('open')?'\u25BC':'\u25B6';});
-    var bd=document.createElement('div');bd.className='cat-body';
-    cat.clues.forEach(function(clue){
-      var r=document.createElement('div');r.className='clue-row';
+    var bd=document.createElement('div');bd.className='cat-body'+(ci===openCategoryIndex?' open':'');
+    cat.clues.forEach(function(clue,ri){
+      var r=document.createElement('div');r.className='clue-row';r.setAttribute('data-row-index',ri);
+      var dragHandle=document.createElement('button');dragHandle.type='button';dragHandle.className='clue-drag-handle';
+      dragHandle.textContent='\u283F';dragHandle.draggable=true;
+      dragHandle.title='Drag to another value, or use the Up and Down arrow keys';
+      dragHandle.setAttribute('aria-label','Move $'+clue.value+' clue. Drag it or use the Up and Down arrow keys.');
+      dragHandle.addEventListener('dragstart',function(e){
+        draggedClue={boardIndex:bi,categoryIndex:ci,rowIndex:ri};r.classList.add('dragging');
+        if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',ci+'-'+ri);}
+      });
+      dragHandle.addEventListener('dragend',function(){
+        draggedClue=null;
+        document.querySelectorAll('.clue-row.dragging,.clue-row.drop-target').forEach(function(row){row.classList.remove('dragging','drop-target');});
+      });
+      dragHandle.addEventListener('keydown',function(e){
+        var next=e.key==='ArrowUp'?ri-1:e.key==='ArrowDown'?ri+1:ri;
+        if(next!==ri&&next>=0&&next<cat.clues.length){e.preventDefault();moveClueWithinCategory(bi,ci,ri,next);}
+      });
+      r.addEventListener('dragover',function(e){
+        if(draggedClue&&draggedClue.boardIndex===bi&&draggedClue.categoryIndex===ci){e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='move';r.classList.add('drop-target');}
+      });
+      r.addEventListener('dragleave',function(){r.classList.remove('drop-target');});
+      r.addEventListener('drop',function(e){
+        if(!draggedClue||draggedClue.boardIndex!==bi||draggedClue.categoryIndex!==ci) return;
+        e.preventDefault();var from=draggedClue.rowIndex;draggedClue=null;moveClueWithinCategory(bi,ci,from,ri);
+      });
       var vs=document.createElement('div');vs.className='val';vs.textContent='$'+clue.value;
       var fs=document.createElement('div');fs.className='clue-fields';
       var qi=document.createElement('textarea');qi.value=clue.question;qi.placeholder='Clue';qi.rows=2;
       qi.addEventListener('input',function(){clue.question=this.value;saveState();});
       var ai=document.createElement('textarea');ai.value=clue.answer;ai.placeholder='Answer';ai.rows=2;
       ai.addEventListener('input',function(){clue.answer=this.value;saveState();});
-      var vi=document.createElement('input');vi.type='number';vi.value=clue.value;vi.style.width='80px';
-      vi.addEventListener('input',function(){clue.value=+this.value;vs.textContent='$'+clue.value;saveState();});
       // Media row
       if(!clue.media) clue.media={type:'',url:''};
-      var mr=document.createElement('div');mr.style.cssText='display:flex;gap:4px;align-items:center;';
+      var isEmbeddedImage=/^data:image\//i.test(clue.media.url||'');
+      var mr=document.createElement('div');mr.className='media-row';
       var ms=document.createElement('select');ms.style.width='80px';
       ['','image','video','youtube'].forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v||'None';if(clue.media.type===v)o.selected=true;ms.appendChild(o);});
       ms.addEventListener('change',function(){clue.media.type=this.value;saveState();});
-      var mu=document.createElement('input');mu.type='text';mu.value=clue.media.url||'';mu.placeholder='URL, media/file.jpg, or YouTube link';mu.style.flex='1';
+      var mu=document.createElement('input');mu.type='text';mu.value=isEmbeddedImage?'':(clue.media.url||'');
+      mu.placeholder=isEmbeddedImage?'Embedded image — type a URL to replace it':'URL, media/file.jpg, or YouTube link';
       mu.addEventListener('input',function(){
         clue.media.url=this.value;
+        delete clue.media.fileName;delete clue.media.fileSize;
         if(extractYouTubeId(this.value)&&clue.media.type!=='youtube'){clue.media.type='youtube';ms.value='youtube';}
         saveState();
       });
       mu.addEventListener('change',function(){saveState();});
-      mr.appendChild(ms);mr.appendChild(mu);
-      fs.appendChild(qi);fs.appendChild(ai);fs.appendChild(mr);r.appendChild(vs);r.appendChild(fs);bd.appendChild(r);
+      var uploadBtn=document.createElement('button');uploadBtn.type='button';uploadBtn.className='btn btn-gray btn-sm media-upload-btn';uploadBtn.textContent='Upload image';
+      var uploadInput=document.createElement('input');uploadInput.type='file';uploadInput.accept='image/*';uploadInput.className='media-upload-input';
+      uploadBtn.addEventListener('click',function(){uploadInput.click();});
+      uploadInput.addEventListener('change',function(){setClueImageFromFile(this.files[0],clue,ci,ri);this.value='';});
+      mr.appendChild(ms);mr.appendChild(mu);mr.appendChild(uploadBtn);mr.appendChild(uploadInput);
+      fs.appendChild(qi);fs.appendChild(ai);fs.appendChild(mr);
+      if(isEmbeddedImage){
+        var note=document.createElement('div');note.className='media-embedded-note';
+        var noteText=document.createElement('span');noteText.textContent='Embedded: '+(clue.media.fileName||'uploaded image')+(clue.media.fileSize?' ('+Math.max(1,Math.round(clue.media.fileSize/1024))+' KB)':'');
+        var clearBtn=document.createElement('button');clearBtn.type='button';clearBtn.className='btn btn-gray btn-sm';clearBtn.textContent='Remove';
+        clearBtn.addEventListener('click',function(){clue.media={type:'',url:''};saveState();renderBoardEditor(ci,ri);});
+        note.appendChild(noteText);note.appendChild(clearBtn);fs.appendChild(note);
+      }
+      r.appendChild(dragHandle);r.appendChild(vs);r.appendChild(fs);bd.appendChild(r);
     });
     ed.appendChild(hd);ed.appendChild(bd);el.appendChild(ed);
   });
+  if(openCategoryIndex!==undefined&&focusRowIndex!==undefined){
+    requestAnimationFrame(function(){
+      var handle=el.querySelector('[data-category-index="'+openCategoryIndex+'"] [data-row-index="'+focusRowIndex+'"] .clue-drag-handle');
+      if(handle) handle.focus();
+    });
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -1075,9 +1216,12 @@ function setDisplayMode(mode){
         category:fj.category||'',question:fj.question||'',answer:fj.answer||'',
         timer:30,timerRunning:false,
         phase:'category',categoryRevealed:false,
-        teams:setup.teams.map(function(){return{wager:0,answer:'',wagerRevealed:false,answerRevealed:false,result:null};})
+        teams:setup.teams.map(function(){return makeFinalTeamState();})
       };
     }
+    // Setup fields remain editable after Final mode has been opened. Refresh the
+    // snapshot so category/question reveals never use stale blank content.
+    syncFinalContent();syncFinalTeams();
   } else {
     if(mode!=='clue'&&mode!=='daily-double'){game.currentClue=null;game.answerRevealed=false;game.wager=null;previewClue=null;}
     if(finalTimerInterval){clearInterval(finalTimerInterval);finalTimerInterval=null;}
@@ -1091,6 +1235,7 @@ function renderFinalPanel(){
   if(game.displayMode!=='final'||!game.final){section.style.display='none';return;}
   section.style.display='';
   while(el.firstChild) el.removeChild(el.firstChild);
+  syncFinalTeams();
   var f=game.final;
 
   // Category / Question / Answer (read-only, set in Setup tab)
@@ -1497,7 +1642,11 @@ function renderFinalSetup(){
     else inp.rows=3;
     inp.value=f[1];inp.placeholder='Enter '+f[0].toLowerCase();
     inp.style.marginBottom='8px';
-    inp.addEventListener('input',function(){fj[f[2]]=this.value;saveState();});
+    inp.addEventListener('input',function(){
+      fj[f[2]]=this.value;
+      if(game.final){game.final[f[2]]=this.value;broadcast();}
+      else saveState();
+    });
     el.appendChild(lb);el.appendChild(inp);
   });
 }

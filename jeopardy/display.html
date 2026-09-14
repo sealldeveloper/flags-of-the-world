@@ -75,19 +75,23 @@
   }
 
   /* ══════ CLUE SCREEN ══════ */
-  #screen-clue{align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a8e,#0a0a4e);padding:40px;text-align:center;}
-  .clue-category-label{font-size:1.8vw;color:#c8a832;letter-spacing:4px;text-transform:uppercase;margin-bottom:4px;}
-  .clue-value-label{font-size:2.5vw;color:#c8a832;margin-bottom:10px;}
-  .clue-wager-label{font-size:2vw;color:#ff8c00;margin-bottom:20px;letter-spacing:3px;}
-  .clue-question{font-size:4vw;line-height:1.3;text-shadow:2px 2px 8px rgba(0,0,0,0.5);max-width:85%;max-height:60vh;overflow:hidden;white-space:pre-line;}
+  #screen-clue{align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a8e,#0a0a4e);padding:clamp(12px,3vh,40px);text-align:center;}
+  .clue-content{width:100%;height:100%;min-height:0;display:flex;flex-direction:column;align-items:center;}
+  .clue-meta{flex:0 0 auto;}
+  .clue-body{width:100%;flex:1 1 0;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.4vh,18px);}
+  .clue-category-label{font-size:clamp(14px,1.8vw,30px);color:#c8a832;letter-spacing:4px;text-transform:uppercase;margin-bottom:4px;}
+  .clue-value-label{font-size:clamp(18px,2.5vw,40px);color:#c8a832;margin-bottom:6px;}
+  .clue-wager-label{font-size:clamp(16px,2vw,34px);color:#ff8c00;margin-bottom:8px;letter-spacing:3px;}
+  .clue-question{flex:0 1 auto;width:85%;font-size:clamp(22px,4vw,64px);line-height:1.25;text-shadow:2px 2px 8px rgba(0,0,0,0.5);max-height:100%;overflow:hidden;white-space:pre-line;overflow-wrap:anywhere;}
+  #screen-clue.has-media .clue-question{flex:0 0 42%;max-height:42%;display:flex;align-items:center;justify-content:center;}
   .clue-question.anim{animation:clueTextIn 0.5s cubic-bezier(.22,1,.36,1);}
-  .clue-media{max-width:70%;max-height:50vh;margin:20px auto;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
-  .clue-media img{max-width:100%;max-height:50vh;border-radius:8px;object-fit:contain;}
-  .clue-media video{max-width:100%;max-height:50vh;border-radius:8px;object-fit:contain;background:#000;}
-  .clue-media iframe{width:60vw;height:34vw;max-height:50vh;border:none;border-radius:8px;}
+  .clue-media{flex:0 0 54%;width:70%;min-height:0;max-width:70%;max-height:54%;margin:0 auto;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .clue-media img{max-width:100%;max-height:100%;border-radius:8px;object-fit:contain;}
+  .clue-media video{max-width:100%;max-height:100%;border-radius:8px;object-fit:contain;background:#000;}
+  .clue-media iframe{width:min(60vw,100%);height:100%;aspect-ratio:16/9;border:none;border-radius:8px;}
   @keyframes clueTextIn{from{opacity:0;transform:scale(0.85);}to{opacity:1;transform:scale(1);}}
-  .clue-answer-text{font-size:3vw;color:#44ff44;margin-top:30px;opacity:0;visibility:hidden;transform:translateY(20px);transition:opacity 0.5s cubic-bezier(.22,1,.36,1),transform 0.5s cubic-bezier(.22,1,.36,1),visibility 0s 0.5s;white-space:pre-line;}
-  .clue-answer-text.show{opacity:1;visibility:visible;transform:translateY(0);transition:opacity 0.5s cubic-bezier(.22,1,.36,1),transform 0.5s cubic-bezier(.22,1,.36,1),visibility 0s 0s;}
+  .clue-answer-text{flex:0 0 auto;width:85%;max-height:0;font-size:clamp(18px,3vw,48px);line-height:1.2;color:#44ff44;margin-top:0;opacity:0;visibility:hidden;overflow:hidden;overflow-wrap:anywhere;transform:translateY(12px);transition:opacity 0.35s cubic-bezier(.22,1,.36,1),transform 0.35s cubic-bezier(.22,1,.36,1),visibility 0s 0.35s;white-space:pre-line;}
+  .clue-answer-text.show{max-height:24%;margin-top:clamp(8px,1.5vh,18px);opacity:1;visibility:visible;transform:translateY(0);transition:opacity 0.35s cubic-bezier(.22,1,.36,1),transform 0.35s cubic-bezier(.22,1,.36,1),visibility 0s 0s;}
 
   /* ══════ DAILY DOUBLE ══════ */
   #screen-dd{overflow:hidden;background:radial-gradient(ellipse at 50% 50%,#5a1a1a 0%,#2a0808 40%,#0a0204 80%,#000 100%);}
@@ -114,13 +118,15 @@
   .final-timer-fill{height:100%;background:linear-gradient(90deg,#c8a832,#e8d862);border-radius:4px;transition:width 1s linear;}
   .final-timer-fill.urgent{background:linear-gradient(90deg,#ff4444,#ff6666);}
   .final-teams{display:flex;gap:2vw;flex:1;min-height:0;justify-content:center;align-items:stretch;padding:1vh 2vw;}
-  .final-team-card{flex:1;max-width:28vw;background:linear-gradient(180deg,#1a1a4e,#0e0e2e);border:3px solid #2a2a5e;border-radius:12px;padding:2vh 2vw;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1.5vh;transition:border-color 0.4s;}
+  .final-team-card{flex:1;min-width:0;max-width:28vw;background:linear-gradient(180deg,#1a1a4e,#0e0e2e);border:3px solid #2a2a5e;border-radius:12px;padding:2vh 2vw;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1.5vh;transition:border-color 0.4s;}
+  .final-teams.team-count-1 .final-team-card{max-width:60vw;}
+  .final-teams.team-count-2 .final-team-card{max-width:42vw;}
   .final-team-card.revealed{border-color:#c8a832;}
   .ftc-name{font-size:3.5vh;color:#c8a832;letter-spacing:0.3vw;text-transform:uppercase;font-weight:700;}
   .ftc-divider{width:60%;height:1px;background:#2a2a5e;}
   .ftc-label{font-size:2vh;color:#666;text-transform:uppercase;letter-spacing:2px;}
   .ftc-wager{font-size:4.5vh;font-weight:700;color:#ff8c00;min-height:1.5em;}
-  .ftc-answer{font-size:3.5vh;color:#fff;min-height:1.5em;line-height:1.3;white-space:pre-line;word-break:break-word;overflow:hidden;}
+  .ftc-answer{width:100%;max-width:100%;font-size:3.5vh;color:#fff;min-height:1.5em;line-height:1.3;white-space:pre-line;overflow-wrap:anywhere;overflow:hidden;}
   .ftc-hidden{color:#2a2a5e;font-style:italic;font-size:2.5vh;}
   .ftc-result{font-size:6vh;font-weight:700;min-height:1.2em;}
   .ftc-result.correct{color:#44ff44;}
@@ -187,6 +193,37 @@
   .room-code-float{position:fixed;bottom:70px;right:20px;z-index:50;pointer-events:none;text-align:right;}
   .room-code-float .label{font-size:clamp(8px,0.7vw,12px);color:#666;letter-spacing:2px;text-transform:uppercase;}
   .room-code-float .code{font-size:clamp(12px,1.2vw,20px);color:#c8a832;font-weight:700;letter-spacing:4px;}
+
+  @media (max-width:700px){
+    #screen-final{padding:10px;}
+    .final-title{font-size:clamp(24px,7vw,38px);letter-spacing:3px;}
+    .final-category{font-size:clamp(18px,5vw,28px);letter-spacing:2px;}
+    .final-question{font-size:clamp(18px,5vw,28px);max-width:95%;}
+    .final-question.shrunk{font-size:clamp(14px,3.8vw,20px);}
+    .final-teams{gap:8px;padding:8px 0;}
+    .final-teams.team-count-1,.final-teams.team-count-2{flex-direction:column;}
+    .final-team-card,.final-teams.team-count-1 .final-team-card,.final-teams.team-count-2 .final-team-card{max-width:none;padding:10px 6px;gap:7px;}
+    .ftc-name{font-size:clamp(15px,2.5vh,22px);letter-spacing:1px;}
+    .ftc-label{font-size:clamp(10px,1.5vh,14px);letter-spacing:1px;}
+    .ftc-answer{font-size:clamp(14px,2.5vh,22px);}
+    .ftc-wager{font-size:clamp(18px,3vh,28px);}
+    .ftc-result{font-size:clamp(24px,4vh,36px);}
+    .winner-label{font-size:clamp(18px,5vw,26px);letter-spacing:4px;}
+    .winner-name{font-size:clamp(36px,12vw,64px);letter-spacing:3px;overflow-wrap:anywhere;}
+    .winner-score-final{font-size:clamp(22px,7vw,34px);}
+    .winner-all{gap:6px;margin-top:24px;flex-wrap:nowrap;width:100%;}
+    .winner-team{flex:1;min-width:0;padding:8px 4px;}
+    .winner-team-name{font-size:clamp(11px,3vw,15px);letter-spacing:1px;overflow-wrap:anywhere;}
+    .winner-team-score{font-size:clamp(16px,5vw,24px);}
+    .scoreboard{gap:6px;padding:6px;}
+    .sb-team{min-width:0;flex:1;padding:6px;}
+    .sb-name{font-size:clamp(10px,1.6vh,14px);}
+    .sb-score{font-size:clamp(16px,2.5vh,24px);}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+  }
 </style>
 </head>
 <body>
@@ -204,12 +241,16 @@
   </div>
 
   <div class="screen" id="screen-clue">
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-      <div class="clue-category-label" id="clue-cat"></div>
-      <div class="clue-value-label" id="clue-val"></div>
-      <div class="clue-wager-label" id="clue-wager"></div>
-      <div class="clue-media" id="clue-media"></div>
-      <div class="clue-question" id="clue-q"></div>
+    <div class="clue-content" id="clue-content">
+      <div class="clue-meta">
+        <div class="clue-category-label" id="clue-cat"></div>
+        <div class="clue-value-label" id="clue-val"></div>
+        <div class="clue-wager-label" id="clue-wager"></div>
+      </div>
+      <div class="clue-body" id="clue-body">
+        <div class="clue-media" id="clue-media"></div>
+        <div class="clue-question" id="clue-q"></div>
+      </div>
       <div class="clue-answer-text" id="clue-a"></div>
     </div>
   </div>
@@ -488,6 +529,7 @@ function fitCategoryText() {
 
 function fitFinalQuestion(el) {
   if (!el || el.style.display === 'none') return;
+  el.style.fontSize = '';
   var size = parseFloat(getComputedStyle(el).fontSize);
   var safety = 40;
   while (safety-- > 0 && size > 12 && el.scrollHeight > el.clientHeight + 2) {
@@ -504,14 +546,54 @@ function fitFinalTeamCards() {
     var size = parseFloat(getComputedStyle(el).fontSize);
     var card = el.closest('.final-team-card');
     if (!card) continue;
-    var maxW = card.clientWidth - 20;
     var maxH = card.clientHeight * 0.35;
     var safety = 30;
-    while (safety-- > 0 && size > 8 && (el.scrollWidth > maxW || el.scrollHeight > maxH)) {
+    while (safety-- > 0 && size > 8 && (el.scrollWidth > el.clientWidth + 2 || el.scrollHeight > maxH)) {
       size -= 1;
       el.style.fontSize = size + 'px';
     }
   }
+}
+
+function fitTextInside(el,minPx) {
+  if(!el) return;
+  el.style.fontSize='';
+  var size=parseFloat(getComputedStyle(el).fontSize);
+  var safety=60;
+  while(safety-- > 0&&size>minPx&&(el.scrollHeight>el.clientHeight+Math.max(4,size*.2)||el.scrollWidth>el.clientWidth+2)){
+    size-=1;el.style.fontSize=size+'px';
+  }
+}
+
+function fitClueLayout() {
+  var qEl=document.getElementById('clue-q');
+  var ansEl=document.getElementById('clue-a');
+  if(ansEl.classList.contains('show')) fitTextInside(ansEl,14);
+  fitTextInside(qEl,16);
+}
+
+var resizeFitFrame=null;
+window.addEventListener('resize',function(){
+  if(resizeFitFrame) cancelAnimationFrame(resizeFitFrame);
+  resizeFitFrame=requestAnimationFrame(function(){
+    resizeFitFrame=null;
+    if(state&&state.displayMode==='clue') fitClueLayout();
+    if(state&&state.displayMode==='board') fitCategoryText();
+    if(state&&state.displayMode==='final'){
+      fitFinalQuestion(document.getElementById('final-q'));
+      fitFinalTeamCards();
+    }
+  });
+});
+if(document.fonts&&document.fonts.ready){
+  document.fonts.ready.then(function(){
+    if(state&&state.displayMode==='clue') fitClueLayout();
+    if(state&&state.displayMode==='board') fitCategoryText();
+    if(state&&state.displayMode==='final'){
+      fitFinalQuestion(document.getElementById('final-q'));
+      fitFinalTeamCards();
+    }
+  });
 }
 
 /* ══════ CLUE ══════ */
@@ -534,9 +616,11 @@ function renderClue() {
   // Media (image/video/youtube)
   var mediaEl = document.getElementById('clue-media');
   var media = state.clue.media;
-  if (media && media.url) {
+  var ytId = media && media.url ? extractYouTubeId(media.url) : null;
+  var hasMedia = !!(media && media.url && (ytId || media.type === 'image' || media.type === 'video'));
+  document.getElementById('screen-clue').classList.toggle('has-media',hasMedia);
+  if (hasMedia) {
     var currentSrc = mediaEl.getAttribute('data-src');
-    var ytId = extractYouTubeId(media.url);
     if (currentSrc !== media.url) {
       while (mediaEl.firstChild) mediaEl.removeChild(mediaEl.firstChild);
       mediaEl.setAttribute('data-src', media.url);
@@ -551,12 +635,14 @@ function renderClue() {
         var img = document.createElement('img');
         img.src = media.url;
         img.alt = 'Clue image';
+        img.addEventListener('load',fitClueLayout);
         mediaEl.appendChild(img);
       } else if (media.type === 'video') {
         var vid = document.createElement('video');
         vid.src = media.url;
         vid.setAttribute('playsinline', '');
         vid.volume = 1;
+        vid.addEventListener('loadedmetadata',fitClueLayout);
         mediaEl.appendChild(vid);
       }
     }
@@ -576,19 +662,18 @@ function renderClue() {
   }
 
   var qEl = document.getElementById('clue-q');
-  qEl.style.fontSize = '';
   qEl.textContent = state.clue.question;
   if (isNew) {
     qEl.classList.remove('anim');
     void qEl.offsetWidth;
     qEl.classList.add('anim');
   }
-  fitFinalQuestion(qEl);
-
   var ansEl = document.getElementById('clue-a');
   ansEl.textContent = state.clue.answer;
-  if (state.clue.showAnswer) ansEl.classList.add('show');
-  else ansEl.classList.remove('show');
+  var showAnswer=!!state.clue.showAnswer;
+  ansEl.classList.toggle('show',showAnswer);
+  document.getElementById('screen-clue').classList.toggle('answer-visible',showAnswer);
+  requestAnimationFrame(fitClueLayout);
 }
 
 /* ══════ DAILY DOUBLE ══════ */
@@ -656,6 +741,8 @@ function renderFinal() {
   var timerBar = document.getElementById('final-timer-bar');
   var timerFill = document.getElementById('final-timer-fill');
   var teamsEl = document.getElementById('final-teams');
+  var finalTeams = f.teams || [];
+  teamsEl.className='final-teams team-count-'+Math.min(finalTeams.length,4);
 
   // Question
   if (f.phase === 'clue' || f.phase === 'reveal') {
@@ -694,10 +781,10 @@ function renderFinal() {
   }
 
   // Team cards (reveal phase)
-  if (f.phase === 'reveal' && f.teams) {
-    if (teamsEl.children.length !== f.teams.length) {
+  if (f.phase === 'reveal') {
+    if (teamsEl.children.length !== finalTeams.length) {
       while (teamsEl.firstChild) teamsEl.removeChild(teamsEl.firstChild);
-      f.teams.forEach(function() {
+      finalTeams.forEach(function() {
         var card = document.createElement('div');
         card.className = 'final-team-card';
         teamsEl.appendChild(card);
@@ -707,7 +794,7 @@ function renderFinal() {
     // Track previous state for animation triggers
     var prevFinal = (prevState && prevState.final && prevState.final.phase === 'reveal') ? prevState.final : null;
 
-    f.teams.forEach(function(t, i) {
+    finalTeams.forEach(function(t, i) {
       var card = teamsEl.children[i];
       if (!card) return;
       var prev = prevFinal && prevFinal.teams ? prevFinal.teams[i] : null;
@@ -784,7 +871,7 @@ function renderWinner() {
 
   // All teams sorted by score
   var sorted = state.teams.slice().sort(function(a, b) { return b.score - a.score; });
-  var allDiv = document.createElement('div'); allDiv.className = 'winner-all';
+  var allDiv = document.createElement('div'); allDiv.className = 'winner-all team-count-'+Math.min(sorted.length,4);
   sorted.forEach(function(t) {
     var td = document.createElement('div'); td.className = 'winner-team';
     var tn = document.createElement('div'); tn.className = 'winner-team-name'; tn.textContent = t.name;
