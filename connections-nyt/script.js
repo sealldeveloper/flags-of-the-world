@@ -353,7 +353,7 @@ function renderWordGrid() {
     if (!card || state.solved.includes(card.categoryIndex)) return;
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = `word-card${card.content.length > 12 ? ' is-long' : ''}`;
+    button.className = 'word-card';
     button.dataset.cardId = card.id;
     button.textContent = card.content;
     button.setAttribute('aria-pressed', state.selected.has(card.id) ? 'true' : 'false');
