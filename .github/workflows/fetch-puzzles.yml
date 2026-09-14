@@ -1,4 +1,4 @@
-name: Fetch Crossword Puzzles
+name: Fetch Puzzle Archives
 
 on:
   schedule:
@@ -82,34 +82,34 @@ jobs:
                 NEW=$((NEW + 1))
                 # Download overlay assets and rewrite URIs to local paths
                 python3 - "$file" "$dir" "crossword-nyt" <<'PYEOF'
-import json, sys, os, urllib.request
-json_path, out_dir, base_dir = sys.argv[1], sys.argv[2], sys.argv[3]
-with open(json_path) as f:
-    data = json.load(f)
-assets = data.get('assets', [])
-if not assets:
-    sys.exit(0)
-date_id = os.path.basename(json_path).replace('.json', '')
-modified = False
-for i, asset in enumerate(assets):
-    uri = asset.get('uri', '')
-    if not uri:
-        continue
-    ext = os.path.splitext(uri)[1] or '.png'
-    local_name = f"{date_id}.overlay-{i}{ext}"
-    local_path = os.path.join(out_dir, local_name)
-    try:
-        urllib.request.urlretrieve(uri, local_path)
-        rel = out_dir.replace(base_dir + '/', './')
-        asset['uri'] = f"{rel}/{local_name}"
-        modified = True
-        print(f"  Downloaded overlay: {local_name}")
-    except Exception as e:
-        print(f"  Failed overlay {uri}: {e}")
-if modified:
-    with open(json_path, 'w') as f:
-        json.dump(data, f, separators=(',', ':'))
-PYEOF
+          import json, sys, os, urllib.request
+          json_path, out_dir, base_dir = sys.argv[1], sys.argv[2], sys.argv[3]
+          with open(json_path) as f:
+              data = json.load(f)
+          assets = data.get('assets', [])
+          if not assets:
+              sys.exit(0)
+          date_id = os.path.basename(json_path).replace('.json', '')
+          modified = False
+          for i, asset in enumerate(assets):
+              uri = asset.get('uri', '')
+              if not uri:
+                  continue
+              ext = os.path.splitext(uri)[1] or '.png'
+              local_name = f"{date_id}.overlay-{i}{ext}"
+              local_path = os.path.join(out_dir, local_name)
+              try:
+                  urllib.request.urlretrieve(uri, local_path)
+                  rel = out_dir.replace(base_dir + '/', './')
+                  asset['uri'] = f"{rel}/{local_name}"
+                  modified = True
+                  print(f"  Downloaded overlay: {local_name}")
+              except Exception as e:
+                  print(f"  Failed overlay {uri}: {e}")
+          if modified:
+              with open(json_path, 'w') as f:
+                  json.dump(data, f, separators=(',', ':'))
+          PYEOF
               else
                 echo "Failed NYT Daily $DATE (may not exist yet)"
                 rm -f "$file"
@@ -160,34 +160,34 @@ PYEOF
                 NEW=$((NEW + 1))
                 # Download overlay assets and rewrite URIs to local paths
                 python3 - "$file" "$dir" "crossword-nytmini" <<'PYEOF'
-import json, sys, os, urllib.request
-json_path, out_dir, base_dir = sys.argv[1], sys.argv[2], sys.argv[3]
-with open(json_path) as f:
-    data = json.load(f)
-assets = data.get('assets', [])
-if not assets:
-    sys.exit(0)
-date_id = os.path.basename(json_path).replace('.json', '')
-modified = False
-for i, asset in enumerate(assets):
-    uri = asset.get('uri', '')
-    if not uri:
-        continue
-    ext = os.path.splitext(uri)[1] or '.png'
-    local_name = f"{date_id}.overlay-{i}{ext}"
-    local_path = os.path.join(out_dir, local_name)
-    try:
-        urllib.request.urlretrieve(uri, local_path)
-        rel = out_dir.replace(base_dir + '/', './')
-        asset['uri'] = f"{rel}/{local_name}"
-        modified = True
-        print(f"  Downloaded overlay: {local_name}")
-    except Exception as e:
-        print(f"  Failed overlay {uri}: {e}")
-if modified:
-    with open(json_path, 'w') as f:
-        json.dump(data, f, separators=(',', ':'))
-PYEOF
+          import json, sys, os, urllib.request
+          json_path, out_dir, base_dir = sys.argv[1], sys.argv[2], sys.argv[3]
+          with open(json_path) as f:
+              data = json.load(f)
+          assets = data.get('assets', [])
+          if not assets:
+              sys.exit(0)
+          date_id = os.path.basename(json_path).replace('.json', '')
+          modified = False
+          for i, asset in enumerate(assets):
+              uri = asset.get('uri', '')
+              if not uri:
+                  continue
+              ext = os.path.splitext(uri)[1] or '.png'
+              local_name = f"{date_id}.overlay-{i}{ext}"
+              local_path = os.path.join(out_dir, local_name)
+              try:
+                  urllib.request.urlretrieve(uri, local_path)
+                  rel = out_dir.replace(base_dir + '/', './')
+                  asset['uri'] = f"{rel}/{local_name}"
+                  modified = True
+                  print(f"  Downloaded overlay: {local_name}")
+              except Exception as e:
+                  print(f"  Failed overlay {uri}: {e}")
+          if modified:
+              with open(json_path, 'w') as f:
+                  json.dump(data, f, separators=(',', ':'))
+          PYEOF
               else
                 echo "Failed NYT Mini $DATE (may not exist yet)"
                 rm -f "$file"
@@ -217,12 +217,70 @@ PYEOF
           print(f"NYT Mini manifest: {len(puzzles)} puzzles")
           EOF
 
+      # ── NYT Connections ──
+      - name: Fetch NYT Connections puzzles
+        run: |
+          UPSTREAM="https://www.nytimes.com/svc/connections/v2"
+          PUZZLE_DIR="connections-nyt/puzzles"
+          NEW=0
+
+          # Fetch the last 7 days so a transient failure does not leave a gap.
+          for i in $(seq 0 6); do
+            DATE=$(date -u -d "$i days ago" +%Y-%m-%d 2>/dev/null || date -u -v-${i}d +%Y-%m-%d)
+            YYYY="${DATE:0:4}"
+            MM="${DATE:5:2}"
+            dir="${PUZZLE_DIR}/${YYYY}/${MM}"
+            file="${dir}/${DATE}.json"
+            tmp="${file}.tmp"
+
+            if [ ! -f "$file" ]; then
+              mkdir -p "$dir"
+              if curl --fail --silent --show-error --location --retry 3 \
+                --user-agent "Mozilla/5.0" \
+                "${UPSTREAM}/${DATE}.json" -o "$tmp" \
+                && jq -e '.status == "OK"
+                  and (.categories | length == 4)
+                  and ([.categories[].cards[]] | length == 16)' "$tmp" >/dev/null; then
+                mv "$tmp" "$file"
+                echo "Downloaded NYT Connections $DATE"
+                NEW=$((NEW + 1))
+              else
+                echo "Failed NYT Connections $DATE (may not exist yet)"
+                rm -f "$tmp"
+              fi
+            fi
+          done
+
+          echo "CONNECTIONS_NEW=$NEW" >> "$GITHUB_ENV"
+
+      - name: Regenerate NYT Connections manifest
+        run: |
+          python3 - <<'EOF'
+          import glob
+          import json
+          import os
+
+          puzzles = []
+          for filename in glob.glob('connections-nyt/puzzles/**/*.json', recursive=True):
+              puzzle_id = os.path.basename(filename)[:-5]
+              if len(puzzle_id) == 10 and puzzle_id[4] == '-' and puzzle_id[7] == '-':
+                  puzzles.append(puzzle_id)
+
+          puzzles.sort(reverse=True)
+
+          os.makedirs('connections-nyt/puzzles', exist_ok=True)
+          with open('connections-nyt/puzzles/manifest.json', 'w') as manifest:
+              json.dump(puzzles, manifest)
+
+          print(f"NYT Connections manifest: {len(puzzles)} puzzles")
+          EOF
+
       # ── Commit all ──
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add crossword-seattle/puzzles/ crossword-nyt/puzzles/ crossword-nytmini/puzzles/
+          git add crossword-seattle/puzzles/ crossword-nyt/puzzles/ crossword-nytmini/puzzles/ connections-nyt/puzzles/
           git diff --cached --quiet && echo "Nothing to commit" && exit 0
-          git commit -m "feat(crossword): archive puzzles $(date +%Y-%m-%d)"
+          git commit -m "feat(puzzles): archive daily puzzles $(date +%Y-%m-%d)"
           git push
