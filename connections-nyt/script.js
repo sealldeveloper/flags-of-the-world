@@ -99,7 +99,9 @@ function formatDate(value, includeYear = true) {
 }
 
 function populatePuzzleSelector(archivedDates = []) {
+  const today = localDateId();
   const dates = [...new Set([...recentDates(90), ...archivedDates])]
+    .filter(dateId => dateId <= today)
     .sort((a, b) => b.localeCompare(a));
   let currentGroup = '';
   let group = null;
@@ -804,10 +806,11 @@ async function boot() {
   const archivedDates = await loadArchiveManifest();
   state.archivedDates = new Set(archivedDates);
   populatePuzzleSelector(archivedDates);
-  dom.puzzleDate.max = localDateId();
+  const today = localDateId();
+  dom.puzzleDate.max = today;
   applyTheme(localStorage.getItem('xw-theme') || 'light');
   const requested = new URLSearchParams(window.location.search).get('date');
-  const initialDate = isDateId(requested) ? requested : localDateId();
+  const initialDate = isDateId(requested) && requested <= today ? requested : today;
   state.date = initialDate;
   dom.puzzleDate.value = initialDate;
   loadPuzzle(initialDate, false);

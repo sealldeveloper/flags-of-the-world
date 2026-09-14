@@ -224,9 +224,14 @@ jobs:
           PUZZLE_DIR="connections-nyt/puzzles"
           NEW=0
 
-          # Fetch the last 7 days so a transient failure does not leave a gap.
-          for i in $(seq 0 6); do
-            DATE=$(date -u -d "$i days ago" +%Y-%m-%d 2>/dev/null || date -u -v-${i}d +%Y-%m-%d)
+          # Prefetch tomorrow for time zones ahead of UTC, then retry the last
+          # seven dates so a transient failure does not leave an archive gap.
+          for i in $(seq -1 6); do
+            if [ "$i" -eq -1 ]; then
+              DATE=$(date -u -d "tomorrow" +%Y-%m-%d 2>/dev/null || date -u -v+1d +%Y-%m-%d)
+            else
+              DATE=$(date -u -d "$i days ago" +%Y-%m-%d 2>/dev/null || date -u -v-${i}d +%Y-%m-%d)
+            fi
             YYYY="${DATE:0:4}"
             MM="${DATE:5:2}"
             dir="${PUZZLE_DIR}/${YYYY}/${MM}"
