@@ -12,7 +12,9 @@
         "Brawler",
         "Bull-Headed"
       ],
-      "playstyle": "Abrams has the bulk and sustain to lead from the front, often running into the middle of his foes and watching them scatter. If his enemies waste their fire on him, his backline teammates can lay out damage with impunity.",
+      "playstyle": "Abrams is a Hero in Deadlock. He is a hard-boiled, hard-hitting bruiser of a character that focuses on engaging enemies in close combat. Abrams is a juggernaut on the battlefield, tapping into the dark power of his Tome to Siphon Life from nearby enemies and utilizing his Infernal Resilience to brush off the damage he takes. With a sudden Shoulder Charge or area stun from his Seismic Impact, he can aggressively initiate fights and isolate fragile targets from the rest of their team to set up a devastating burst of damage.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Abrams",
       "body": "./assets/deadlock/hero-6-card.webp",
       "showcase": "./assets/deadlock/hero-6-showcase.webp",
       "background": "./assets/deadlock/hero-6-background.webp",
@@ -21,29 +23,29 @@
           "name": "Siphon Life",
           "description": "Drain health from nearby enemies, dealing spirit damage over time and healing for a portion of the damage dealt.",
           "icon": "./assets/deadlock/hero-6-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Abrams#Siphon_Life"
         },
         {
           "name": "Shoulder Charge",
           "description": "Charge forward, pulling enemies you hit. Pushing a hero into a wall applies stun. If you collide with a hero you move faster during your charge.",
           "icon": "./assets/deadlock/hero-6-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Abrams#Shoulder_Charge"
         },
         {
           "name": "Infernal Resilience",
           "description": "Gain bonus defensive attributes. Taking damage grants temporary regeneration for a portion of the damage taken.",
           "icon": "./assets/deadlock/hero-6-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Abrams#Infernal_Resilience"
         },
         {
           "name": "Seismic Impact",
           "description": "Leap high into the air before crashing into the ground, dealing spirit damage and applying stun.",
           "icon": "./assets/deadlock/hero-6-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Abrams#Seismic_Impact"
         }
       ],
       "headshot": "./assets/deadlock/hero-6-headshot.webp"
@@ -57,7 +59,9 @@
         "Mobility",
         "A Cut Above"
       ],
-      "playstyle": "A land of beauty, tradition and conflict; North Ixia is no stranger to brutal political violence. So when Apollo was told that it was for his own safety he was being sent to New York for school, he knew the situation was serious.",
+      "playstyle": "Apollo is a Hero in Deadlock. With Flawless Advance the fencer begins his approach, timing his strikes perfectly to inflict more damage. Counter-attacks aren't a concern for Apollo, as a flourish of his blade deflects the damage and triggers a quick Riposte, and Disengaging Sigil allows him to jump out of the fray with ease. For his final blow, Apollo dons his fencer's mask and channels Ixia 's might with Itani Lo Sahn, leaving enemies defeated in his wake.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Apollo",
       "body": "./assets/deadlock/hero-77-card.webp",
       "showcase": "./assets/deadlock/hero-77-showcase.webp",
       "background": "./assets/deadlock/hero-77-background.webp",
@@ -66,29 +70,29 @@
           "name": "Disengaging Sigil",
           "description": "Draw a sigil sphere in front of you and then leap backwards as it explodes, damaging and slowing enemies caught in it.",
           "icon": "./assets/deadlock/hero-77-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Apollo#Disengaging_Sigil"
         },
         {
           "name": "Riposte",
           "description": "Prepare to deflect the next incoming attack. On a successful deflection, briefly become invulnerable and target an enemy hero to dash towards them, stunning them and reducing their Melee Resist. Press Ability 2 to select a target. Does not trigger against trooper or neutral damage.",
           "icon": "./assets/deadlock/hero-77-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Apollo#Riposte"
         },
         {
           "name": "Flawless Advance",
           "description": "Perform a series of lunges in any direction, delivering piercing stabs ahead of you. Hold your ability key to time your attacks, dealing more damage the longer it's held. Releasing your attack during the perfect window deals maximum damage. Press Ability 3 to re-cast.",
           "icon": "./assets/deadlock/hero-77-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Apollo#Flawless_Advance"
         },
         {
           "name": "Itani Lo Sahn",
-          "description": "Charge up and perform a long range slash. Struck enemies cannot take action or heal and are stuck in slow motion. When this effect expires, they suffer devastating damage, dealing bonus damage against half-health enemies. While in slow motion, Apollo is invulnerable and enemies take reduced damage. Hold Ability 4 to delay the cast.",
+          "description": "Charge up and perform a long range slash. Struck enemies cannot take action or heal and are stuck in slow motion. When this effect expires, they suffer devastating damage, dealing bonus damage against half-health enemies. While in slow motion, Apollo is invulnerable and enemies take reduced damage. Hold Ability 4 or Fire to delay the cast.",
           "icon": "./assets/deadlock/hero-77-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Apollo#Itani_Lo_Sahn"
         }
       ],
       "headshot": "./assets/deadlock/hero-77-headshot.webp"
@@ -102,7 +106,9 @@
         "Bomb",
         "Punch"
       ],
-      "playstyle": "Bebop can string together his abilities in many different ways. Disrupting enemy positions, saving an ally or dealing bursts of damage. When the situation doesn't require subtlety his giant laser still solves many problems.",
+      "playstyle": "Bebop is a Hero in Deadlock. A scrap golem with a big heart and a bigger extendable arm, Bebop is a potent threat on the battlefield when supported by his team. His Grappling Arm can pull friends and enemies alike towards him, saving them from certain doom or guaranteeing it. Bebop can attach Sticky Bombs to nearby foes and launch them in any direction with a powerful Exploding Uppercut. For any foes left standing, Bebop's Hyper Beam can cut across the battlefield and finish them off.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Bebop",
       "body": "./assets/deadlock/hero-15-card.webp",
       "showcase": "./assets/deadlock/hero-15-showcase.webp",
       "background": "./assets/deadlock/hero-15-background.webp",
@@ -111,29 +117,29 @@
           "name": "Exploding Uppercut",
           "description": "Deal melee damage to nearby enemies and apply knockback. When they land, they deal spirit damage and apply reduced fire rate to other nearby enemies. Exploding Uppercut can be used on allies.",
           "icon": "./assets/deadlock/hero-15-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Bebop#Exploding_Uppercut"
         },
         {
           "name": "Sticky Bomb",
           "description": "Attach a bomb that explodes after a delay, dealing spirit damage to nearby enemies. If the bomb hits or kills a hero, you gain permanent bonus damage on Sticky Bomb. Stacks diminish by half after 60 hits and 7 kills",
           "icon": "./assets/deadlock/hero-15-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Bebop#Sticky_Bomb"
         },
         {
           "name": "Grapple Arm",
           "description": "Launch out a mechanical hand that pulls the first character it hits, reeling them in. Grapple Arm can be used on allies.",
           "icon": "./assets/deadlock/hero-15-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Bebop#Grapple_Arm"
         },
         {
           "name": "Hyper Beam",
           "description": "Channel a powerful torrent of energy that deals spirit damage and applies slow.",
           "icon": "./assets/deadlock/hero-15-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Bebop#Hyper_Beam"
         }
       ],
       "headshot": "./assets/deadlock/hero-15-headshot.webp"
@@ -147,7 +153,9 @@
         "Chaotic",
         "G.O.A.T."
       ],
-      "playstyle": "Billy is a white hot ball of rage, furious at the very notion of...something.  Maybe it’s the cops.  Maybe it’s magic regulations.  Maybe it’s the service at the gyro place downtown.  (Not the good one.  The other one.)",
+      "playstyle": "Billy is a Hero in Deadlock. A white hot ball of rage, furious at the very notion of... something. Billy is a chaotic front-liner who never backs down from a challenge. With Rising Ram he gets up close and personal, before slamming down with Bashdown to create shockwaves through his enemies. Running isn't even an option when Billy can use his ultimate Chain Gang to grapple enemies and pull them back in. A quick swig from his bottle gets him Blasted, and his enemies totally wrecked.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Billy",
       "body": "./assets/deadlock/hero-72-card.webp",
       "showcase": "./assets/deadlock/hero-72-showcase.webp",
       "background": "./assets/deadlock/hero-72-background.webp",
@@ -156,29 +164,29 @@
           "name": "Bashdown",
           "description": "Slam your bat into the ground, pulling enemies down and dealing melee damage. The slam creates a shockwave that deals spirit damage and applies knockup.",
           "icon": "./assets/deadlock/hero-72-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Billy#Bashdown"
         },
         {
           "name": "Rising Ram",
           "description": "Charge head-first into an enemy and send them into the air along with Billy. Cooldown reduced by 50% on impact.",
           "icon": "./assets/deadlock/hero-72-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Billy#Rising_Ram"
         },
         {
           "name": "Blasted",
-          "description": "Passive: Melee hits restore ammo and inflict wrecked on the victim for 7.0s.",
+          "description": "Passive: Melee hits restore ammo and inflict wrecked on the victim for 7s.",
           "icon": "./assets/deadlock/hero-72-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Billy#Blasted"
         },
         {
           "name": "Chain Gang",
           "description": "Chain nearby enemies to you. Chained enemies cannot use movement abilities and receive a heavy slow when they pull on the chain. After a delay, yank everyone towards Billy and deal spirit damage. The chain breaks if you lose line of sight for a short while.",
           "icon": "./assets/deadlock/hero-72-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Billy#Chain_Gang"
         }
       ],
       "headshot": "./assets/deadlock/hero-72-headshot.webp"
@@ -192,7 +200,9 @@
         "Slippery",
         "Burst Damage"
       ],
-      "playstyle": "Calico uses the shadows to her advantage, weaving in and out of combat to hunt down her enemies one by one.",
+      "playstyle": "Calico is a Hero in Deadlock, a former monster hunter turned hired assassin. Possessing her cat, Ava, Calico uses the shadows to her advantage to surprise her foes, slinging Gloom Bombs and attacking with a Leaping Slash for damage and healing. By Returning to the Shadows, she can turn any fight to her advantage, disappearing after a fight or engaging again when the enemy least expects her.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Calico",
       "body": "./assets/deadlock/hero-16-card.webp",
       "showcase": "./assets/deadlock/hero-16-showcase.webp",
       "background": "./assets/deadlock/hero-16-background.webp",
@@ -201,29 +211,29 @@
           "name": "Gloom Bombs",
           "description": "Throw a cluster of bombs that detonate after a delay, dealing spirit damage. Enemies hit by multiple bombs take 65% damage.",
           "icon": "./assets/deadlock/hero-16-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Calico#Gloom_Bombs"
         },
         {
           "name": "Leaping Slash",
           "description": "Dash forward before slashing all enemies in a circle, dealing melee damage. If the ability hits at least one hero, heal a small amount of health.",
           "icon": "./assets/deadlock/hero-16-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Calico#Leaping_Slash"
         },
         {
           "name": "Ava",
           "description": "Turn to shadows and possess Ava. You gain bonus move speed that increases over time, and become hidden on the minimap. Taking damage from an enemy hero resets your bonus move speed and puts Ava on a brief cooldown.",
           "icon": "./assets/deadlock/hero-16-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Calico#Ava"
         },
         {
           "name": "Return to Shadows",
           "description": "Instantly turn to shadows, becoming untargetable, gaining bonus move speed, and dealing spirit damage. After a delay, return from the shadows, dealing spirit damage again.",
           "icon": "./assets/deadlock/hero-16-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Calico#Return_to_Shadows"
         }
       ],
       "headshot": "./assets/deadlock/hero-16-headshot.webp"
@@ -237,7 +247,9 @@
         "Disruptive",
         "Dazzling"
       ],
-      "playstyle": "Even in a world of magic, some things are still rare and unusual. So what is a unicorn to do?  Announce her presence to the world and potentially have poachers looking to saw off her horn? Or hide in plain sight at a Coney Island Side Show where most folk would assume her appearance was just part of an act?",
+      "playstyle": "Celeste is a Hero in Deadlock. It's not every day that Coney Island's biggest star, The Dazzling Celeste, performs on the streets of Manhattan. Her show begins with Light Eater, where a deep breath lit by her blazing baton coats enemies in front of her, and grants increased damage against them. Following that up, she envelops herself in the prismatic shield of her Dazzling Trick, which explodes and silences nearby enemies who break it. Try not to get distracted by her gliding gracefully through the air, or by the dance of her Radiant Daggers, as you'll regret being underneath them when they rain down from above. As for her memorable final act, the Shining Wonder will make her allies go OOH and her foes go AGGHHH!",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Celeste",
       "body": "./assets/deadlock/hero-81-card.webp",
       "showcase": "./assets/deadlock/hero-81-showcase.webp",
       "background": "./assets/deadlock/hero-81-background.webp",
@@ -246,29 +258,29 @@
           "name": "Light Eater",
           "description": "Blast enemies in a cone in front of you with a flare of light. Blasted enemies take spirit damage when attacked by Celeste and provides her spirit lifesteal.",
           "icon": "./assets/deadlock/hero-81-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Celeste#Light_Eater"
         },
         {
           "name": "Dazzling Trick",
           "description": "Surround yourself in a protective prism. If the barrier is destroyed, it silences nearby enemies and deals a portion of the barrier as damage.",
           "icon": "./assets/deadlock/hero-81-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Celeste#Dazzling_Trick"
         },
         {
           "name": "Radiant Daggers",
           "description": "Call down a beam of light from the sky. After a short duration, the beam will fully form, causing an explosion that deals spirit damage to all targets in the area. Celeste will receive a stacking buff that increases her spirit damage anytime this hits an enemy hero.",
           "icon": "./assets/deadlock/hero-81-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Celeste#Radiant_Daggers"
         },
         {
           "name": "Shining Wonder",
           "description": "Launch a deadly orb of light that deals spirit damage and applies slow and reduces Dash Distance on impact. The orb then bounces to the enemies within range. If no target is found, the orb will linger for a short duration while continuing to look for targets. Prioritizes enemy heroes when picking targets.",
           "icon": "./assets/deadlock/hero-81-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Celeste#Shining_Wonder"
         }
       ],
       "headshot": "./assets/deadlock/hero-81-headshot.webp"
@@ -282,7 +294,9 @@
         "Bloodthirsty",
         "Cruel"
       ],
-      "playstyle": "An ancient vampire roaming across America, the nameless monstrosity known as The Drifter has been preying on the living for generations.",
+      "playstyle": "Drifter is a Hero in Deadlock. Something ancient has arrived in New York... a nameless horror known only as the Drifter. Relentless as time, as certain as death, once Drifter sets his eyes on a victim there's nothing they can do to stop him. They can try to run, but his Bloodscent drives him forward, leading him to isolated prey. Even if they manage to escape it doesn't matter, as Stalker's Mark allows Drifter to appear right behind his enemies before lunging in for the kill with a vicious Rend. Soon Eternal Night comes, and a faint whistling in the breeze will be joined by a chorus of screams.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Drifter",
       "body": "./assets/deadlock/hero-64-card.webp",
       "showcase": "./assets/deadlock/hero-64-showcase.webp",
       "background": "./assets/deadlock/hero-64-background.webp",
@@ -291,29 +305,29 @@
           "name": "Rend",
           "description": "Swipe at enemies in a cone ahead of you, dealing spirit damage. If the enemy is in close range, deal bonus melee damage.",
           "icon": "./assets/deadlock/hero-64-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Drifter#Rend"
         },
         {
           "name": "Stalker's Mark",
           "description": "Send out a mark that bleeds the first target it hits, dealing spirit damage over time. While the enemy is bleeding you can re-activate Stalker's Mark to instantly appear behind their back.",
           "icon": "./assets/deadlock/hero-64-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Drifter#Stalker%27s_Mark"
         },
         {
           "name": "Bloodscent",
-          "description": "Active: Accentuate your senses, revealing a trail that leads to nearby heroes. Isolated heroes leave a trail as they move, and emit their heartbeat from afar. You deal amplified damage against isolated heroes, and when isolated heroes die nearby you gain permanent weapon damage.",
+          "description": "Isolated heroes leave a trail as they move, and emit their heartbeat from afar. You deal amplified damage against isolated heroes, and when isolated heroes die nearby you gain permanent weapon damage.",
           "icon": "./assets/deadlock/hero-64-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Drifter#Bloodscent"
         },
         {
           "name": "Eternal Night",
           "description": "Surround nearby enemy heroes in darkness, severely limiting their vision of other units. Affected enemies are briefly revealed to you and are considered isolated for the duration. You gain bonus sprint speed.",
           "icon": "./assets/deadlock/hero-64-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Drifter#Eternal_Night"
         }
       ],
       "headshot": "./assets/deadlock/hero-64-headshot.webp"
@@ -327,7 +341,9 @@
         "Initiator",
         "Clutch"
       ],
-      "playstyle": "Dynamo keeps himself and his allies healthy while waiting for his moment. Few things can warp a team fight more than a well-coordinated use of Singularity.",
+      "playstyle": "Professor Dynamo is a Hero in Deadlock. He is a man of wit, using his brain and his brawn to provide support to his teammates by healing them, teleporting them, knocking his opponents into the air, and when the time is right, unleashing a Singularity which can drastically shift the tides of battle.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Dynamo",
       "body": "./assets/deadlock/hero-11-card.webp",
       "showcase": "./assets/deadlock/hero-11-showcase.webp",
       "background": "./assets/deadlock/hero-11-background.webp",
@@ -336,29 +352,29 @@
           "name": "Kinetic Pulse",
           "description": "Release an energy pulse that travels along the ground, dealing spirit damage and applying knockup.",
           "icon": "./assets/deadlock/hero-11-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Dynamo#Kinetic_Pulse"
         },
         {
           "name": "Quantum Entanglement",
-          "description": "Briefly become untargetable while teleporting to the target location. Restores stamina upon use.: Bring nearby allies with you.",
+          "description": "Briefly become untargetable while teleporting to the target location. Restores stamina upon use. Alternate cast: Bring nearby allies with you.",
           "icon": "./assets/deadlock/hero-11-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Dynamo#Quantum_Entanglement"
         },
         {
           "name": "Rejuvenating Aurora",
           "description": "While channeling, restore health over time to you and any allies nearby. You can dash and melee without breaking the channel.",
           "icon": "./assets/deadlock/hero-11-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Dynamo#Rejuvenating_Aurora"
         },
         {
           "name": "Singularity",
-          "description": "Create a singularity in your hands, dealing spirit damage over time, applying stun, and pulling in nearby enemies.",
+          "description": "Create a singularity in your hands, dealing < spirit damage over time, applying stun, and pulling in nearby enemies.",
           "icon": "./assets/deadlock/hero-11-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Dynamo#Singularity"
         }
       ],
       "headshot": "./assets/deadlock/hero-11-headshot.webp"
@@ -372,7 +388,9 @@
         "Area Denial",
         "Necromancer"
       ],
-      "playstyle": "The daughter of high-power defense attorneys, Darcy Graves grew up in a home where every conversation was a debate, argument, or negotiation. It was exhausting. But while her parents were often too busy meeting with clients or working on cases to bond with her, the dead were always there to listen.",
+      "playstyle": "Graves is a Hero in Deadlock. The dead have been making a whole lot of demands lately, and only Graves has the courage to oblige. That severed lich hand she found in the cemetery has proven itself a valuable ally, allowing her to latch onto her enemies and steal their power for herself. Her curiosities about the passage of life are further put to use with Jar of Dead, collecting the remains of the fallen, shaking them up, and throwing them back at her enemies to grant those remorseful spirits a final shot at revenge. With Grasping Hands she strikes a deep crack in the earth, allowing those down below to grab onto enemies' ankles and stop them from escaping her reach. And when all else fails, a Borrowed Decree will summon the dead to fight alongside her.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Graves",
       "body": "./assets/deadlock/hero-76-card.webp",
       "showcase": "./assets/deadlock/hero-76-showcase.webp",
       "background": "./assets/deadlock/hero-76-background.webp",
@@ -381,29 +399,29 @@
           "name": "Jar of Dead",
           "description": "Passive: Collect death when anything dies nearby and store it in your Jar of Dead. Active: Throw a jar to summon Deadheads that repeatedly deal spirit damage to enemies. Deadheads follow you instead if there's no nearby enemies, and prioritize the target of your weapon.",
           "icon": "./assets/deadlock/hero-76-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Graves#Jar_of_Dead"
         },
         {
           "name": "Grasping Hands",
-          "description": "Unearth a line of grasping hands, summoning a Ghoul and leaving behind a rift. Enemies who pass through take spirit damage and receive immobilize. Alt-Cast rotates the orientation of the wall.",
+          "description": "Unearth a line of grasping hands, summoning a Ghoul and leaving behind a rift. Enemies who pass through take spirit damage and receive immobilize. Alt-Cast Alternate cast rotates the orientation of the wall.",
           "icon": "./assets/deadlock/hero-76-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Graves#Grasping_Hands"
         },
         {
           "name": "Essence Theft",
           "description": "Your weapon steals weapon damage and spirit resist over time, up to a maximum amount per target.",
           "icon": "./assets/deadlock/hero-76-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Graves#Essence_Theft"
         },
         {
           "name": "Borrowed Decree",
-          "description": "Create a gravestone at a target location that summons Ghouls over time. Enemies can destroy the gravestone with two heavy melees.",
+          "description": "Innate: Abilities can summon Ghouls that shamble toward the enemy base, dealing melee damage. They explode when they approach a hero or objective, dealing spirit damage in an area and applying a brief slow",
           "icon": "./assets/deadlock/hero-76-ability-4-v2.png",
           "textSource": "Deadlock Wiki",
-          "textSourceUrl": "https://deadlock.wiki/Graves"
+          "textSourceUrl": "https://deadlock.wiki/Graves#Borrowed_Decree"
         }
       ],
       "headshot": "./assets/deadlock/hero-76-headshot.webp"
@@ -417,38 +435,40 @@
         "Hunter",
         "Area Denial"
       ],
-      "playstyle": "A cunning predator, Grey Talon uses a combination of deadly accuracy, traps, and clever positioning to bring down the toughest of opponents.",
+      "playstyle": "Grey Talon is a Hero in Deadlock. He is a clever, long-range combatant that uses his powerful bow in combination with traps and mystical flight to pin down and destroy his foes. With the ability to charge his arrow shot for powerful effect, Grey Talon can harry his foes at a distance before launching a guided Spirit Owl to finish them off.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Grey_Talon",
       "body": "./assets/deadlock/hero-17-card.webp",
       "showcase": "./assets/deadlock/hero-17-showcase.webp",
       "background": "./assets/deadlock/hero-17-background.webp",
       "abilities": [
         {
           "name": "Charged Shot",
-          "description": "Charge up a powerful shot that pierces through enemies. Hold Ability 1 to hold the shot.",
+          "description": "Charge up a powerful shot that pierces through enemies. Hold Ability 1 or Fire to hold the shot.",
           "icon": "./assets/deadlock/hero-17-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Grey_Talon#Charged_Shot"
         },
         {
           "name": "Rain of Arrows",
-          "description": "Launches you high in the air, allowing you to glide slowly. While airborne, you gain Weapon Damage and multishot on your weapon. for reduced jump height. Press Jump / mantle to cancel the glide.",
+          "description": "Launches you high in the air, allowing you to glide slowly. While airborne, you gain Weapon Damage and multishot on your weapon. Alternate cast for reduced jump height. Press Jump / mantle to cancel the glide.",
           "icon": "./assets/deadlock/hero-17-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Grey_Talon#Rain_of_Arrows"
         },
         {
           "name": "Spirit Snare",
           "description": "Throw out a trap that begins to arm itself. Once armed, the trap will trigger when an enemy enters its radius, applying Curse and Movement Slow that interrupts, Silences, Disarms, and prevents item usage. Hit the trap with a Charged Shot to detonate early with increased radius.",
           "icon": "./assets/deadlock/hero-17-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Grey_Talon#Spirit_Snare"
         },
         {
           "name": "Guided Owl",
-          "description": "After 1.5s cast time, launch a spirit owl that you control and which explodes on impact, damaging and stunning enemies. Hold [W] to accelerate the owl. Press Jump / mantle to release control. Gain permanent Spirit Power for each enemy hero killed with Guided Owl.",
+          "description": "After 1.5s cast time, launch a spirit owl that you control and which explodes on impact, damaging and stunning enemies. Hold Move forward to accelerate the owl. Press Jump / mantle to release control. Gain permanent Spirit Power for each enemy hero killed with Guided Owl.",
           "icon": "./assets/deadlock/hero-17-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Grey_Talon#Guided_Owl"
         }
       ],
       "headshot": "./assets/deadlock/hero-17-headshot.webp"
@@ -462,7 +482,9 @@
         "Stealthy",
         "Lethal"
       ],
-      "playstyle": "When Haze fixates on a target she can hold her own in a firefight. She prefers to create one sided exchanges, avoiding damage then picking off unsuspecting targets up close.",
+      "playstyle": "Haze is a Hero in Deadlock. She works as a secret agent in the Sandman Division of OSIC, fighting as a devastating assassin character who excels in Fixating on foes that are out of position and swiftly ending them. Her Smoke Bomb lets her sneak up on enemies before knocking them out with a Sleep Dagger and unleashing a hail of gunfire at close range. In desperate situations, Haze can enter her Bullet Dance to avoid return fire while dispatching her remaining targets.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Haze",
       "body": "./assets/deadlock/hero-13-card.webp",
       "showcase": "./assets/deadlock/hero-13-showcase.webp",
       "background": "./assets/deadlock/hero-13-background.webp",
@@ -471,29 +493,29 @@
           "name": "Sleep Dagger",
           "description": "Throw a dagger that damages and sleeps the target. Sleeping targets wake up shortly after being damaged. Throwing a Dagger does not break your invisibility. Sleep Dagger does not interrupt enemies' channeling abilities.",
           "icon": "./assets/deadlock/hero-13-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Haze#Sleep_Dagger"
         },
         {
           "name": "Smoke Bomb",
           "description": "Fade out of sight, becoming invisible and gaining sprint speed. Attacking removes invisibility, but using items does not. Close enemies can see through your invisibility.",
           "icon": "./assets/deadlock/hero-13-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Haze#Smoke_Bomb"
         },
         {
           "name": "Fixation",
           "description": "Shooting a target increases your bullet damage on that target. Gain one stack per bullet hit, two if the hit is a headshot.",
           "icon": "./assets/deadlock/hero-13-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Haze#Fixation"
         },
         {
           "name": "Bullet Dance",
           "description": "Enter a flurry, firing your weapon at nearby enemies with perfect accuracy and added Bullet Damage.",
           "icon": "./assets/deadlock/hero-13-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Haze#Bullet_Dance"
         }
       ],
       "headshot": "./assets/deadlock/hero-13-headshot.webp"
@@ -507,7 +529,9 @@
         "Explosive",
         "Apprehender"
       ],
-      "playstyle": "Holliday depends on her skills as a crack shot, shooting things she's bounced into the air. With good aim she can lay out heavy damage. Her movement skills let her isolate her enemies or beat a hasty retreat.",
+      "playstyle": "Holliday is a Hero in Deadlock. She is a sheriff, relying on her aim with her trusty heirloom revolver and a litany of abilities to take down her enemies. With a Crackshot of her pistol, she can slow and damage her foes from a distance before launching an explosive Powder Keg with her Bounce Pad or a melee attack. To isolate her foes, she can wrangle them with her Spirit Lasso and drag them into the attacks of her allies.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Holliday",
       "body": "./assets/deadlock/hero-14-card.webp",
       "showcase": "./assets/deadlock/hero-14-showcase.webp",
       "background": "./assets/deadlock/hero-14-background.webp",
@@ -516,29 +540,29 @@
           "name": "Powder Keg",
           "description": "Throw a barrel that explodes after a delay, dealing spirit damage, setting enemies on fire and applying knockup. The barrel can be detonated early by being shot, melee'd, or detonated by another barrel. The burn stacks, so overlapping barrels burn for their combined damage. Can be Alt-Cast to place the barrel infront of Holliday.",
           "icon": "./assets/deadlock/hero-14-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Holliday#Powder_Keg"
         },
         {
           "name": "Bounce Pad",
           "description": "Drop a bounce pad in the world that launches any hero. You explode on landing, dealing Damage to any nearby enemies. The explosion can only occur once per person per Bounce Pad.",
           "icon": "./assets/deadlock/hero-14-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Holliday#Bounce_Pad"
         },
         {
           "name": "Crackshot",
           "description": "Headshots deal bonus Damage and applies a Fading Move Speed penalty. This effect can only occur when off cooldown. Cooldown is reduced by 50% on NPC hits. Crackshot ignores range damage fall-off and does not apply to objectives.",
           "icon": "./assets/deadlock/hero-14-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Holliday#Crackshot"
         },
         {
           "name": "Spirit Lasso",
           "description": "Throw out your lasso, dealing spirit damage, pulling, and applying stun. Using a Bounce Pad extends the duration of Spirit Lasso.",
           "icon": "./assets/deadlock/hero-14-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Holliday#Spirit_Lasso"
         }
       ],
       "headshot": "./assets/deadlock/hero-14-headshot.webp"
@@ -552,7 +576,9 @@
         "Explosive",
         "Burn Rubber"
       ],
-      "playstyle": "Infernus has many ways to deal damage over time, burning foes before swooping in for the kill. Due to Infernus' blazing speed, his enemies won't be able to escape the flames.",
+      "playstyle": "Infernus is a Hero in Deadlock. He is an Ixian with a powerful control of flame that he uses to enhance his speed and ignite his enemies. Combining his Flame Dash with the ability to spew a Napalm catalyst, Infernus can chase down and ignite his foes with a deadly Afterburn. Any targets left standing will be subject to his explosive Concussive Combustion, knocking them out and leaving them vulnerable to further immolation.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Infernus",
       "body": "./assets/deadlock/hero-1-card.webp",
       "showcase": "./assets/deadlock/hero-1-showcase.webp",
       "background": "./assets/deadlock/hero-1-background.webp",
@@ -561,29 +587,29 @@
           "name": "Napalm",
           "description": "Spew an incendiary mixture, dealing spirit damage, applying slow, and coating targets in napalm.",
           "icon": "./assets/deadlock/hero-1-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Infernus#Napalm"
         },
         {
           "name": "Flame Dash",
-          "description": "Dash forward, gaining slow resistance while leaving a flaming trail that deals spirit damage over time. Hold [W] while active to dash farther.",
+          "description": "Dash forward, gaining slow resistance while leaving a flaming trail that deals spirit damage over time. Hold Move forward while active to dash farther.",
           "icon": "./assets/deadlock/hero-1-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Infernus#Flame_Dash"
         },
         {
           "name": "Afterburn",
           "description": "Weapon hits build up a burning effect, dealing spirit damage over time. Abilities refresh to the base burn duration and weapon hits extend it.",
           "icon": "./assets/deadlock/hero-1-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Infernus#Afterburn"
         },
         {
           "name": "Concussive Combustion",
           "description": "Become a living bomb, dealing spirit damage and applying stun to all nearby enemies after a delay. Once cast, Concussive Combustion cannot be interrupted.",
           "icon": "./assets/deadlock/hero-1-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Infernus#Concussive_Combustion"
         }
       ],
       "headshot": "./assets/deadlock/hero-1-headshot.webp"
@@ -597,7 +623,9 @@
         "Disruptor",
         "Rock Solid"
       ],
-      "playstyle": "Ivy has disruptive combat tricks that slow and stun enemies. She's most effective when linking up with an ally, empowering her and her ally's guns as well as sharing heals.",
+      "playstyle": "Ivy is a Hero in Deadlock. She is a gargoyle-turned-vigilante with potent supportive and disruptive abilities to assist her allies in combat. After setting up a Kudzu Connection with an ally to share healing and buffs, she can grow patches of Entangling Thorns and transform into her Stone Form to damage and stun the enemy while healing herself. With her abilities of flight, she can pick up any ally or create a bomb and fly them to any point on the battlefield, choosing to either explosively Air Drop them into the middle of the enemy battle group, or rescue an ally from danger.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Ivy",
       "body": "./assets/deadlock/hero-20-card.webp",
       "showcase": "./assets/deadlock/hero-20-showcase.webp",
       "background": "./assets/deadlock/hero-20-background.webp",
@@ -606,29 +634,29 @@
           "name": "Entangling Thorns",
           "description": "Summon a patch of choking thorns that damage and slows enemies in its radius.",
           "icon": "./assets/deadlock/hero-20-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Ivy#Entangling_Thorns"
         },
         {
           "name": "Kudzu Connection",
           "description": "Connect with a nearby ally to gain bonuses, replicated healing, and ignore the move speed penalty while shooting. Receive 50% of Bonuses with no connection Connection requires line of sight.",
           "icon": "./assets/deadlock/hero-20-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Ivy#Kudzu_Connection"
         },
         {
           "name": "Stone Form",
           "description": "Turn yourself into impervious stone and smash into the ground, stunning and damaging enemies nearby. Heals you for a percentage of your max health.",
           "icon": "./assets/deadlock/hero-20-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Ivy#Stone_Form"
         },
         {
           "name": "Air Drop",
           "description": "Grab an ally and take flight with them. Drop your ally to cause an explosion, dealing spirit damage. You and your ally gain increased Outgoing Damage when flying ends. Cooldown reduced by 30% when used on allies. Taking damage briefly disables using the ability. While lifted, your ally cannot attack and deals -20% damage.",
           "icon": "./assets/deadlock/hero-20-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Ivy#Air_Drop"
         }
       ],
       "headshot": "./assets/deadlock/hero-20-headshot.webp"
@@ -642,7 +670,9 @@
         "Explorer",
         "Ice Cold"
       ],
-      "playstyle": "Timely heals and splitting a teamfight properly is the difference between an easy victory or a ruinous defeat. Gliding around slowing enemies gives Kelvin's team the maneuvering advantage to make this happen.",
+      "playstyle": "Kelvin is a Hero in Deadlock. He is a dedicated, undead scientist with a bevy of freezing abilities to slow his enemies and heal allies. He can conjure an Ice Path under his feet for faster movement for himself and his team, throwing Frost Grenades and firing his Arctic Beam at nearby enemies to set them up for his companions' attacks. Tactical usage of his Frozen Shelter ice dome can protect and heal allies while trapping hapless opponents.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Kelvin",
       "body": "./assets/deadlock/hero-12-card.webp",
       "showcase": "./assets/deadlock/hero-12-showcase.webp",
       "background": "./assets/deadlock/hero-12-background.webp",
@@ -651,29 +681,29 @@
           "name": "Frost Grenade",
           "description": "Throw a grenade that explodes in a cloud of freezing ice that heals allies and applies spirit damage and move speed reduction to enemies.",
           "icon": "./assets/deadlock/hero-12-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Kelvin#Frost_Grenade"
         },
         {
           "name": "Ice Path",
           "description": "Kelvin creates a floating trail of ice and snow that gives movement bonuses to him and his allies. Kelvin gains 60% slow resistance for the duration. Enemies can also walk on the floating trail. Press Dash / Crouch / slide to travel up or down while in Ice Path.",
           "icon": "./assets/deadlock/hero-12-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Kelvin#Ice_Path"
         },
         {
           "name": "Arctic Beam",
           "description": "Shoot freezing cold energy out in front of you, damaging targets and progressively reducing their movement and fire rate the longer you sustain the beam on them. You have reduced move speed while using Arctic Beam. The beam may also claim Souls.",
           "icon": "./assets/deadlock/hero-12-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Kelvin#Arctic_Beam"
         },
         {
           "name": "Frozen Shelter",
           "description": "Target yourself or a Hero to freeze the air and create an impenetrable dome around them. While in the dome, allies gain rapid regeneration and enemies are slowed. Objectives becomes Invulnerable and Frozen under Frozen Shelter",
           "icon": "./assets/deadlock/hero-12-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Kelvin#Frozen_Shelter"
         }
       ],
       "headshot": "./assets/deadlock/hero-12-headshot.webp"
@@ -687,7 +717,9 @@
         "Self Damage",
         "Fatale"
       ],
-      "playstyle": "Expending health to achieve devastating effects is the source of Lady Geist's power. When running low, she can drain the life out of her rivals.",
+      "playstyle": "Lady Geist is a Hero in Deadlock. A socialite with a necromantic pact, Lady Geist consumes her own health for her abilities while draining the life away from opponents. Sacrificing her life force to launch Essence Bombs and blood shards filled with Malice, Lady Geist can regain lost health with Life Drain, sapping enemy heroes and units of their health. Her Soul Exchange swaps health values with an enemy hero, turning the odds against them for a killing blow.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Lady_Geist",
       "body": "./assets/deadlock/hero-4-card.webp",
       "showcase": "./assets/deadlock/hero-4-showcase.webp",
       "background": "./assets/deadlock/hero-4-background.webp",
@@ -696,29 +728,29 @@
           "name": "Essence Bomb",
           "description": "Sacrifice some of your health to launch a bomb that deals damage after a brief arm time. Self damage type is Spirit and can be mitigated.",
           "icon": "./assets/deadlock/hero-4-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Lady_Geist#Essence_Bomb"
         },
         {
           "name": "Life Drain",
-          "description": "Create a tether that drains enemy health over time and heals you. Target must be in line of sight and within max range to drain. You can shoot and use other abilities during the drain, but your move speed is reduced. to give health to friendly Heroes.",
+          "description": "Create a tether that drains enemy health over time and heals you. Target must be in line of sight and within max range to drain. You can shoot and use other abilities during the drain, but your move speed is reduced. Alternate cast to give health to friendly Heroes.",
           "icon": "./assets/deadlock/hero-4-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Lady_Geist#Life_Drain"
         },
         {
           "name": "Malice",
           "description": "Sacrifice some of your health to launch blood shards that apply a stack of Malice. Each stack slows the victim and increases the damage they take from you. The slow effect decreases over time.",
           "icon": "./assets/deadlock/hero-4-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Lady_Geist#Malice"
         },
         {
           "name": "Soul Exchange",
           "description": "Swaps health levels with an enemy target. There is a minimum health percentage that enemies can be brought down to and a minimum amount of health received based on victims current health.",
           "icon": "./assets/deadlock/hero-4-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Lady_Geist#Soul_Exchange"
         }
       ],
       "headshot": "./assets/deadlock/hero-4-headshot.webp"
@@ -732,7 +764,9 @@
         "High Flying",
         "Arrogant"
       ],
-      "playstyle": "Lash gives his enemies little room to breathe, either by flying in from long distances to initiate combat with unsuspecting enemies, or pursuing said enemies when they try to run.",
+      "playstyle": "Jacob Lash is an asshole, and a Hero in Deadlock. The Lash is a brutal bruiser who eagerly initiates fights and chases down fleeing opponents. He leaps into combat with his Grappling hook, Flogging his foes with a life-stealing whip and stomping the ground with a Ground Strike that damages multiple targets. If the enemy team groups up, the Lash can pick them all up at once and Death Slam them into the ground.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Lash",
       "body": "./assets/deadlock/hero-31-card.webp",
       "showcase": "./assets/deadlock/hero-31-showcase.webp",
       "background": "./assets/deadlock/hero-31-background.webp",
@@ -741,29 +775,29 @@
           "name": "Ground Strike",
           "description": "Stomp the ground beneath you, damaging enemies in front of you. If you perform Ground Strike while airborne, you quickly dive towards the ground. Damage grows slower after 25m.",
           "icon": "./assets/deadlock/hero-31-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Lash#Ground_Strike"
         },
         {
           "name": "Grapple",
           "description": "Pull yourself through the air toward a target. Using Grapple also resets your limit of air jumps and dashes.",
           "icon": "./assets/deadlock/hero-31-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Lash#Grapple"
         },
         {
           "name": "Flog",
           "description": "Strike enemies in front of you with your whip, healing for a portion of the damage dealt.",
           "icon": "./assets/deadlock/hero-31-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Lash#Flog"
         },
         {
           "name": "Death Slam",
-          "description": "Focus on enemies to connect whips to them. After channeling, connected enemies are lifted and stunned then slammed into the ground. Your victims and any enemies in the landing zone will be damaged and slowed. Press to throw connected enemies early. Enemies that are not in line of sight or go out of range during the latch time will not be grabbed.",
+          "description": "Focus on enemies to connect whips to them. After channeling, connected enemies are lifted and stunned then slammed into the ground. Your victims and any enemies in the landing zone will be damaged and slowed. Press Fire to throw connected enemies early. Enemies that are not in line of sight or go out of range during the latch time will not be grabbed.",
           "icon": "./assets/deadlock/hero-31-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Lash#Death_Slam"
         }
       ],
       "headshot": "./assets/deadlock/hero-31-headshot.webp"
@@ -777,7 +811,9 @@
         "Support",
         "Disruption"
       ],
-      "playstyle": "Precise placement is everything for McGinnis, whether she's creating a killzone or splitting the enemy team. She can help keep her team running making them hard to dislodge when entrenched.",
+      "playstyle": "McGinnis is a Hero in Deadlock. The head of Fairfax Industries Military R&D department, McGinnis has a high opinion of her own work which includes her machine gun, numerous automatic Mini Turrets, Spectral Walls that she can create to protect teammates, hold down positions and trap enemies, a Medicinal Specter that dispenses health to nearby allies, and finally, a devastating spectral Heavy Barrage that can reach even faraway enemies.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/McGinnis",
       "body": "./assets/deadlock/hero-8-card.webp",
       "showcase": "./assets/deadlock/hero-8-showcase.webp",
       "background": "./assets/deadlock/hero-8-background.webp",
@@ -786,29 +822,29 @@
           "name": "Mini Turret",
           "description": "Deploy a turret that shoots enemies, dealing spirit damage over time. The turret expires after a limited lifetime. Turrets deal reduced damage to troopers and objectives.",
           "icon": "./assets/deadlock/hero-8-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/McGinnis#Mini_Turret"
         },
         {
           "name": "Medicinal Specter",
           "description": "Deploy a spirit that provides healing to nearby allies.",
           "icon": "./assets/deadlock/hero-8-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/McGinnis#Medicinal_Specter"
         },
         {
           "name": "Spectral Wall",
-          "description": "Cast a wall that applies slow on enemies it passes through. Erupt the wall to divide the terrain in half and damage nearby enemies. After casting, press or Ability 3 to erupt the wall early. Can be Destroyed with Melee Attacks",
+          "description": "Cast a wall that applies slow on enemies it passes through. Erupt the wall to divide the terrain in half and damage nearby enemies. After casting, press Fire or Ability 3 to erupt the wall early. Can be Destroyed with Melee Attacks",
           "icon": "./assets/deadlock/hero-8-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/McGinnis#Spectral_Wall"
         },
         {
           "name": "Heavy Barrage",
           "description": "Unleashes a volley of rockets that home in on a targeted location. McGinnis is slowed and is still able to use stamina.",
           "icon": "./assets/deadlock/hero-8-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/McGinnis#Heavy_Barrage"
         }
       ],
       "headshot": "./assets/deadlock/hero-8-headshot.webp"
@@ -822,38 +858,40 @@
         "Nimble",
         "Vexing"
       ],
-      "playstyle": "Mina Ha had it all...rich parents, elite education, and an arranged marriage that would see her ascend from run-of-the-mill upper class to American royalty.  She was happy.",
+      "playstyle": "Mina is a Hero in Deadlock; a glass cannon that rakes enemies with her umbrella and delivers quick bursts of Spirit damage at range with her passive, Love Bites. She can transform into bats and escape when things get a bit too messy. Each time she triggers Love Bites, her vampiric powers grow stronger. This builds toward her ultimate, Nox Nostra, which unleashes a massive swarm of bats that hunt down and silence nearby enemies.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Mina",
       "body": "./assets/deadlock/hero-63-card.webp",
       "showcase": "./assets/deadlock/hero-63-showcase.webp",
       "background": "./assets/deadlock/hero-63-background.webp",
       "abilities": [
         {
           "name": "Rake",
-          "description": "Slash with your umbrella, dealing spirit damage, increasing with their missing health. Receive a heal for every target killed.",
+          "description": "Active: Slash with your umbrella, dealing spirit damage, increasing with their missing health. Receive a heal for every target killed. Passive: Holding Zoom / alt-fire causes you to briefly float. Rake executes non-heroes below 60 health.",
           "icon": "./assets/deadlock/hero-63-ability-1-v2.png",
           "textSource": "Deadlock Wiki",
-          "textSourceUrl": "https://deadlock.wiki/Mina"
+          "textSourceUrl": "https://deadlock.wiki/Mina#Rake"
         },
         {
           "name": "Sanguine Retreat",
           "description": "Briefly disperse, becoming untargetable and flying to a target location. Can be recast within a brief window.",
           "icon": "./assets/deadlock/hero-63-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Mina#Sanguine_Retreat"
         },
         {
           "name": "Love Bites",
           "description": "Your bullets apply additional spirit damage. Dealing damage your abilities builds up to a vicious bite, dealing a burst of bonus spirit damage. Love Bites has a unique cooldown per target.",
           "icon": "./assets/deadlock/hero-63-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Mina#Love_Bites"
         },
         {
           "name": "Nox Nostra",
           "description": "Active: Unleash a cloud of bats that seek out targets, each dealing spirit damage and applying Silence. Passive: Triggering Love Bites against heroes permanently increases the number of bats released.",
           "icon": "./assets/deadlock/hero-63-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Mina#Nox_Nostra"
         }
       ],
       "headshot": "./assets/deadlock/hero-63-headshot.webp"
@@ -867,7 +905,9 @@
         "Traveller",
         "Focused"
       ],
-      "playstyle": "Mirage can envelop himself in a violent tornado to catch up to enemies and lift them up. His scarabs help him sustain against multiple enemies, and he's always ready to help an ally or punish an enemy anywhere.",
+      "playstyle": "Mirage is a Hero in Deadlock. He is agile and uses powerful wind-based abilities for disruption. By throwing out Fire Scarabs and transforming into a Dust Devil, Mirage can damage, lift up, steal life and elude his targets while applying Djinn's Mark to enemies to enhance his attacks. When the time is right, he can Travel across the map in an instant to assist his allies, hunt down weak foes and take care of objectives.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Mirage",
       "body": "./assets/deadlock/hero-52-card.webp",
       "showcase": "./assets/deadlock/hero-52-showcase.webp",
       "background": "./assets/deadlock/hero-52-background.webp",
@@ -876,29 +916,29 @@
           "name": "Fire Scarabs",
           "description": "Infest an enemy with fire scarabs, stealing life from them and causing them to deal reduced damage.",
           "icon": "./assets/deadlock/hero-52-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Mirage#Fire_Scarabs"
         },
         {
           "name": "Dust Devil",
           "description": "Transform yourself into a whirlwind that travels forward, damaging enemies, slowing their move speed and lifting them up in the air. After emerging from the tornado you gain bullet evasion.",
           "icon": "./assets/deadlock/hero-52-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Mirage#Dust_Devil"
         },
         {
           "name": "Djinn's Mark",
-          "description": "Active: Consume all Djinn Mark's to deal its damage now.",
+          "description": "Passive: Your shots apply a Djinn Mark on the target. When the mark expires or is consumed, it deals spirit damage and the target is briefly revealed on the map. Each added mark doubles the current damage. There is a per target Cooldown for applying additional marks",
           "icon": "./assets/deadlock/hero-52-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Mirage#Djinn%27s_Mark"
         },
         {
           "name": "Traveler",
           "description": "Target a location on the minimap. After a brief wait, teleport to that location. Taking damage during the wait period causes the teleport to be interrupted.",
           "icon": "./assets/deadlock/hero-52-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Mirage#Traveler"
         }
       ],
       "headshot": "./assets/deadlock/hero-52-headshot.webp"
@@ -912,7 +952,9 @@
         "Initiator",
         "Burrower"
       ],
-      "playstyle": "By burrowing through the ground, Mo and Krill can get the drop on almost anyone; and once they get in close the results can be devastating.",
+      "playstyle": "Mo & Krill are Heroes in Deadlock. Highly respected members of America's underworld, together they are a disruptive and mobile pair that can Burrow around the battlefield and leave their enemies in ruins. Jumping out of ground let Mo & Krill catch their enemies unprepared, and if they are prepared then that will be rectified when Sand Blast jams their weapons. The duo is not concerned about being ambushed by a large group of people, as Scorn will force them to scatter or else risk the pair surviving long enough for backup to arrive. If some poor moron oversteps, Mo and Krill can Combo them to render them helpless.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Mo_&_Krill",
       "body": "./assets/deadlock/hero-18-card.webp",
       "showcase": "./assets/deadlock/hero-18-showcase.webp",
       "background": "./assets/deadlock/hero-18-background.webp",
@@ -921,29 +963,29 @@
           "name": "Scorn",
           "description": "Deal damage to nearby enemies and heal yourself based on the damage done. Heal is stronger against enemy heroes.",
           "icon": "./assets/deadlock/hero-18-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Mo_&_Krill#Scorn"
         },
         {
           "name": "Burrow",
           "description": "Burrow underground, moving faster, and gaining spirit and bullet armor. Damage from enemy heroes will reduce the speed bonus. When you jump out, deal spirit damage, slow, and knockup.",
           "icon": "./assets/deadlock/hero-18-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Mo_&_Krill#Burrow"
         },
         {
           "name": "Sand Blast",
           "description": "Spray sand that disarms enemies in front of you and deals damage.",
           "icon": "./assets/deadlock/hero-18-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Mo_&_Krill#Sand_Blast"
         },
         {
           "name": "Combo",
           "description": "Hold the target in place, stunning them and dealing damage during the channel. If they die during, or within 3 seconds of Combo ending, you permanently gain max health.",
           "icon": "./assets/deadlock/hero-18-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Mo_&_Krill#Combo"
         }
       ],
       "headshot": "./assets/deadlock/hero-18-headshot.webp"
@@ -957,7 +999,9 @@
         "Protector",
         "Booksmart"
       ],
-      "playstyle": "The daughter of a rare book dealer, Paige grew up in a loving home that prioritized kindness, magic, and storytelling.  But while Paige took naturally to her parents' values, her little brother Bryce did not.",
+      "playstyle": "Paige is a Hero in Deadlock. Citizens of Manhattan will learn to appreciate the power of the written word when Paige joins the fight. With the mere toss of a book she can conjure a Bookwyrm that sears enemies who get too close, or bind them to the ground with Captivating Read. Waning allies will find themselves emboldened by Plot Armor, granting them the courage to fight another day. Fantasy becomes reality with Rallying Charge, summoning an entire cavalry to gallop across the city.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Paige",
       "body": "./assets/deadlock/hero-67-card.webp",
       "showcase": "./assets/deadlock/hero-67-showcase.webp",
       "background": "./assets/deadlock/hero-67-background.webp",
@@ -966,29 +1010,29 @@
           "name": "Bookwyrm",
           "description": "Conjure a dragon that appears at the target location before flying forward, dealing spirit damage and leaving a burning path in its trail.",
           "icon": "./assets/deadlock/hero-67-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Paige#Bookwyrm"
         },
         {
           "name": "Plot Armor",
           "description": "Grant an ally a barrier. While the barrier holds, they gain bonus weapon damage.",
           "icon": "./assets/deadlock/hero-67-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Paige#Plot_Armor"
         },
         {
           "name": "Captivating Read",
           "description": "Target an area with latent magic, applying slow. The magic detonates after a delay, dealing spirit damage and applying immobilize.",
           "icon": "./assets/deadlock/hero-67-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Paige#Captivating_Read"
         },
         {
           "name": "Rallying Charge",
           "description": "Release a wave of spectral knights and steeds that charge across the entire city, healing allies and dealing spirit damage to enemies. The strength of the heal and spirit damage is amplified as the knights travel further.",
           "icon": "./assets/deadlock/hero-67-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Paige#Rallying_Charge"
         }
       ],
       "headshot": "./assets/deadlock/hero-67-headshot.webp"
@@ -1002,7 +1046,9 @@
         "Disruptor",
         "Tactician"
       ],
-      "playstyle": "Manipulating time lets Paradox outpace an enemy in one on one combat. She thrives by subjecting her enemies to timely swaps into a waiting pulse grenade, her wall, or into the middle of her teammates.",
+      "playstyle": "Paradox is a Hero in Deadlock. She wields time manipulation with potent disruption and slowing abilities. With a charged Kinetic Carbine, she can threaten her enemies at any range while damaging and slowing them with thrown Pulse Grenades and well-placed Time Walls. At just the right moment, Paradox can activate her Paradoxical Swap to change places with her target, dropping them into a dangerous situation amongst her team.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Paradox",
       "body": "./assets/deadlock/hero-10-card.webp",
       "showcase": "./assets/deadlock/hero-10-showcase.webp",
       "background": "./assets/deadlock/hero-10-background.webp",
@@ -1011,29 +1057,29 @@
           "name": "Pulse Grenade",
           "description": "Throw a grenade that begins pulsing when it lands. Each pulse expands the radius and applies spirit damage, time slow, and stacking increased damage for Paradox against the victim.",
           "icon": "./assets/deadlock/hero-10-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Paradox#Pulse_Grenade"
         },
         {
           "name": "Time Wall",
           "description": "Create a time warping wall that stops time for all enemy projectiles and bullets that touch it and increases the speed and damage of friendly bullets. Enemies that touch the wall will be briefly slowed and silenced.",
           "icon": "./assets/deadlock/hero-10-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Paradox#Time_Wall"
         },
         {
           "name": "Kinetic Carbine",
-          "description": "Charge up a powerful shot of time energy, dealing spirit damage and applying a Time-Stop to enemies hit. The damage dealt increases with weapon damage. Move speed is increased while charging. While in the air and charging, to timeslow your movement.",
+          "description": "Charge up a powerful shot of time energy, dealing spirit damage and applying a Time-Stop to enemies hit. The damage dealt increases with weapon damage. Move speed is increased while charging. While in the air and charging, Zoom / alt-fire to timeslow your movement.",
           "icon": "./assets/deadlock/hero-10-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Paradox#Kinetic_Carbine"
         },
         {
           "name": "Paradoxical Swap",
           "description": "Fire a projectile that swaps your position with the target enemy hero.",
           "icon": "./assets/deadlock/hero-10-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Paradox#Paradoxical_Swap"
         }
       ],
       "headshot": "./assets/deadlock/hero-10-headshot.webp"
@@ -1047,7 +1093,9 @@
         "Burst Damage",
         "Frogs"
       ],
-      "playstyle": "With a powerful shotgun and a thin frame, Pocket relies on their ability to briefly escape into a mystic suitcase and teleport via a flying cloak in order to survive close encounters.",
+      "playstyle": "Pocket is a Hero in Deadlock. Having to fight in the Ritual for the chance to stop their father, Pocket prefers to fight up close thanks to their powerful shotgun and highly mobile abilities. Opening their magic briefcase to Barrage groups of enemies with spiritual bursts, Pocket may use their Flying Cloak to teleport beside their targets and unload their shotgun; disappearing inside their Enchanter's Satchel to avoid return fire. When surrounded by enemies, Pocket can unleash an Affliction to slowly eat away at their health, setting their enemies up for a devastating attack.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Pocket",
       "body": "./assets/deadlock/hero-50-card.webp",
       "showcase": "./assets/deadlock/hero-50-showcase.webp",
       "background": "./assets/deadlock/hero-50-background.webp",
@@ -1056,29 +1104,29 @@
           "name": "Barrage",
           "description": "Channel to start launching projectiles that deal spirit damage and apply slow around their impact point. Projectiles that hit a hero grant Pocket increased damage that stacks. Casting while airborne will cause Pocket to float. Casting AirDash or Flying Cloaking will not cancel Barrage.",
           "icon": "./assets/deadlock/hero-50-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Pocket#Barrage"
         },
         {
           "name": "Flying Cloak",
           "description": "Launch a sentient cloak that travels forward and damages enemies. You can press Ability 2 to teleport to its location.",
           "icon": "./assets/deadlock/hero-50-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Pocket#Flying_Cloak"
         },
         {
           "name": "Enchanter's Satchel",
           "description": "Escape into your suitcase. When the duration ends, deal spirit damage to nearby enemies. Duration can be ended early by performing any action.",
           "icon": "./assets/deadlock/hero-50-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Pocket#Enchanter%27s_Satchel"
         },
         {
           "name": "Affliction",
           "description": "Applies damage over time to enemies nearby. Affliction's damage is non-lethal and does not apply item procs.",
           "icon": "./assets/deadlock/hero-50-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Pocket#Affliction"
         }
       ],
       "headshot": "./assets/deadlock/hero-50-headshot.webp"
@@ -1092,7 +1140,9 @@
         "Tiny",
         "zZzzZ"
       ],
-      "playstyle": "An accidental stowaway from the world of dreams, Rem has found himself stranded in the city that never sleeps.  Driven by his curious nature, Rem and his helpful friends have been seen wandering across the five boroughs in search of a way back home.",
+      "playstyle": "Rem is a Hero in Deadlock. An accidental stowaway from the world of dreams, Rem has found himself stranded in the city that never sleeps. Pillow fights are Rem's preferred form of conflict, tossing his favorite pillow at enemies to knock them back when they're getting too close. His friends, however, he likes to keep nearby - leaping to their aid when things get dicey and taking a quick nap on their shoulder. His Lil Helpers are curious creatures, taking interest in everything the streets of New York have to offer, and cheering on his allies as they go. Ultimately when Naptime hits, no one will be able to keep their eyes open.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Rem",
       "body": "./assets/deadlock/hero-79-card.webp",
       "showcase": "./assets/deadlock/hero-79-showcase.webp",
       "background": "./assets/deadlock/hero-79-background.webp",
@@ -1101,29 +1151,29 @@
           "name": "Pillow Toss",
           "description": "Throw your trusty pillow inflicting spirit damage and heavy knockback. Landing hits reduces the cooldown of your other abilities.",
           "icon": "./assets/deadlock/hero-79-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Rem#Pillow_Toss"
         },
         {
           "name": "Tag Along",
           "description": "Jump to an ally and nap alongside them. Both you and the ally receive a burst heal based on missing health followed by lingering regeneration. Hop between allies with Ability 2 to apply the heal, once per ally. You are knocked off if stunned by an ultimate ability. You can use items and all self-casts target your ally instead.",
           "icon": "./assets/deadlock/hero-79-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Rem#Tag_Along"
         },
         {
           "name": "Lil Helpers",
           "description": "Signal a Helper to lend a hand. They can collect boxes, do Sinner's Sacrifices, or be sent to support allies and troopers. Follow a hero: Provides a short burst of spirit resist and fading move speed. Follow a trooper: Provides healing, damage, resists, and allows tagging along. When no hero is around, souls from trooper kills are split amongst the team. Can be cast during Tag Along. Helpers will take a nap for 15.1s after following someone.",
           "icon": "./assets/deadlock/hero-79-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Rem#Lil_Helpers"
         },
         {
           "name": "Naptime",
           "description": "Cast your gaze forward, piercing walls and floors. Enemies in the gaze are slowed, have reduced dash distance, and cannot use movement abilities. When the channel ends they fall asleep before waking up to a splitting headache that deals heavy spirit damage.",
           "icon": "./assets/deadlock/hero-79-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Rem#Naptime"
         }
       ],
       "headshot": "./assets/deadlock/hero-79-headshot.webp"
@@ -1137,7 +1187,9 @@
         "Merciless",
         "Area Denial"
       ],
-      "playstyle": "Seven thrives in a skirmish waiting for the time to strike. Then he rolls into the fight like a storm and batters his enemies with a cascade of lightning.",
+      "playstyle": "Seven is a Hero in Deadlock. A megalomaniac scientist who substitutes his absence of ethics with a wide array of electric attacks, Seven excels in rapidly taking control of the battlefield by denying areas with Lightning Balls and Surging his gun to punish his foes for staying close together. After putting his enemies in their place with Static Charge, Seven is free to discharge himself into a Storm Cloud and fry them alive.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Seven",
       "body": "./assets/deadlock/hero-2-card.webp",
       "showcase": "./assets/deadlock/hero-2-showcase.webp",
       "background": "./assets/deadlock/hero-2-background.webp",
@@ -1146,29 +1198,29 @@
           "name": "Lightning Ball",
           "description": "Shoot a ball of lightning that travels in a straight line. Does damage to all targets in its radius. Slows down when damaging enemies and stops if it hits the world.",
           "icon": "./assets/deadlock/hero-2-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Seven#Lightning_Ball"
         },
         {
           "name": "Static Charge",
           "description": "Apply a charge to a target enemy hero. After a short duration, the static charge stuns and damages enemies within the radius.",
           "icon": "./assets/deadlock/hero-2-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Seven#Static_Charge"
         },
         {
           "name": "Power Surge",
           "description": "Power up your weapon with a shock effect, making your bullets proc shock damage on your target. This shock damage bounces to enemies near your target. Occurs once per burst shot.",
           "icon": "./assets/deadlock/hero-2-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Seven#Power_Surge"
         },
         {
           "name": "Storm Cloud",
           "description": "Channel an expanding storm cloud around you that damages all enemies within its radius. Enemies do not take damage when they are out of line-of-sight.",
           "icon": "./assets/deadlock/hero-2-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Seven#Storm_Cloud"
         }
       ],
       "headshot": "./assets/deadlock/hero-2-headshot.webp"
@@ -1182,7 +1234,9 @@
         "Bleed",
         "Repeat"
       ],
-      "playstyle": "Shiv has zero interest in playing fair, which is why he relies on hit and run tactics to weaken enemies before he dives in for the kill.",
+      "playstyle": "Shiv is a Hero in Deadlock. Seeking atonement for his past life, Shiv is a cutthroat monster hunter with a cause, conducting hit-and-run attacks and picking off vulnerable targets. Shiv can efficiently traverse the battlefield and catch up with his targets by making full use of his shotgun's recoil. Flinging Serrated Knives to bleed his foes from range, Shiv initiates close quarters combat on his terms by dashing to them while Slicing and Dicing through those standing in his way. By continuously dealing damage, Shiv builds Rage which enhances his abilities and allows him to be a one man army. Withstanding grievous damage via Bloodletting, Shiv finishes off dying targets with a devastating Killing Blow.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Shiv",
       "body": "./assets/deadlock/hero-19-card.webp",
       "showcase": "./assets/deadlock/hero-19-showcase.webp",
       "background": "./assets/deadlock/hero-19-background.webp",
@@ -1191,29 +1245,29 @@
           "name": "Serrated Knives",
           "description": "Throw a knife that bleeds an enemy. Each additional hit adds a stack and refreshes the bleed duration, causing the bleed to increase per stack.",
           "icon": "./assets/deadlock/hero-19-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Shiv#Serrated_Knives"
         },
         {
           "name": "Slice and Dice",
           "description": "Perform a dash forward, damaging enemies along the path. Hit Enemies have their spirit resist reduced. This debuff can stack.",
           "icon": "./assets/deadlock/hero-19-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Shiv#Slice_and_Dice"
         },
         {
           "name": "Bloodletting",
           "description": "Take only a portion of incoming damage immediately and defer the rest to be taken over time. Activate to clear a portion of the deferred damage.",
           "icon": "./assets/deadlock/hero-19-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Shiv#Bloodletting"
         },
         {
           "name": "Killing Blow",
-          "description": "Travel to a low health hero and instantly kill it",
+          "description": "Active: Leap forward, dealing spirit damage to the first enemy hero. If they are below the kill threshold, execute them instead. Finishing an enemy with Killing Blow lets you recast for 16s",
           "icon": "./assets/deadlock/hero-19-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Shiv#Killing_Blow"
         }
       ],
       "headshot": "./assets/deadlock/hero-19-headshot.webp"
@@ -1227,7 +1281,9 @@
         "Hot Mess",
         "Transformation"
       ],
-      "playstyle": "Lilah Silver is a mess.  She drinks too much, she smokes too much, and the less is said about her personal life the better.   But despite Silver's flaws she has managed to carve out a career as a successful bounty hunter, and while she would like to think that her successes are solely because she has incredible intuition, the fact that she’s a werewolf doesn’t hurt.",
+      "playstyle": "Silver is a Hero in Deadlock, making her living tracking down lowlifes, but today New York’s misanthrope lycanthrope plans on summoning a god. Fortunately, her career as a bounty hunter has prepared her well for all that the ritual requires. She makes quick work of adversaries by catching them with her Entangling Bola, Boot Kicking them in the face, and finishing them off with a Slam Fire from her rifle. But inevitably, the Lycan Curse comes calling whether she likes it or not, and her foes will regret being too close when it does.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Silver",
       "body": "./assets/deadlock/hero-80-card.webp",
       "showcase": "./assets/deadlock/hero-80-showcase.webp",
       "background": "./assets/deadlock/hero-80-background.webp",
@@ -1236,29 +1292,29 @@
           "name": "Slam Fire",
           "description": "Instantly reload your gun. You gain bonus fire rate and deal bonus weapon damage based on the target's health for a limited number of shots, but suffer from reduced accuracy. Deals bonus Weapon Damage against troopers and neutrals.",
           "icon": "./assets/deadlock/hero-80-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Silver#Slam_Fire"
         },
         {
           "name": "Boot Kick",
           "description": "Dash forward and kick the first enemy hit, dealing melee damage while pushing yourself off and marking them.",
           "icon": "./assets/deadlock/hero-80-ability-2-v2.png",
           "textSource": "Deadlock Wiki",
-          "textSourceUrl": "https://deadlock.wiki/Silver"
+          "textSourceUrl": "https://deadlock.wiki/Silver#Boot_Kick"
         },
         {
           "name": "Entangling Bola",
           "description": "Throw a bola, dealing spirit damage, applying slow and preventing movement abilities or stamina.",
           "icon": "./assets/deadlock/hero-80-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Silver#Entangling_Bola"
         },
         {
           "name": "Lycan Curse",
           "description": "Passive: Dealing damage generates bloodlust, increased at low health. At max bloodlust, you automatically cast Lycan Curse. Active: Instantly transform, gaining increased max health, and stacking fire rate on enemy heroes, and replacing your abilities and weapon with their ferocious versions.",
           "icon": "./assets/deadlock/hero-80-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Silver#Lycan_Curse"
         }
       ],
       "headshot": "./assets/deadlock/hero-80-headshot.webp"
@@ -1272,7 +1328,9 @@
         "Copycat",
         "Versatile"
       ],
-      "playstyle": "With the help of their unwilling assistant, <i>The Magnificent Sinclair</i> can confuse enemies with curving hexes and rapid bolts.",
+      "playstyle": "Sinclair is a Hero in Deadlock. With their trusty magic wand, they can shoot Vexing Bolts to surprise enemies and use magic to turn them into Rabbits. The Spectral Assistant amplifies their damage and can serve as a fast escape route. Sinclair can even turn their enemies' abilities against themselves with their surprising final trick, Audience Participation.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Sinclair",
       "body": "./assets/deadlock/hero-60-card.webp",
       "showcase": "./assets/deadlock/hero-60-showcase.webp",
       "background": "./assets/deadlock/hero-60-background.webp",
@@ -1281,29 +1339,29 @@
           "name": "Vexing Bolt",
           "description": "Fire a bolt of magic that deals Damage, increasing as it travels. If you have an Assistant, they also cast Vexing Bolt at reduced damage. Press Ability 1 to redirect the bolt towards your crosshairs.",
           "icon": "./assets/deadlock/hero-60-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Sinclair#Vexing_Bolt"
         },
         {
           "name": "Spectral Assistant",
           "description": "Summon an Assistant at the targeted location. The Assistant attacks whenever you fire your weapon, dealing Damage. While the Assistant is out, you can press Ability 2 to swap positions with your Assistant. Casting Spectral Assistant also reloads your weapon.",
           "icon": "./assets/deadlock/hero-60-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Sinclair#Spectral_Assistant"
         },
         {
           "name": "Rabbit Hex",
           "description": "Hex a target area and transforming all enemies into a Rabbit for a limited duration. Rabbits are small and move faster, but take increased Damage and are unable to perform most actions. Hex does not interrupt abilities.",
           "icon": "./assets/deadlock/hero-60-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Sinclair#Rabbit_Hex"
         },
         {
           "name": "Audience Participation",
           "description": "Copy the Ultimate of an enemy hero for a limited time. Reactivating the ability will use the Copied Ultimate instead. Copies will inherit this ability's upgrade points. Audience Participation will also copy the cooldown.",
           "icon": "./assets/deadlock/hero-60-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Sinclair#Audience_Participation"
         }
       ],
       "headshot": "./assets/deadlock/hero-60-headshot.webp"
@@ -1317,7 +1375,9 @@
         "Map Control",
         "Mind Games"
       ],
-      "playstyle": "He's proper, he's polite, but the humble Doorman of The Baroness Hotel is more than meets the eye.",
+      "playstyle": "The Doorman is a Hero in Deadlock. He's proper, he's polite, but the humble Doorman of The Baroness Hotel is more than meets the eye. A brisk ring of his Call Bell leaves nearby enemies disoriented, and his high-speed Luggage Cart knocks them right off their feet. Do you find yourself getting lost easily in the streets of Manhattan? Don't worry, The Doorman is here to provide a shortcut with his Doorway whenever the need arises. And only the most special of enemies get to experience the trip of a lifetime to The Baroness Hotel.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/The_Doorman",
       "body": "./assets/deadlock/hero-69-card.webp",
       "showcase": "./assets/deadlock/hero-69-showcase.webp",
       "background": "./assets/deadlock/hero-69-background.webp",
@@ -1326,29 +1386,29 @@
           "name": "Call Bell",
           "description": "Throw out a call bell that deals spirit damage on impact. After a short delay it explodes, dealing additional spirit damage and causing affected enemies to suffer reduced weapon accuracy and movement slow. Can be shot to detonate early.",
           "icon": "./assets/deadlock/hero-69-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/The_Doorman#Call_Bell"
         },
         {
           "name": "Doorway",
           "description": "Place two connected doors in the world. Players and most projectiles entering one door will exit out through the other. The doors will close at the end of the duration. The two doors must be placed within the doorway distance of each other.",
           "icon": "./assets/deadlock/hero-69-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/The_Doorman#Doorway"
         },
         {
           "name": "Luggage Cart",
-          "description": "Send out a luggage Cart that deals spirit damage and pulls enemy heroes along its path. Can be alt cast with to target friendly heroes instead.",
+          "description": "Send out a luggage Cart that deals spirit damage and pulls enemy heroes along its path. Can be alt cast with Alternate cast to target friendly heroes instead.",
           "icon": "./assets/deadlock/hero-69-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/The_Doorman#Luggage_Cart"
         },
         {
           "name": "Hotel Guest",
           "description": "Send the target's physical body to be a guest at the Baroness Hotel. The guest is to promptly make their way to the exit elevator, where they'll be sent back to their original position. A stay at the Baroness Hotel is paid for in spirit damage. Failure to check-out on time costs additional spirit damage.",
           "icon": "./assets/deadlock/hero-69-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/The_Doorman#Hotel_Guest"
         }
       ],
       "headshot": "./assets/deadlock/hero-69-headshot.webp"
@@ -1362,7 +1422,9 @@
         "Arms Expert",
         "Tactical"
       ],
-      "playstyle": "The Venators of St. Benedict are a Vatican-sanctioned order whose members are deployed to regions with a high concentration of supernatural predators.   Few in number, their modus operandi is to observe, identify, and exterminate. They are methodical, they are precise, and once they identify a threat to the flock they are relentless.",
+      "playstyle": "Venator is a Hero in Deadlock. He doesn't walk the righteous path, he blazes the trail so that others may do so safely. His biggest challenge is knowing which weapon to use first. Firing a Consecrating Grenade into the fray softens up his enemies and keeps them from restoring health, and his Hex-Lined Snap Trap scatters across the ground to lock them in place. A Gutshot from his shotgun will knock back enemies who get too close, and when the time is right, Ira Domini will rid the world of evil once and for all.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Venator",
       "body": "./assets/deadlock/hero-65-card.webp",
       "showcase": "./assets/deadlock/hero-65-showcase.webp",
       "background": "./assets/deadlock/hero-65-background.webp",
@@ -1371,29 +1433,29 @@
           "name": "Consecrating Grenade",
           "description": "Fire a grenade that bounces before exploding, dealing weapon damage and setting enemies on fire. Burning targets deal pure damage to enemies in the area and suffer from reduced healing.",
           "icon": "./assets/deadlock/hero-65-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Venator#Consecrating_Grenade"
         },
         {
           "name": "Gutshot",
           "description": "Fire a blast with your shotgun, dealing weapon damage and pushing enemies back. Enemies near a wall receive stun and take bonus weapon damage.",
           "icon": "./assets/deadlock/hero-65-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Venator#Gutshot"
         },
         {
           "name": "Hex-Lined Snap Trap",
           "description": "Kick a trap that arms after a brief delay. The trap springs on the first enemy it touches, dealing spirit damage, applying immobilize, and revealing enemies for a duration afterwards.",
           "icon": "./assets/deadlock/hero-65-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Venator#Hex-Lined_Snap_Trap"
         },
         {
           "name": "Ira Domini",
           "description": "Load your crossbow with 3 stakes, dealing massively increased weapon damage. The final stake is blessed, dealing bonus pure damage and executing low-health enemies.",
           "icon": "./assets/deadlock/hero-65-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Venator#Ira_Domini"
         }
       ],
       "headshot": "./assets/deadlock/hero-65-headshot.webp"
@@ -1407,7 +1469,9 @@
         "Can't",
         "Kill Me"
       ],
-      "playstyle": "A lot of people spend their whole lives wondering who they really are. For Victor, this existential question is made more complicated as he woke up on a mortuary table with no knowledge of his creator, why he was made, and whom he is made of.",
+      "playstyle": "Victor is a Hero in Deadlock who walks the line between life and death. Victor has learned to harness pain, shocking himself with Jumpstart to get his adrenaline rushing and his faulty heart pumping. He welcomes incoming damage with open (albeit mismatched) arms, channeling it into his Pain Battery and granting enemies a taste of the pain he endures. Get too close and risk getting caught in his Aura of Suffering, but hey, at least you'll be suffering together. And just when you think you've taken him down, he'll piece himself back together and live again!",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Victor",
       "body": "./assets/deadlock/hero-66-card.webp",
       "showcase": "./assets/deadlock/hero-66-showcase.webp",
       "background": "./assets/deadlock/hero-66-background.webp",
@@ -1416,29 +1480,29 @@
           "name": "Pain Battery",
           "description": "Taking any damage passively charges up your Pain Battery. Once full, activating the ability fires multiple shocking bolts, dealing spirit damage once per target.",
           "icon": "./assets/deadlock/hero-66-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Victor#Pain_Battery"
         },
         {
           "name": "Jumpstart",
           "description": "Deal spirit damage to yourself. Then, gain bonus regeneration and bonus move speed, decaying over time.",
           "icon": "./assets/deadlock/hero-66-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Victor#Jumpstart"
         },
         {
           "name": "Aura of Suffering",
           "description": "Unleash pain, dealing spirit damage over time to both enemies and yourself. The damage continues to increase the longer the ability is channeled, up to a maximum amount.",
           "icon": "./assets/deadlock/hero-66-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Victor#Aura_of_Suffering"
         },
         {
           "name": "Shocking Reanimation",
           "description": "Release a wave after taking lethal damage, applying a diminishing slow. After a brief channel you reanimate, dealing spirit damage and applying stun to nearby enemies.",
           "icon": "./assets/deadlock/hero-66-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Victor#Shocking_Reanimation"
         }
       ],
       "headshot": "./assets/deadlock/hero-66-headshot.webp"
@@ -1452,7 +1516,9 @@
         "Soaring",
         "One Shot Kill"
       ],
-      "playstyle": "Vindicta has the mobility to engage at her leisure, picking at her prey and bleeding them out slowly. Injured enemies at any distance should fear being picked off when she is on the map.",
+      "playstyle": "Vindicta is a Hero in Deadlock. She is a mobile and powerful marksman, engaging and picking off her targets from a distance. Using her Crow Familiar to initiate fights by bleeding her targets, Vindicta may launch into Flight to keep her distance from enemies and tether them with a Stake in the ground while targeting them with her powerful rifle. Enemies that are near-death should fear her ability to Assassinate at long-range with a devastating sniper shot.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Vindicta",
       "body": "./assets/deadlock/hero-3-card.webp",
       "showcase": "./assets/deadlock/hero-3-showcase.webp",
       "background": "./assets/deadlock/hero-3-background.webp",
@@ -1461,29 +1527,29 @@
           "name": "Stake",
           "description": "Throw a stake that tethers enemies to the location where the stake lands. Enemy movement is restricted to the length of the tether.",
           "icon": "./assets/deadlock/hero-3-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Vindicta#Stake"
         },
         {
           "name": "Flight",
           "description": "Leap into the air and fly. While in flight your weapon deals bonus spirit damage and your items have increased range.",
           "icon": "./assets/deadlock/hero-3-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Vindicta#Flight"
         },
         {
           "name": "Crow Familiar",
           "description": "Your crow familiar deals impact damage, reduces their bullet resist and applies a bleed that deals damage based on the target's current health.",
           "icon": "./assets/deadlock/hero-3-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Vindicta#Crow_Familiar"
         },
         {
           "name": "Assassinate",
-          "description": "Use your scoped rifle to fire a powerful shot over long distances. Deal only partial damage until fully charged after 1.0s of being scoped. Does bonus damage to enemies with less than 50% health remaining. Landing a killing blow on a player with Assassinate grants you bonus weapon damage.",
+          "description": "Use your scoped rifle to fire a powerful shot over long distances. Deal only partial damage until fully charged after 1s of being scoped. Does bonus damage to enemies with less than 50% health remaining. Landing a killing blow on a player with Assassinate grants you bonus weapon damage.",
           "icon": "./assets/deadlock/hero-3-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Vindicta#Assassinate"
         }
       ],
       "headshot": "./assets/deadlock/hero-3-headshot.webp"
@@ -1497,7 +1563,9 @@
         "Disruptor",
         "Gooey"
       ],
-      "playstyle": "Viscous vexes his opponents through clever evasion and strategic uses of healing, enabling him to withstand the most brutal of enemy attacks.",
+      "playstyle": "Viscous is a Hero in Deadlock. He's green. A psychic sea anemone in a protoplasmic suit, Viscous can throw Splatter to cover the area in green goo which slows down his victims and leaves them vulnerable to Puddle Punches, which will knock his enemies away from their friends and his friends away from their enemies. Even if they manage to catch Viscous it doesn't matter, as anything inside The Cube is completely invulnerable. Soon Goo Ball comes, and walls painted green will be joined by echoes of screams.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Viscous",
       "body": "./assets/deadlock/hero-35-card.webp",
       "showcase": "./assets/deadlock/hero-35-showcase.webp",
       "background": "./assets/deadlock/hero-35-background.webp",
@@ -1506,29 +1574,29 @@
           "name": "Splatter",
           "description": "Throw a ball of goo that deals damage and leaves puddles of goo behind that apply movement slow to enemies in the radius.",
           "icon": "./assets/deadlock/hero-35-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Viscous#Splatter"
         },
         {
           "name": "The Cube",
           "description": "Encase the target in a cube of restorative goo that protects from damage, and increases health regen. Target is unable to take any new actions while cubed. Can be used on self. Press Jump / mantle to escape early.",
           "icon": "./assets/deadlock/hero-35-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Viscous#The_Cube"
         },
         {
           "name": "Puddle Punch",
           "description": "Materialize a fist in the world that punches everyone in the area, applying knockup. Punching an enemy deals melee damage and applies slow. You and your allies have increased Air Control.",
           "icon": "./assets/deadlock/hero-35-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Viscous#Puddle_Punch"
         },
         {
           "name": "Goo Ball",
           "description": "Morph into a large goo ball that deals damage and stuns enemies on impact. The ball grants large amounts of Bullet and Spirit resist, bounces off walls and can double jump.",
           "icon": "./assets/deadlock/hero-35-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Viscous#Goo_Ball"
         }
       ],
       "headshot": "./assets/deadlock/hero-35-headshot.webp"
@@ -1542,7 +1610,9 @@
         "Slippery",
         "Rat-a-Tat"
       ],
-      "playstyle": "With a powerful weapon (and deadly venom to match), Vyper can slither into the back of teams and assassinate high-priority targets in a storm of bullets.",
+      "playstyle": "Vyper is a Hero in Deadlock. After Slithering across the battlefield to swiftly avoid enemy attacks while spraying them with copious amount of bullets, Vyper can inject retreating foes with Lethal Venom to finish them off and use her Screwjab Dagger to hit faraway targets. By slinging her Petrifying Bolas, Vyper will make sure that her targets won't get away from her.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Vyper",
       "body": "./assets/deadlock/hero-58-card.webp",
       "showcase": "./assets/deadlock/hero-58-showcase.webp",
       "background": "./assets/deadlock/hero-58-background.webp",
@@ -1551,29 +1621,29 @@
           "name": "Screwjab Dagger",
           "description": "Throw a dagger, dealing spirit damage and applying slow. Every subsequent dagger against the same target stacks in spirit damage and slow.",
           "icon": "./assets/deadlock/hero-58-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Vyper#Screwjab_Dagger"
         },
         {
           "name": "Lethal Venom",
           "description": "Inject a target with lethal venom. After a delay the venom triggers, dealing Spirit Damage. The damage is increased by the target's missing health. Lethal Venom will ignore Petrify's damage block.",
           "icon": "./assets/deadlock/hero-58-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Vyper#Lethal_Venom"
         },
         {
           "name": "Slither",
           "description": "You have increased Slide Distance, can Slide up hills, and can turn faster while Sliding.",
           "icon": "./assets/deadlock/hero-58-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Vyper#Slither"
         },
         {
           "name": "Petrifying Bola",
           "description": "Throw an explosive bola. On exploding, the bola Slows and Damages all enemies in the area. Direct hits deal Additional Damage and Petrify instead. Petrified units block all damage, but cannot take actions.",
           "icon": "./assets/deadlock/hero-58-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Vyper#Petrifying_Bola"
         }
       ],
       "headshot": "./assets/deadlock/hero-58-headshot.webp"
@@ -1587,7 +1657,9 @@
         "Fearless",
         "One Man Army"
       ],
-      "playstyle": "Warden leads from the front, jumping into the fray and hindering his opponents' ability to fight effectively. But what Warden considers brave, others consider reckless, and if he's not careful he can easily find himself in over his head.",
+      "playstyle": "Warden is a Hero in Deadlock. He is a tough, tenacious brawler with endless determination and a technique for alchemy. Opening fights with either a Binding Word or a disrupting Alchemical Flask, Warden dashes into the fight to brawl at close range and utilizing his Willpower for protection and staying power. In desperate situations, Warden can trigger his Last Stand, damaging and stealing life from all foes in front of him.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Warden",
       "body": "./assets/deadlock/hero-25-card.webp",
       "showcase": "./assets/deadlock/hero-25-showcase.webp",
       "background": "./assets/deadlock/hero-25-background.webp",
@@ -1596,29 +1668,29 @@
           "name": "Alchemical Flask",
           "description": "Throw a flask that damages and reduces the weapon damage and move speed of enemies it hits.",
           "icon": "./assets/deadlock/hero-25-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Warden#Alchemical_Flask"
         },
         {
           "name": "Willpower",
           "description": "Gain a Barrier and bonus move speed.",
           "icon": "./assets/deadlock/hero-25-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Warden#Willpower"
         },
         {
           "name": "Binding Word",
           "description": "Curse an enemy hero. If they don't move away from their initial position within the escape time, they will be damaged and immobilized.",
           "icon": "./assets/deadlock/hero-25-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Warden#Binding_Word"
         },
         {
           "name": "Last Stand",
           "description": "After charging for 2s, release pulses that damage enemies and heal you based on the damage done. While channeling Last Stand you have greatly increased bullet and spirit resist.",
           "icon": "./assets/deadlock/hero-25-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Warden#Last_Stand"
         }
       ],
       "headshot": "./assets/deadlock/hero-25-headshot.webp"
@@ -1632,7 +1704,9 @@
         "Isolator",
         "Telekinetic"
       ],
-      "playstyle": "Excelling at one-on-one combat, Wraith isolates targets, eliminating them with ruthless efficiency. Then teleporting away before anyone can retaliate.",
+      "playstyle": "Wraith is a Hero in Deadlock. She is a fast-talking and fast-firing combatant with potent offensive abilities and mobility. She can activate her Full Auto to boost her own fire rate, perform Card Tricks by sending them at her targets and Project Mind to teleport either into or out of dangerous fights. Singling out a foe with her Telekinesis and throwing them into any direction, Wraith can decide who on the enemy team should die first.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Wraith",
       "body": "./assets/deadlock/hero-7-card.webp",
       "showcase": "./assets/deadlock/hero-7-showcase.webp",
       "background": "./assets/deadlock/hero-7-background.webp",
@@ -1641,29 +1715,29 @@
           "name": "Card Trick",
           "description": "Deal weapon damage to summon cards of a random suit. Each card can be thrown, dealing damage and applying a different effect depending of its suit. Cards thrown fly towards the enemy or point under your crosshair. Alt-cast to throw first card",
           "icon": "./assets/deadlock/hero-7-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Wraith#Card_Trick"
         },
         {
           "name": "Project Mind",
           "description": "Teleport to the targeted location.",
           "icon": "./assets/deadlock/hero-7-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Wraith#Project_Mind"
         },
         {
           "name": "Full Auto",
           "description": "Temporarily boosts your fire rate and deal bonus spirit damage",
           "icon": "./assets/deadlock/hero-7-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Wraith#Full_Auto"
         },
         {
           "name": "Telekinesis",
           "description": "Lift an enemy hero into the air and then slam them towards the target location.",
           "icon": "./assets/deadlock/hero-7-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Wraith#Telekinesis"
         }
       ],
       "headshot": "./assets/deadlock/hero-7-headshot.webp"
@@ -1677,50 +1751,50 @@
         "Acrobatics",
         "Pursuer"
       ],
-      "playstyle": "Yamato uses precise strikes to decimate her rivals. However, such damaging attacks often will leave her exposed, so she needs to make every shot count.",
+      "playstyle": "Yamato is a Hero in Deadlock. She is a close-range assassin using precise strikes and sword attacks to destroy her foes. Conducting a Flying Strike with her grapple to get close, Yamato unleashes her powerful melee attacks along with Power Slash and Crimson Slash attacks to damage, slow, and disable her enemies while healing herself. Once fully engaged, she can unleash her Shadow Transformation to become infused with her brother's shadow soul, becoming unstoppable for a short time while ending the life of her opponents.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/Yamato",
       "body": "./assets/deadlock/hero-27-card.webp",
       "showcase": "./assets/deadlock/hero-27-showcase.webp",
       "background": "./assets/deadlock/hero-27-background.webp",
       "abilities": [
         {
           "name": "Power Slash",
-          "description": "Channel to increase damage over 1.4 seconds, then release a fully-charged sword strike. Press Ability 1 to trigger the strike early, dealing partial damage.",
+          "description": "Channel to increase damage over 1.4 seconds, then release a fully-charged sword strike. Press Ability 1 or Fire to trigger the strike early, dealing partial damage.",
           "icon": "./assets/deadlock/hero-27-ability-1-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Yamato#Power_Slash"
         },
         {
           "name": "Flying Slash",
           "description": "Throw a grappling hook to reel yourself towards an enemy, dealing Light melee damage and slowing the target when you arrive.",
           "icon": "./assets/deadlock/hero-27-ability-2-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Yamato#Flying_Slash"
         },
         {
           "name": "Crimson Slash",
           "description": "Slash enemies in front of you, damaging them and slowing their fire rate. If any enemy heroes are hit, you heal.",
           "icon": "./assets/deadlock/hero-27-ability-3-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Yamato#Crimson_Slash"
         },
         {
           "name": "Shadow Transformation",
           "description": "Become infused with Yamato's shadow soul. After an initial invincible transformation your abilities are refreshed and are 60% faster. You gain immunity to negative status effects and have greatly increased bullet and spirit resist. When you get a hero kill, you heal and the duration is extended.",
           "icon": "./assets/deadlock/hero-27-ability-4-v2.png",
-          "textSource": "Deadlock game files",
-          "textSourceUrl": "https://assets.deadlock-api.com/v2/items"
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/Yamato#Shadow_Transformation"
         }
       ],
       "headshot": "./assets/deadlock/hero-27-headshot.webp"
     }
   ],
   "textSources": {
-    "heroDescriptions": "https://assets.deadlock-api.com/v2/heroes",
-    "abilityDescriptions": "https://assets.deadlock-api.com/v2/items",
-    "wikiFallbacks": [
-      "https://deadlock.wiki/Mina",
-      "https://deadlock.wiki/Graves",
-      "https://deadlock.wiki/Silver"
-    ]
+    "heroDescriptions": "https://deadlock.wiki/Heroes",
+    "abilityDescriptions": "https://deadlock.wiki/Heroes",
+    "license": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "retrieved": "2026-09-15"
   }
 }

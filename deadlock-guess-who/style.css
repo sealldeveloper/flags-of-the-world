@@ -1611,9 +1611,10 @@ button:disabled {
 .hero-panel {
   --hero-accent: #d2a53c;
   position: sticky;
+  z-index: 3;
   top: 88px;
   display: grid;
-  grid-template-rows: minmax(360px, 1fr) auto;
+  grid-template-rows: minmax(280px, 0.78fr) minmax(0, 1.22fr);
   align-self: start;
   height: min(820px, calc(100vh - 112px));
   min-height: 690px;
@@ -1719,20 +1720,21 @@ button:disabled {
 .hero-intel {
   position: relative;
   z-index: 3;
+  min-height: 0;
   padding: 14px 20px 16px;
+  overflow-y: auto;
   border-top: 1px solid #344044;
   background: #11191c;
+  scrollbar-color: #56625f #11191c;
 }
 
 .hero-panel .hero-playstyle {
-  display: -webkit-box;
+  display: block;
   margin: 0 0 12px;
-  overflow: hidden;
+  overflow: visible;
   color: #aeb7b3;
   font-size: 0.78rem;
   line-height: 1.45;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
 }
 
 .ability-heading-row {
@@ -1799,14 +1801,12 @@ button:disabled {
 }
 
 .hero-panel .ability p {
-  display: -webkit-box;
+  display: block;
   margin: 0;
-  overflow: hidden;
+  overflow: visible;
   color: #8f9c98;
   font-size: 0.62rem;
   line-height: 1.32;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
 }
 
 .hero-panel-close,
@@ -1981,9 +1981,6 @@ button:disabled {
     min-height: 57px;
   }
 
-  .hero-panel .ability p {
-    -webkit-line-clamp: 2;
-  }
 }
 
 @media (max-width: 720px) {
@@ -2132,6 +2129,7 @@ button:disabled {
 
   .hero-intel {
     padding: 15px 12px max(14px, env(safe-area-inset-bottom));
+    overflow: visible;
   }
 
   .hero-panel .hero-playstyle {
