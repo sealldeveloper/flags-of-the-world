@@ -62,6 +62,11 @@
         <button id="reset-button" class="btn-sm btn-danger-outline" type="button">Reset puzzle</button>
       </div>
 
+      <label class="easy-mode-control">
+        <input id="easy-mode" type="checkbox" aria-describedby="easy-mode-help">
+        <span>Easy mode <small id="easy-mode-help">Unlimited tries · separate saved progress</small></span>
+      </label>
+
       <div id="status-message" class="status-message" aria-live="polite"></div>
 
       <div id="solved-groups" class="solved-groups" aria-label="Found groups"></div>
@@ -70,7 +75,7 @@
 
       <div class="game-footer">
         <div class="mistakes" aria-label="Mistakes remaining">
-          <span>Mistakes remaining:</span>
+          <span id="mistake-label">Mistakes remaining:</span>
           <span id="mistake-dots" class="mistake-dots" aria-hidden="true"></span>
         </div>
         <div class="game-controls">

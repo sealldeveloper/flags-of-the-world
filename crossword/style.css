@@ -765,21 +765,28 @@ select, input { font-family: inherit; }
 /* ============================================================
    RESPONSIVE / MOBILE
    ============================================================ */
+#xw-keyboard, #xw-tools-toggle { display: none; }
+#crossword-grid:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 @media (max-width: 768px) {
   /* Make the page scrollable on mobile so grid + clues both fit */
   html { height: auto; overflow: visible; }
   body {
     height: auto;
-    min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: calc(210px + env(safe-area-inset-bottom));
     overflow-y: auto;
     overflow-x: hidden;
   }
 
   /* app-main doesn't need to fill height on mobile */
   #app-main { flex: 0 0 auto; }
+  .overlay { position: relative; inset: auto; min-height: 220px; padding: 16px; }
+  .overlay-box { width: 100%; padding: 24px 16px; }
 
   /* Compact header — one row, hide title/selector */
   #app-header {
+    position: static;
     height: auto;
     min-height: 44px;
     padding: 6px 10px;
@@ -797,13 +804,17 @@ select, input { font-family: inherit; }
   .back-link { font-size: 0.8rem; }
 
   /* Compact toolbar — hide secondary actions */
+  #xw-tools-toggle { display: inline-flex; }
+  #toolbar { display: none; }
+  .tools-open #toolbar { display: flex; }
   #toolbar {
-    padding: 4px 8px;
+    position: static;
+    padding: 8px;
     min-height: 0;
     gap: 6px;
     top: var(--header-h); /* keep sticky position right */
   }
-  .misc-group .toolbar-label { display: none; }
+  .misc-group .toolbar-label { display: flex; min-height: 36px; }
   .misc-group { gap: 4px; flex-wrap: wrap; }
   #rebus-btn, #btn-undo, #btn-export, #btn-import { font-size: 0.72rem; padding: 3px 6px; }
   .toolbar-label { display: none; }
@@ -812,7 +823,39 @@ select, input { font-family: inherit; }
   #btn-clear-incorrect { padding: 3px 6px; font-size: 0.72rem; }
 
   /* Active clue bar */
-  #active-clue-bar { padding: 5px 10px; font-size: 0.82rem; min-height: 30px; }
+  #active-clue-bar { position: sticky; top: 0; z-index: 5; padding: 10px; font-size: 0.9rem; min-height: 52px; }
+  #active-clue-text { min-width: 0; overflow-wrap: anywhere; }
+  .header-left, .puzzle-selector-wrap { min-width: 0; flex-wrap: wrap; }
+  #app-header button, #toolbar button, #toolbar select { min-height: 36px; }
+  #xw-keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    padding: 8px 5px calc(8px + env(safe-area-inset-bottom));
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+  .keyboard-row { display: flex; justify-content: center; gap: 4px; width: 100%; max-width: 600px; margin: auto; }
+  .keyboard-row button {
+    flex: 1;
+    min-width: 0;
+    min-height: 42px;
+    padding: 4px 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--text);
+    font: inherit;
+    font-weight: 600;
+    touch-action: manipulation;
+  }
+  .keyboard-row button:active { background: var(--accent); color: white; }
+  .keyboard-row button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
   /* Puzzle layout: fill naturally */
   #puzzle-layout { flex: 0 0 auto; min-height: 0; }
@@ -850,7 +893,7 @@ select, input { font-family: inherit; }
   /* Clue lists: enough height to show ~5 clues each */
   .clue-list { height: 130px; }
 
-  .clue-item { font-size: 0.78rem; padding: 4px 10px; }
+  .clue-item { font-size: 0.88rem; padding: 8px 10px; min-height: 40px; }
   .clue-panel-header { padding: 6px 12px; }
 
   /* Hide keyboard shortcuts panel on mobile */

@@ -247,6 +247,10 @@ input:focus-visible {
   color: #111;
 }
 
+.easy-mode-control { display: flex; align-items: center; gap: 10px; min-height: 44px; margin: 8px 0; cursor: pointer; }
+.easy-mode-control input { width: 18px; height: 18px; accent-color: var(--accent); }
+.easy-mode-control small { display: block; color: var(--text-muted); font-size: 0.78rem; margin-top: 3px; }
+
 .game-footer {
   display: flex;
   flex-direction: column;

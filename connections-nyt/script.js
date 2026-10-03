@@ -17,6 +17,7 @@ const state = {
   selected: new Set(),
   solved: [],
   mistakesRemaining: 4,
+  easyMode: localStorage.getItem(`${STORAGE_PREFIX}:easy-mode`) === '1',
   guesses: [],
   completed: false,
   lost: false,
@@ -40,6 +41,8 @@ const dom = {
   solvedGroups: document.getElementById('solved-groups'),
   wordGrid: document.getElementById('word-grid'),
   mistakeDots: document.getElementById('mistake-dots'),
+  mistakeLabel: document.getElementById('mistake-label'),
+  easyMode: document.getElementById('easy-mode'),
   shuffle: document.getElementById('shuffle-button'),
   deselect: document.getElementById('deselect-button'),
   submit: document.getElementById('submit-button'),
@@ -170,7 +173,8 @@ function parsePuzzle(data, requestedDate) {
 }
 
 function progressKey() {
-  return `${STORAGE_PREFIX}:${state.date}`;
+  // Keep standard-mode progress intact when trying easy mode.
+  return `${STORAGE_PREFIX}:${state.date}${state.easyMode ? ':easy' : ''}`;
 }
 
 function saveProgress() {
@@ -207,7 +211,7 @@ function restoreProgress() {
       ? saved.guesses.filter(guess => Array.isArray(guess) && guess.length === 4)
       : [];
     state.completed = Boolean(saved.completed) && state.solved.length === 4;
-    state.lost = Boolean(saved.lost) && !state.completed;
+    state.lost = !state.easyMode && Boolean(saved.lost) && !state.completed;
   } catch (_) {
     localStorage.removeItem(progressKey());
   }
@@ -364,6 +368,9 @@ function renderWordGrid() {
 
 function renderMistakes() {
   dom.mistakeDots.replaceChildren();
+  dom.mistakeLabel.textContent = state.easyMode ? 'Easy mode: unlimited tries' : 'Mistakes remaining:';
+  dom.mistakeDots.parentElement.setAttribute('aria-label', state.easyMode ? 'Unlimited tries' : `${state.mistakesRemaining} mistakes remaining`);
+  if (state.easyMode) return;
   for (let count = 0; count < state.mistakesRemaining; count += 1) {
     const dot = document.createElement('span');
     dot.className = 'mistake-dot';
@@ -377,6 +384,8 @@ function renderControls() {
   dom.puzzleSelect.disabled = state.transitioning;
   dom.puzzleDate.disabled = state.transitioning;
   dom.reset.disabled = state.transitioning;
+  dom.easyMode.disabled = state.transitioning;
+  dom.easyMode.checked = state.easyMode;
   dom.wordGrid.querySelectorAll('.word-card').forEach(card => {
     card.disabled = state.transitioning || gameOver;
   });
@@ -662,14 +671,14 @@ async function submitGuess() {
   }
 
   state.transitioning = true;
-  state.mistakesRemaining = Math.max(0, state.mistakesRemaining - 1);
+  if (!state.easyMode) state.mistakesRemaining = Math.max(0, state.mistakesRemaining - 1);
   const oneAway = Math.max(...counts) === 3;
   setStatus(oneAway ? 'One away…' : 'Not a group. Try again.', 'error');
   renderControls();
   saveProgress();
   await animateRejectedGuess(selectedIds);
 
-  if (state.mistakesRemaining === 0) {
+  if (!state.easyMode && state.mistakesRemaining === 0) {
     if (motionEnabled()) {
       await Promise.all([...dom.wordGrid.querySelectorAll('.word-card')].map((card, index) => finished(card.animate([
         { opacity: 1, transform: 'scale(1)' },
@@ -698,8 +707,8 @@ async function submitGuess() {
 
 function resultText() {
   const result = state.completed ? 'Solved' : 'Not solved';
-  const used = 4 - state.mistakesRemaining;
-  return `${result} with ${used} ${used === 1 ? 'mistake' : 'mistakes'}.`;
+  const used = state.guesses.filter(guess => Math.max(...selectedCategoryCounts(guess)) !== 4).length;
+  return `${result}${state.easyMode ? ' in easy mode' : ''} with ${used} ${used === 1 ? 'mistake' : 'mistakes'}.`;
 }
 
 function showResult() {
@@ -733,7 +742,7 @@ function shareText() {
     const card = cardById(id);
     return CATEGORY_EMOJI[card ? card.categoryIndex : 0];
   }).join(''));
-  return [`Connections${number}`, ...lines].join('\n');
+  return [`Connections${number}${state.easyMode ? ' (Easy mode)' : ''}`, ...lines].join('\n');
 }
 
 async function copyResults() {
@@ -777,6 +786,16 @@ dom.shuffle.addEventListener('click', shuffleWords);
 dom.deselect.addEventListener('click', deselectAll);
 dom.submit.addEventListener('click', submitGuess);
 dom.reset.addEventListener('click', resetCurrentPuzzle);
+dom.easyMode.addEventListener('change', () => {
+  if (!state.puzzle || state.transitioning) return;
+  saveProgress();
+  state.easyMode = dom.easyMode.checked;
+  localStorage.setItem(`${STORAGE_PREFIX}:easy-mode`, state.easyMode ? '1' : '0');
+  resetPuzzleState();
+  restoreProgress();
+  dom.resultOverlay.classList.add('hidden');
+  render();
+});
 dom.resultClose.addEventListener('click', () => {
   dom.resultOverlay.classList.add('hidden');
   dom.reset.focus();
