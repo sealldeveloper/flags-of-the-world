@@ -27,11 +27,15 @@ async function scheme(p,value){await p.emulateMedia({colorScheme:value});await p
  try{
   for(const route of routes.slice(Number(process.env.THEME_FROM||0))){
    const context=await browser.newContext({colorScheme:'dark',reducedMotion:'reduce'});await network(context);
+   // Old automatic/migrated preferences must not pin any published route.
+   await context.addInitScript(()=>{localStorage.setItem('puzzle-theme-v1','light');localStorage.setItem('xw-theme','light');});
    const p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));p.setDefaultTimeout(20000);
    await p.goto(base+route);await ready(p,route);
    const name=route.split('?')[0].replace(/^\//,'').replaceAll('/','-')||'home';
    assert.equal(await p.evaluate(()=>document.documentElement.dataset.theme),'dark',`${route}: system initial dark`);
-   assert.equal(await p.evaluate(()=>localStorage.getItem('puzzle-theme-v1')),null,'automatic startup must not pin a preference');
+   assert.equal(await p.evaluate(()=>PuzzleTheme.preference),'system',`${route}: system is the default despite old preferences`);
+   if(await p.locator('.site-theme-select').count())assert.equal(await p.locator('.site-theme-select').inputValue(),'system');
+   assert.equal(await p.evaluate(()=>localStorage.getItem('puzzle-theme-v2')),null,'automatic startup must not pin a preference');
    if(route==='/deadlock-guess-who/'){
     for(const theme of ['light','dark']){await scheme(p,theme);await p.setViewportSize({width:390,height:844});await shot(p,`${name}secret-setup-${theme}`);}
     await p.locator('.secret-picker-card').first().click();
@@ -54,7 +58,7 @@ async function scheme(p,value){await p.emulateMedia({colorScheme:value});await p
      assert(theme==='light'?mean>190:mean<90,`${route} ${theme}: body did not adapt (${colour})`);
     }
    }
-   assert.equal(await p.evaluate(()=>localStorage.getItem('puzzle-theme-v1')),null,'OS changes do not save an override');
+   assert.equal(await p.evaluate(()=>localStorage.getItem('puzzle-theme-v2')),null,'OS changes do not save an override');
    // Deliberate choice survives OS changes and reload. Returning to System is explicit.
    if(await p.locator('.site-theme-select').count()){
     await p.locator('.site-theme-select').selectOption('light');await p.emulateMedia({colorScheme:'dark'});
@@ -63,7 +67,7 @@ async function scheme(p,value){await p.emulateMedia({colorScheme:value});await p
     // Deadlock deliberately reopens its setup dialog after every reload; the
     // header is inert until a secret is selected, so don't focus behind it.
     if(route==='/deadlock-guess-who/'){await p.locator('.secret-picker-card').first().click();await frame(p);}
-    assert.equal(await p.evaluate(()=>localStorage.getItem('puzzle-theme-v1')),'light');
+    assert.equal(await p.evaluate(()=>localStorage.getItem('puzzle-theme-v2')),'light');
     await p.locator('.site-theme-select').selectOption('system');await scheme(p,'dark');
     await p.locator('.site-theme-select').focus();await p.keyboard.press('Tab');await p.keyboard.press('Shift+Tab');
     assert(await p.locator('.site-theme-select').evaluate(e=>e.matches(':focus-visible')));
@@ -118,19 +122,31 @@ async function scheme(p,value){await p.emulateMedia({colorScheme:value});await p
    }
    assert.deepEqual(errors,[],route);await context.close();console.log(`PASS themes/controls/layout: ${route}`);
   }
-  // Cross-tab propagation, legacy overrides, and denied storage without global config changes.
+  // Cross-tab propagation, ignored legacy defaults, and preserved game settings.
   const c=await browser.newContext({colorScheme:'dark'});await network(c);
   const a=await c.newPage(),b=await c.newPage();await a.goto(base);await b.goto(base+'/crossword/');
   await a.locator('.site-theme-select').selectOption('light');await b.waitForFunction(()=>PuzzleTheme.current==='light');
   await b.goto(base+'/index.html');assert.equal(await b.evaluate(()=>document.documentElement.dataset.sitePage),'home');assert.equal(await b.evaluate(()=>getComputedStyle(document.body).backgroundColor),'rgb(245, 247, 251)');
   await b.locator('.site-theme-select').selectOption('system');await a.waitForFunction(()=>PuzzleTheme.current==='dark');
-  await a.evaluate(()=>{localStorage.removeItem('puzzle-theme-v1');localStorage.setItem('xw-theme','light');});
-  await a.goto(base+'/connections-nyt/?date=2026-10-02');assert.equal(await a.evaluate(()=>PuzzleTheme.current),'light');
-  await a.locator('.site-theme-select').selectOption('system');await a.reload();assert.equal(await a.evaluate(()=>PuzzleTheme.current),'dark');
-  await a.evaluate(()=>{localStorage.removeItem('puzzle-theme-v1');localStorage.setItem('scattegories-v1',JSON.stringify({inverted:true,count:8,initialSeconds:180,timerDefaultVersion:2,palette:2,categories:['Animals','Cities','Foods','Plants','Films','Books','Sports','Tools']}));});
-  await a.goto(base+'/scattegories/local/');assert.equal(await a.evaluate(()=>PuzzleTheme.current),'dark');
-  assert.deepEqual(await a.evaluate(()=>{const s=JSON.parse(localStorage.getItem('scattegories-v1'));return [s.count,s.initialSeconds,s.palette,s.categories.length];}),[8,180,2,8]);
-  assert.equal(await a.evaluate(()=>localStorage.getItem('puzzle-theme-v1')),'dark');
+  await a.evaluate(()=>{localStorage.removeItem('puzzle-theme-v2');localStorage.setItem('puzzle-theme-v1','dark');localStorage.setItem('xw-theme','dark');});
+  await a.emulateMedia({colorScheme:'light'});
+  for(const route of routes.filter(route=>/^\/(crossword-|connections-)/.test(route))){
+   await a.goto(base+route);await ready(a,route);
+   assert.equal(await a.evaluate(()=>PuzzleTheme.current),'light');
+   assert.equal(await a.locator('.site-theme-select').inputValue(),'system');
+   assert.deepEqual(await a.evaluate(()=>['puzzle-theme-v2','puzzle-theme-v1','xw-theme'].map(key=>localStorage.getItem(key))),[null,'dark','dark']);
+  }
+  await a.locator('.site-theme-select').selectOption('dark');await a.reload();await ready(a,'/connections-nyt/');
+  assert.equal(await a.evaluate(()=>PuzzleTheme.current),'dark','new explicit choices survive reload');
+  await a.locator('.site-theme-select').selectOption('system');await a.reload();assert.equal(await a.evaluate(()=>PuzzleTheme.current),'light');
+  for(const inverted of [true,false]){
+   await a.emulateMedia({colorScheme:inverted?'light':'dark'});
+   await a.evaluate(inverted=>{localStorage.removeItem('puzzle-theme-v2');localStorage.setItem('scattegories-v1',JSON.stringify({inverted,count:8,initialSeconds:180,timerDefaultVersion:2,palette:2,categories:['Animals','Cities','Foods','Plants','Films','Books','Sports','Tools']}));},inverted);
+   await a.goto(base+'/scattegories/local/');assert.equal(await a.evaluate(()=>PuzzleTheme.current),inverted?'light':'dark');
+   assert.equal(await a.locator('.site-theme-select').inputValue(),'system');
+   assert.deepEqual(await a.evaluate(()=>{const s=JSON.parse(localStorage.getItem('scattegories-v1'));return [s.count,s.initialSeconds,s.palette,s.categories.length];}),[8,180,2,8]);
+   assert.equal(await a.evaluate(()=>localStorage.getItem('puzzle-theme-v2')),null);
+  }
   await c.close();
   const denied=await browser.newContext({colorScheme:'dark'});await network(denied);
   await denied.addInitScript(()=>{for(const method of ['getItem','setItem','removeItem'])Storage.prototype[method]=()=>{throw new DOMException('Blocked','SecurityError');};});
@@ -138,6 +154,6 @@ async function scheme(p,value){await p.emulateMedia({colorScheme:value});await p
    const p=await denied.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(base+route);await ready(p,route);
    assert.equal(await p.evaluate(()=>PuzzleTheme.current),'dark');await p.locator('.site-theme-select').selectOption('light');assert.equal(await p.evaluate(()=>PuzzleTheme.current),'light');assert.deepEqual(errors,[]);await p.close();
   }
-  await denied.close();console.log('PASS cross-tab choice, legacy migration, return to system and blocked storage.');
+  await denied.close();console.log('PASS cross-tab choice, System defaults despite old preferences, preserved game settings, explicit overrides, return to system and blocked storage.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1)});

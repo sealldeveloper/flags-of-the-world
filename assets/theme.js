@@ -1,21 +1,14 @@
 // Shared by the published games only. Run in <head> before styles for the first paint.
 (() => {
   'use strict';
-  const key = 'puzzle-theme-v1';
+  // v1 mixed automatically migrated defaults with deliberate choices. Start
+  // everyone in System once; only new explicit choices are remembered in v2.
+  const key = 'puzzle-theme-v2';
   const system = matchMedia('(prefers-color-scheme: dark)');
   const valid = value => value === 'light' || value === 'dark' ? value : null;
   let preference = null;
   try {
-    const saved = localStorage.getItem(key);
-    preference = valid(saved);
-    // Preserve legacy choices without modifying legacy settings or other apps.
-    // Those apps also saved defaults; choose System once to clear that ambiguity.
-    if (saved === null && /^\/(crossword-nyt|crossword-nytmini|crossword-seattle|connections-nyt)\//.test(location.pathname)) preference = valid(localStorage.getItem('xw-theme'));
-    if (saved === null && location.pathname.startsWith('/scattegories/local/')) {
-      const legacy = JSON.parse(localStorage.getItem('scattegories-v1') || '{}');
-      if (typeof legacy.inverted === 'boolean') preference = legacy.inverted ? 'dark' : 'light';
-    }
-    if (saved === null && preference) localStorage.setItem(key, preference);
+    preference = valid(localStorage.getItem(key));
   } catch (_) { /* System default. */ }
   const current = () => preference || (system.matches ? 'dark' : 'light');
   function render() {

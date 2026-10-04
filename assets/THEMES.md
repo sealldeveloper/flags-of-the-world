@@ -2,9 +2,9 @@
 
 `theme.js` runs synchronously in each published page's head, before styles. With no saved preference, the page follows `prefers-color-scheme`, including changes while open. Automatic startup and OS changes do not write a theme override.
 
-The **Theme** selector offers **System**, **Light**, and **Dark**. An explicit choice is saved as `puzzle-theme-v1` and synchronised across same-origin tabs. Choosing System remembers the mode, not the system's current colour. If storage is blocked, the choice still works in the current tab. Native form controls receive the matching `color-scheme` before the first paint.
+The **Theme** selector offers **System**, **Light**, and **Dark**. An explicit choice is saved as `puzzle-theme-v2` and synchronised across same-origin tabs. Choosing System remembers the mode, not the system's current colour. If storage is blocked, the choice still works in the current tab. Native form controls receive the matching `color-scheme` before the first paint.
 
-Existing valid crossword/Connections `xw-theme` and local Scattergories `inverted` choices are migrated when those pages are first visited, without altering legacy keys or other game settings. Older versions also saved defaults, which cannot be distinguished from deliberate choices: select **System** once to resume OS-following in that case.
+All published games start in **System**, including browsers with old `xw-theme`, Scattergories `inverted`, or `puzzle-theme-v1` settings. Those settings mixed automatic defaults with deliberate choices, so this update resets the theme preference once rather than importing them. Old keys, saved games, and unrelated settings are not cleared. Explicit choices made afterward are remembered in v2; ordinary reloads do not reset them.
 
 Included: the home and crossword launchers; all three crossword sources; Connections; Flags; TLDs; Deadlock Guess Who; the Scattergories launcher and local backup; and both Jeopardy pages. The audience display shares the control panel's choice without placing controls over the presentation. External linked sites are not restyled. Unpublished games do not load these assets.
 
