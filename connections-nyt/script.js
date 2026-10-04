@@ -8,6 +8,11 @@ const CONNECTIONS_API = window.CONNECTIONS_API_BASE || (
 );
 const STORAGE_PREFIX = 'nyt-connections-v1';
 const CATEGORY_EMOJI = ['🟨', '🟩', '🟦', '🟪'];
+const CATEGORY_NAMES = ['Yellow', 'Green', 'Blue', 'Purple'];
+const requestedMode = new URLSearchParams(location.search).get('mode');
+function readStored(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
+function writeStored(key, value) { try { localStorage.setItem(key, value); return true; } catch (_) { return false; } }
+function removeStored(key) { try { localStorage.removeItem(key); } catch (_) { /* Storage unavailable. */ } }
 
 const state = {
   puzzle: null,
@@ -17,8 +22,11 @@ const state = {
   selected: new Set(),
   solved: [],
   mistakesRemaining: 4,
-  easyMode: localStorage.getItem(`${STORAGE_PREFIX}:easy-mode`) === '1',
+  easyMode: requestedMode === 'easy' || (requestedMode !== 'standard' && readStored(`${STORAGE_PREFIX}:easy-mode`) === '1'),
   guesses: [],
+  reveals: [],
+  answersRevealed: false,
+  continuedFromStandard: false,
   completed: false,
   lost: false,
   transitioning: false,
@@ -52,11 +60,19 @@ const dom = {
   resultIcon: document.getElementById('result-icon'),
   resultTitle: document.getElementById('result-title'),
   resultSummary: document.getElementById('result-summary'),
+  guessCount: document.getElementById('guess-count'),
+  history: document.getElementById('guess-history'),
+  historyEmpty: document.getElementById('history-empty'),
+  reveals: document.getElementById('category-reveals'),
+  storageStatus: document.getElementById('storage-status'),
+  viewResults: document.getElementById('view-results'),
+  continueEasy: document.getElementById('continue-easy'),
+  revealAnswers: document.getElementById('reveal-answers'),
+  resultCopy: document.getElementById('result-copy'),
+  sharePreview: document.getElementById('share-preview'),
+  shareStatus: document.getElementById('share-status'),
   share: document.getElementById('share-button'),
   resultClose: document.getElementById('result-close'),
-  themeToggle: document.getElementById('btn-theme-toggle'),
-  iconSun: document.getElementById('icon-sun'),
-  iconMoon: document.getElementById('icon-moon'),
 };
 
 function localDateId(date = new Date()) {
@@ -184,17 +200,22 @@ function saveProgress() {
     solved: state.solved,
     mistakesRemaining: state.mistakesRemaining,
     guesses: state.guesses,
+    guessCount: state.guesses.length,
+    reveals: state.reveals,
+    answersRevealed: state.answersRevealed,
+    continuedFromStandard: state.continuedFromStandard,
     completed: state.completed,
     lost: state.lost,
   };
-  localStorage.setItem(progressKey(), JSON.stringify(progress));
+  const saved = writeStored(progressKey(), JSON.stringify(progress));
+  dom.storageStatus.textContent = saved ? 'Progress saved on this browser.' : 'Couldn’t save progress. Keep this tab open; browser storage may be full or blocked.';
 }
 
 function restoreProgress() {
   const validIds = new Set(state.puzzle.cards.map(card => card.id));
   const defaultOrder = state.puzzle.cards.map(card => card.id);
   try {
-    const saved = JSON.parse(localStorage.getItem(progressKey()) || 'null');
+    const saved = JSON.parse(readStored(progressKey()) || 'null');
     if (!saved) return;
 
     const storedOrder = Array.isArray(saved.wordOrder)
@@ -207,13 +228,30 @@ function restoreProgress() {
     state.mistakesRemaining = Number.isInteger(saved.mistakesRemaining)
       ? Math.max(0, Math.min(4, saved.mistakesRemaining))
       : 4;
-    state.guesses = Array.isArray(saved.guesses)
-      ? saved.guesses.filter(guess => Array.isArray(guess) && guess.length === 4)
-      : [];
-    state.completed = Boolean(saved.completed) && state.solved.length === 4;
-    state.lost = !state.easyMode && Boolean(saved.lost) && !state.completed;
+    const seen = new Set();
+    state.guesses = Array.isArray(saved.guesses) ? saved.guesses.filter(guess => {
+      if (!Array.isArray(guess) || guess.length !== 4) return false;
+      const ids = guess.map(String), key = guessKey(ids);
+      if (new Set(ids).size !== 4 || ids.some(id => !validIds.has(id)) || seen.has(key)) return false;
+      seen.add(key); return true;
+    }).map(guess => guess.map(String)) : [];
+    // Recover an accepted match even if an older version closed during its animation.
+    state.guesses.forEach(guess => {
+      const index = selectedCategoryCounts(guess).findIndex(count => count === 4);
+      if (index !== -1 && !state.solved.includes(index)) state.solved.push(index);
+    });
+    const revealed = new Set();
+    state.reveals = Array.isArray(saved.reveals) ? saved.reveals.filter(reveal => {
+      if (!reveal || !Number.isInteger(reveal.categoryIndex) || reveal.categoryIndex < 0 || reveal.categoryIndex > 3 || revealed.has(reveal.categoryIndex)) return false;
+      if (!Number.isInteger(reveal.afterGuess) || reveal.afterGuess < 0 || reveal.afterGuess > state.guesses.length) return false;
+      revealed.add(reveal.categoryIndex); return true;
+    }).map(({categoryIndex, afterGuess}) => ({categoryIndex, afterGuess})) : [];
+    state.answersRevealed = saved.answersRevealed === true || (saved.answersRevealed === undefined && saved.lost === true);
+    state.continuedFromStandard = state.easyMode && saved.continuedFromStandard === true;
+    state.completed = state.solved.length === 4;
+    state.lost = !state.easyMode && (Boolean(saved.lost) || state.mistakesRemaining === 0) && !state.completed;
   } catch (_) {
-    localStorage.removeItem(progressKey());
+    removeStored(progressKey());
   }
 }
 
@@ -223,9 +261,13 @@ function resetPuzzleState() {
   state.solved = [];
   state.mistakesRemaining = 4;
   state.guesses = [];
+  state.reveals = [];
+  state.answersRevealed = false;
+  state.continuedFromStandard = false;
   state.completed = false;
   state.lost = false;
   state.transitioning = false;
+  dom.storageStatus.textContent = 'Guesses and category reveals are saved on this browser.';
 }
 
 function showLoading() {
@@ -288,7 +330,8 @@ async function loadPuzzle(dateId, updateUrl = true) {
     dom.loading.classList.add('hidden');
     dom.error.classList.add('hidden');
     dom.game.classList.remove('hidden');
-    if (updateUrl) history.replaceState(null, '', `?date=${encodeURIComponent(state.date)}`);
+    if (updateUrl) updatePuzzleUrl();
+    if (state.lost && !state.answersRevealed) showResult();
   } catch (error) {
     if (error.name === 'AbortError') return;
     showError(error.message || 'The puzzle service did not respond.');
@@ -322,7 +365,7 @@ function setStatus(message, kind = '') {
 function renderSolvedGroups() {
   dom.solvedGroups.replaceChildren();
   const displayed = [...state.solved];
-  if (state.lost) {
+  if (state.lost && state.answersRevealed) {
     state.puzzle.categories.forEach(category => {
       if (!displayed.includes(category.index)) displayed.push(category.index);
     });
@@ -348,7 +391,7 @@ function renderSolvedGroups() {
 
 function renderWordGrid() {
   dom.wordGrid.replaceChildren();
-  const gameOver = state.completed || state.lost;
+  const gameOver = state.completed || (state.lost && state.answersRevealed);
   dom.wordGrid.classList.toggle('hidden', gameOver);
   if (gameOver) return;
 
@@ -363,6 +406,53 @@ function renderWordGrid() {
     button.setAttribute('aria-pressed', state.selected.has(card.id) ? 'true' : 'false');
     button.addEventListener('click', () => toggleCard(card.id, button));
     dom.wordGrid.appendChild(button);
+  });
+}
+
+function renderHistory() {
+  dom.guessCount.textContent = String(state.guesses.length);
+  dom.history.replaceChildren();
+  state.guesses.forEach((guess, index) => {
+    const best = Math.max(...selectedCategoryCounts(guess));
+    if (best === 4) return;
+    const row = document.createElement('li'); row.className = 'history-guess';
+    const heading = document.createElement('div'); heading.className = 'history-guess-heading';
+    const number = document.createElement('strong'); number.textContent = `Guess ${index + 1}`;
+    const feedback = document.createElement('span'); feedback.textContent = best === 3 ? 'One away' : 'Not one away';
+    heading.append(number, feedback);
+    const words = document.createElement('ul'); words.className = 'history-words';
+    guess.forEach(id => { const word = document.createElement('li'); word.textContent = cardById(id).content; words.append(word); });
+    row.append(heading, words); dom.history.append(row);
+  });
+  dom.historyEmpty.classList.toggle('hidden', dom.history.children.length !== 0);
+}
+
+function revealCategory(index) {
+  if (!state.puzzle || state.transitioning || state.completed || state.lost || state.solved.includes(index) || state.reveals.some(r => r.categoryIndex === index)) return;
+  if (!Number.isInteger(index) || index < 0 || index > 3) return;
+  state.reveals.push({categoryIndex:index, afterGuess:state.guesses.length});
+  saveProgress(); renderReveals();
+  setStatus(`${CATEGORY_NAMES[index]} category: ${state.puzzle.categories[index].title}`);
+  dom.reveals.querySelector(`[data-reveal-index="${index}"] .hint-title`)?.focus();
+}
+
+function renderReveals() {
+  dom.reveals.replaceChildren();
+  state.puzzle.categories.forEach((category, index) => {
+    const revealed = state.reveals.some(r => r.categoryIndex === index), solved = state.solved.includes(index);
+    const row = document.createElement('li'); row.dataset.revealIndex = String(index);
+    const heading = document.createElement('div'); heading.className = 'reveal-heading';
+    const label = document.createElement('span'); label.className = 'reveal-colour';
+    const swatch = document.createElement('span'); swatch.className = `category-swatch category-${index}`; swatch.setAttribute('aria-hidden', 'true');
+    label.append(swatch, document.createTextNode(CATEGORY_NAMES[index])); heading.append(label);
+    if (revealed || solved || state.answersRevealed) {
+      const status = document.createElement('span'); status.className = 'hint-state'; status.textContent = revealed ? 'Revealed' : solved ? 'Found' : 'Game over'; heading.append(status);
+      const title = document.createElement('p'); title.className = 'hint-title'; title.tabIndex = -1; title.textContent = category.title; row.append(heading, title);
+    } else {
+      const button = document.createElement('button'); button.type = 'button'; button.className = 'hint-button'; button.textContent = 'Reveal'; button.setAttribute('aria-label', `Reveal ${CATEGORY_NAMES[index].toLowerCase()} category name`);
+      button.disabled = state.transitioning || state.lost; button.onclick = () => revealCategory(index); heading.append(button); row.append(heading);
+    }
+    dom.reveals.append(row);
   });
 }
 
@@ -386,6 +476,11 @@ function renderControls() {
   dom.reset.disabled = state.transitioning;
   dom.easyMode.disabled = state.transitioning;
   dom.easyMode.checked = state.easyMode;
+  dom.viewResults.classList.toggle('hidden', !gameOver);
+  dom.viewResults.disabled = state.transitioning;
+  dom.viewResults.textContent = state.lost && !state.answersRevealed ? 'Choose how to continue' : 'View / share results';
+  document.getElementById('easy-mode-help').textContent = state.continuedFromStandard ? 'Unlimited tries · continuing your standard run' : 'Unlimited tries · separate saved progress';
+  dom.reveals.querySelectorAll('button').forEach(button => { button.disabled = state.transitioning || gameOver; });
   dom.wordGrid.querySelectorAll('.word-card').forEach(card => {
     card.disabled = state.transitioning || gameOver;
   });
@@ -399,11 +494,13 @@ function renderControls() {
 }
 
 function render() {
+  renderHistory();
+  renderReveals();
   renderSolvedGroups();
   renderWordGrid();
   renderControls();
   if (state.completed) setStatus('Puzzle complete.', 'success');
-  else if (state.lost) setStatus('The remaining groups are shown.', 'error');
+  else if (state.lost) setStatus(state.answersRevealed ? 'The remaining groups are shown.' : 'Out of mistakes. Continue in easy mode or choose to reveal the answers.', 'error');
   else if (state.solved.length === 0) setStatus('Select four words that share a connection.');
   else setStatus(`${4 - state.solved.length} ${4 - state.solved.length === 1 ? 'group' : 'groups'} remaining.`);
 }
@@ -496,10 +593,7 @@ async function animateCorrectMatch(selectedIds, categoryIndex) {
     }))));
   }
 
-  state.solved.push(categoryIndex);
   state.selected.clear();
-  if (state.solved.length === 4) state.completed = true;
-  saveProgress();
   render();
 
   if (!motionEnabled()) return;
@@ -660,7 +754,11 @@ async function submitGuess() {
   state.guesses.push(selectedIds);
 
   if (categoryIndex !== -1 && !state.solved.includes(categoryIndex)) {
+    state.solved.push(categoryIndex);
+    state.completed = state.solved.length === 4;
     state.transitioning = true;
+    saveProgress();
+    renderHistory();
     renderControls();
     await animateCorrectMatch(selectedIds, categoryIndex);
     state.transitioning = false;
@@ -673,30 +771,17 @@ async function submitGuess() {
   state.transitioning = true;
   if (!state.easyMode) state.mistakesRemaining = Math.max(0, state.mistakesRemaining - 1);
   const oneAway = Math.max(...counts) === 3;
+  state.lost = !state.easyMode && state.mistakesRemaining === 0;
   setStatus(oneAway ? 'One away…' : 'Not a group. Try again.', 'error');
+  renderHistory();
   renderControls();
   saveProgress();
   await animateRejectedGuess(selectedIds);
 
-  if (!state.easyMode && state.mistakesRemaining === 0) {
-    if (motionEnabled()) {
-      await Promise.all([...dom.wordGrid.querySelectorAll('.word-card')].map((card, index) => finished(card.animate([
-        { opacity: 1, transform: 'scale(1)' },
-        { opacity: 0, transform: 'scale(.97)' },
-      ], {
-        duration: 150,
-        delay: Math.min(index, 7) * 12,
-        easing: 'ease-in',
-        fill: 'forwards',
-      }))));
-    }
-    state.lost = true;
+  if (state.lost) {
     state.selected.clear();
-    saveProgress();
-    render();
-    await animateLossReveal();
     state.transitioning = false;
-    renderControls();
+    render();
     showResult();
     return;
   }
@@ -712,10 +797,19 @@ function resultText() {
 }
 
 function showResult() {
+  if (!state.completed && !state.lost) return;
+  const offer = state.lost && !state.answersRevealed;
+  dom.continueEasy.classList.toggle('hidden', !offer);
+  dom.revealAnswers.classList.toggle('hidden', !offer);
+  dom.resultCopy.classList.toggle('hidden', offer);
+  dom.share.classList.toggle('hidden', offer);
   dom.resultBox.classList.toggle('is-loss', state.lost);
   dom.resultIcon.textContent = state.completed ? '✓' : '×';
-  dom.resultTitle.textContent = state.completed ? 'Puzzle complete!' : 'Better luck next time';
-  dom.resultSummary.textContent = `${formatDate(state.date)}. ${resultText()}`;
+  dom.resultTitle.textContent = offer ? 'Out of mistakes—not out of options' : state.completed ? 'Puzzle complete!' : 'Answers revealed';
+  dom.resultSummary.textContent = offer ? 'Keep your found groups, guesses and hints and continue with unlimited tries. The remaining answers stay hidden unless you choose Reveal answers.' : `${formatDate(state.date)}. ${resultText()}`;
+  dom.sharePreview.value = shareText();
+  dom.shareStatus.textContent = '';
+  dom.share.textContent = 'Copy results';
   dom.resultOverlay.classList.remove('hidden');
   if (motionEnabled()) {
     dom.resultOverlay.animate([
@@ -733,49 +827,93 @@ function showResult() {
       easing: 'cubic-bezier(.2,.8,.2,1)',
     });
   }
-  dom.share.focus();
+  (offer ? dom.continueEasy : dom.share).focus();
+}
+
+function continueInEasyMode() {
+  if (state.easyMode || !state.lost || state.answersRevealed || state.transitioning) return;
+  let existing = null;
+  try { existing = JSON.parse(readStored(`${STORAGE_PREFIX}:${state.date}:easy`) || 'null'); } catch (_) { /* Replace invalid saved data. */ }
+  if (existing && (existing.guesses?.length || existing.solved?.length || existing.reveals?.length) && !confirm('Replace your saved easy-mode attempt for this date with this standard-mode run? Your standard attempt will remain saved.')) {
+    dom.easyMode.checked = false; return;
+  }
+  saveProgress();
+  state.easyMode = true; state.lost = false; state.continuedFromStandard = true;
+  state.selected.clear();
+  writeStored(`${STORAGE_PREFIX}:easy-mode`, '1');
+  saveProgress(); updatePuzzleUrl();
+  dom.resultOverlay.classList.add('hidden'); render();
+  setStatus('Continuing in easy mode. Your groups, guesses and category reveals are kept.', 'success');
+  dom.easyMode.focus();
+}
+
+async function revealRemainingAnswers() {
+  if (!state.lost || state.answersRevealed || state.transitioning) return;
+  state.answersRevealed = true; state.transitioning = true;
+  saveProgress(); dom.resultOverlay.classList.add('hidden'); render();
+  await animateLossReveal(); state.transitioning = false; renderControls(); showResult();
+}
+
+function puzzleUrl(origin = 'https://puzzle.seall.dev') {
+  const url = new URL('/connections-nyt/', origin);
+  url.searchParams.set('date', state.date);
+  url.searchParams.set('mode', state.easyMode ? 'easy' : 'standard');
+  return url;
+}
+
+function updatePuzzleUrl() {
+  const url = puzzleUrl(location.origin);
+  history.replaceState(null, '', url.pathname + url.search);
 }
 
 function shareText() {
+  // No colour breakdown / hidden-answer spoilers in the pre-reveal loss offer.
+  if (!state.completed && !(state.lost && state.answersRevealed)) return '';
   const number = Number.isFinite(state.puzzle.id) ? ` #${state.puzzle.id}` : '';
-  const lines = state.guesses.map(guess => guess.map(id => {
-    const card = cardById(id);
-    return CATEGORY_EMOJI[card ? card.categoryIndex : 0];
-  }).join(''));
-  return [`Connections${number}${state.easyMode ? ' (Easy mode)' : ''}`, ...lines].join('\n');
+  const lines = [], hints = afterGuess => state.reveals.filter(r => r.afterGuess === afterGuess).forEach(r => lines.push(`💡${CATEGORY_EMOJI[r.categoryIndex]} Category name revealed`));
+  hints(0);
+  state.guesses.forEach((guess, index) => {
+    lines.push(guess.map(id => CATEGORY_EMOJI[cardById(id).categoryIndex]).join(''));
+    hints(index + 1);
+  });
+  const reveals = state.reveals.length ? state.reveals.map(r => CATEGORY_EMOJI[r.categoryIndex]).join('') : 'None';
+  return [
+    `Connections${number} — ${state.date}`,
+    `${state.easyMode ? `Easy mode${state.continuedFromStandard ? ' (continued from standard)' : ''} · Unlimited tries` : 'Standard mode'} · ${state.guesses.length} ${state.guesses.length === 1 ? 'guess' : 'guesses'}`,
+    resultText(), `Category reveals: ${reveals} (names only)`, '', ...lines, '',
+    `Found order: ${state.solved.map(index => CATEGORY_EMOJI[index]).join('') || 'None'} (${state.solved.length}/4)`,
+    ...(state.lost ? ['Remaining answers revealed by choice after the fourth mistake.'] : []),
+    `Play: ${puzzleUrl()}`,
+  ].join('\n');
 }
 
 async function copyResults() {
   const text = shareText();
+  if (!text) return;
+  dom.share.textContent = 'Copy results';
+  dom.shareStatus.textContent = '';
   try {
     await navigator.clipboard.writeText(text);
   } catch (_) {
-    const area = document.createElement('textarea');
-    area.value = text;
-    area.style.position = 'fixed';
-    area.style.opacity = '0';
-    document.body.appendChild(area);
-    area.select();
-    document.execCommand('copy');
-    area.remove();
+    dom.sharePreview.focus(); dom.sharePreview.select();
+    let copied = false;
+    try { copied = document.execCommand('copy'); } catch (_) { /* Manual copy remains available. */ }
+    if (!copied) { dom.shareStatus.textContent = 'Copy was blocked. The text is selected—copy it manually.'; return; }
   }
+  dom.shareStatus.textContent = 'Results copied. Paste them into a message.';
   dom.share.textContent = 'Copied!';
-  window.setTimeout(() => { dom.share.textContent = 'Share results'; }, 1400);
 }
 
 function resetCurrentPuzzle() {
   if (!state.puzzle || state.transitioning || !window.confirm('Reset this puzzle and erase its saved progress?')) return;
-  localStorage.removeItem(progressKey());
+  removeStored(progressKey());
   resetPuzzleState();
+  saveProgress();
+  dom.resultOverlay.classList.add('hidden');
   render();
 }
 
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('xw-theme', theme);
-  dom.iconSun.hidden = theme !== 'light';
-  dom.iconMoon.hidden = theme === 'light';
-}
+function applyTheme(theme) { window.PuzzleTheme.setPreference(theme); }
 
 dom.puzzleSelect.addEventListener('change', () => loadPuzzle(dom.puzzleSelect.value));
 dom.puzzleDate.addEventListener('change', () => {
@@ -789,27 +927,38 @@ dom.reset.addEventListener('click', resetCurrentPuzzle);
 dom.easyMode.addEventListener('change', () => {
   if (!state.puzzle || state.transitioning) return;
   saveProgress();
+  if (dom.easyMode.checked && state.lost && !state.answersRevealed) { continueInEasyMode(); return; }
   state.easyMode = dom.easyMode.checked;
-  localStorage.setItem(`${STORAGE_PREFIX}:easy-mode`, state.easyMode ? '1' : '0');
+  writeStored(`${STORAGE_PREFIX}:easy-mode`, state.easyMode ? '1' : '0');
   resetPuzzleState();
   restoreProgress();
   dom.resultOverlay.classList.add('hidden');
+  updatePuzzleUrl();
   render();
 });
+dom.viewResults.addEventListener('click', showResult);
+dom.continueEasy.addEventListener('click', continueInEasyMode);
+dom.revealAnswers.addEventListener('click', revealRemainingAnswers);
 dom.resultClose.addEventListener('click', () => {
   dom.resultOverlay.classList.add('hidden');
-  dom.reset.focus();
+  dom.viewResults.focus();
 });
 dom.share.addEventListener('click', copyResults);
 dom.resultOverlay.addEventListener('click', event => {
   if (event.target === dom.resultOverlay) dom.resultClose.click();
 });
-dom.themeToggle.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme') || 'light';
-  applyTheme(current === 'light' ? 'dark' : 'light');
-});
 
 document.addEventListener('keydown', event => {
+  if (!dom.resultOverlay.classList.contains('hidden')) {
+    if (event.key === 'Escape') { event.preventDefault(); dom.resultClose.click(); }
+    if (event.key === 'Tab') {
+      const focusable = [dom.continueEasy, dom.revealAnswers, dom.sharePreview, dom.share, dom.resultClose].filter(el => el.getClientRects().length);
+      const index = focusable.indexOf(document.activeElement);
+      if (event.shiftKey && index <= 0) { event.preventDefault(); focusable.at(-1).focus(); }
+      else if (!event.shiftKey && (index === focusable.length - 1 || index === -1)) { event.preventDefault(); focusable[0].focus(); }
+    }
+    return;
+  }
   if (event.key === 'Escape') {
     if (!dom.resultOverlay.classList.contains('hidden')) dom.resultClose.click();
     else if (state.selected.size) deselectAll();
@@ -827,7 +976,6 @@ async function boot() {
   populatePuzzleSelector(archivedDates);
   const today = localDateId();
   dom.puzzleDate.max = today;
-  applyTheme(localStorage.getItem('xw-theme') || 'light');
   const requested = new URLSearchParams(window.location.search).get('date');
   const initialDate = isDateId(requested) && requested <= today ? requested : today;
   state.date = initialDate;

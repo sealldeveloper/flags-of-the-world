@@ -93,7 +93,6 @@
     status: "ready",
     timerId: null,
     palette: 0,
-    inverted: false,
     revealed: false
   };
   let toastTimer = null;
@@ -131,7 +130,6 @@
         count: state.count,
         categories: state.categories,
         palette: state.palette,
-        inverted: state.inverted,
         timerDefaultVersion: 2
       }));
     } catch {
@@ -150,7 +148,6 @@
         state.categories = parseLines(saved.categories.join("\n"));
       }
       state.palette = clamp(Number(saved.palette) || 0, 0, PALETTES.length - 1);
-      state.inverted = Boolean(saved.inverted);
     } catch {
       // Invalid saved data is ignored in favour of defaults.
     }
@@ -198,7 +195,6 @@
     const [accent, accentInk] = PALETTES[state.palette];
     document.documentElement.style.setProperty("--accent", accent);
     document.documentElement.style.setProperty("--accent-ink", accentInk);
-    document.documentElement.dataset.inverted = String(state.inverted);
   }
 
   function formatTime(seconds) {
@@ -489,9 +485,7 @@
   els.copyListLink.addEventListener("click", copyShareLink);
   els.openAbout.addEventListener("click", () => els.aboutDialog.showModal());
   els.invertColors.addEventListener("click", () => {
-    state.inverted = !state.inverted;
-    applyPalette();
-    saveState();
+    window.PuzzleTheme.setPreference(window.PuzzleTheme.current === 'dark' ? 'light' : 'dark');
   });
   els.changeColors.addEventListener("click", () => {
     state.palette = (state.palette + 1) % PALETTES.length;

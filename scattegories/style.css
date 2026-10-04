@@ -3,11 +3,23 @@
   --paper: #f2efe8;
   --surface: #ffffff;
   --accent: #f2c94c;
+  --accent-ink: #171717;
   --muted: #686868;
   --success: #28784b;
   --danger: #b83f3f;
   --border: #171717;
   color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --ink: #f4f1e9;
+  --paper: #151515;
+  --surface: #242424;
+  --muted: #b8b8b8;
+  --success: #6bc591;
+  --danger: #f18b8b;
+  --border: #b8b8b8;
+  color-scheme: dark;
 }
 
 * {
@@ -87,6 +99,7 @@ main {
   justify-content: center;
   border-left: 3px solid var(--border);
   background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .eyebrow {
@@ -99,7 +112,7 @@ main {
 }
 
 .fallback-note .eyebrow {
-  color: var(--ink);
+  color: var(--accent-ink);
   opacity: 0.68;
 }
 
@@ -137,7 +150,7 @@ h2 {
 }
 
 .fallback-note p {
-  color: var(--ink);
+  color: var(--accent-ink);
 }
 
 .fallback-note > a {
@@ -208,7 +221,7 @@ h2 {
 
 .button:hover {
   background: var(--accent);
-  color: var(--ink);
+  color: var(--accent-ink);
 }
 
 footer {
@@ -217,6 +230,7 @@ footer {
   padding-block: 20px;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 20px;
   border-top: 2px solid var(--border);
   color: var(--muted);

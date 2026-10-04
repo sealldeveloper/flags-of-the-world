@@ -82,7 +82,9 @@ select, input { font-family: inherit; }
   position: sticky;
   top: 0;
   z-index: 100;
-  height: var(--header-h);
+  height: auto;
+  min-height: 64px;
+  flex: 0 0 auto;
   background: var(--card);
   border-bottom: 2px solid var(--border);
   display: flex;
@@ -94,6 +96,7 @@ select, input { font-family: inherit; }
 
 .header-left {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 16px;
   flex: 1;
@@ -109,6 +112,8 @@ select, input { font-family: inherit; }
 
 .puzzle-selector-wrap {
   display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   font-size: 0.85rem;
@@ -132,14 +137,15 @@ select, input { font-family: inherit; }
 
 .header-center {
   text-align: center;
-  flex: 0 0 auto;
+  min-width: 0;
+  flex: 0 1 auto;
 }
 
 #puzzle-title {
   font-size: 1rem;
   font-weight: bold;
   color: var(--text);
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .puzzle-author {
@@ -220,6 +226,7 @@ select, input { font-family: inherit; }
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   min-height: var(--toolbar-h);
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -266,6 +273,7 @@ select, input { font-family: inherit; }
    ============================================================ */
 #app-main {
   flex: 1;
+  min-height: 0;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -322,6 +330,7 @@ select, input { font-family: inherit; }
 
 /* Active clue bar */
 #active-clue-bar {
+  flex: 0 0 auto;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: 8px 20px;
@@ -765,7 +774,7 @@ select, input { font-family: inherit; }
 /* ============================================================
    RESPONSIVE / MOBILE
    ============================================================ */
-#xw-keyboard, #xw-tools-toggle { display: none; }
+#xw-clue-nav, #xw-tools-toggle { display: none; }
 #crossword-grid:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 @media (max-width: 768px) {
@@ -774,7 +783,7 @@ select, input { font-family: inherit; }
   body {
     height: auto;
     min-height: 100dvh;
-    padding-bottom: calc(210px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
     overflow-y: auto;
     overflow-x: hidden;
   }
@@ -794,7 +803,9 @@ select, input { font-family: inherit; }
     gap: 6px;
   }
   .header-center { display: none; }
-  .puzzle-selector-wrap { font-size: 0.78rem; gap: 4px; }
+  .header-left { flex: 1 1 100%; gap: 8px; }
+  .header-right { flex: 1 1 100%; gap: 8px; justify-content: space-between; }
+  .puzzle-selector-wrap { flex: 1; font-size: 0.78rem; gap: 4px; }
   .puzzle-selector-wrap label { display: none; }
   #puzzle-select { max-width: 140px; font-size: 0.75rem; padding: 2px 4px; }
   #puzzle-date { font-size: 0.75rem; padding: 2px 4px; }
@@ -827,35 +838,9 @@ select, input { font-family: inherit; }
   #active-clue-text { min-width: 0; overflow-wrap: anywhere; }
   .header-left, .puzzle-selector-wrap { min-width: 0; flex-wrap: wrap; }
   #app-header button, #toolbar button, #toolbar select { min-height: 36px; }
-  #xw-keyboard {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-    padding: 8px 5px calc(8px + env(safe-area-inset-bottom));
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-  }
-  .keyboard-row { display: flex; justify-content: center; gap: 4px; width: 100%; max-width: 600px; margin: auto; }
-  .keyboard-row button {
-    flex: 1;
-    min-width: 0;
-    min-height: 42px;
-    padding: 4px 0;
-    border: 1px solid var(--border-strong);
-    border-radius: 4px;
-    background: var(--bg);
-    color: var(--text);
-    font: inherit;
-    font-weight: 600;
-    touch-action: manipulation;
-  }
-  .keyboard-row button:active { background: var(--accent); color: white; }
-  .keyboard-row button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  #xw-clue-nav { display: flex; gap: 8px; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  #xw-clue-nav button { flex: 1; min-width: 0; min-height: 36px; touch-action: manipulation; }
+  #xw-clue-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
   /* Puzzle layout: fill naturally */
   #puzzle-layout { flex: 0 0 auto; min-height: 0; }

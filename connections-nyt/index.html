@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
+  <script src="/assets/theme.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NYT Connections — seall.dev</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../crossword/style.css">
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="/assets/theme.css">
 </head>
 <body>
   <header id="app-header">
@@ -62,10 +64,14 @@
         <button id="reset-button" class="btn-sm btn-danger-outline" type="button">Reset puzzle</button>
       </div>
 
+      <div class="game-board">
+      <div class="game-options">
       <label class="easy-mode-control">
         <input id="easy-mode" type="checkbox" aria-describedby="easy-mode-help">
         <span>Easy mode <small id="easy-mode-help">Unlimited tries · separate saved progress</small></span>
       </label>
+      <p class="guess-count">Guesses <strong id="guess-count">0</strong></p>
+      </div>
 
       <div id="status-message" class="status-message" aria-live="polite"></div>
 
@@ -83,7 +89,23 @@
           <button id="deselect-button" class="btn-game" type="button" disabled>Deselect All</button>
           <button id="submit-button" class="btn-game btn-submit" type="button" disabled>Submit</button>
         </div>
+        <button id="view-results" class="btn-game hidden" type="button">View / share results</button>
       </div>
+      </div>
+      <aside class="play-notes" aria-label="Category hints and guess history">
+        <section class="notes-panel" aria-labelledby="reveals-heading">
+          <h3 id="reveals-heading">Category hints</h3>
+          <p class="notes-help">Reveal a colour’s category name, not its words. Hints are recorded in your results.</p>
+          <ul id="category-reveals" class="category-reveals"></ul>
+        </section>
+        <section class="notes-panel" aria-labelledby="history-heading">
+          <h3 id="history-heading">Incorrect guesses</h3>
+          <p class="notes-help">Your previous groups, with only “One away” or “Not one away” feedback.</p>
+          <p id="history-empty" class="history-empty">No incorrect guesses yet.</p>
+          <ol id="guess-history" class="guess-history"></ol>
+        </section>
+        <p id="storage-status" class="notes-help" role="status">Guesses and category reveals are saved on this browser.</p>
+      </aside>
     </section>
   </main>
 
@@ -92,8 +114,15 @@
       <div id="result-icon" class="result-icon" aria-hidden="true"></div>
       <div id="result-title" class="modal-title"></div>
       <div id="result-summary" class="modal-body"></div>
+      <div id="result-copy">
+        <label for="share-preview" class="share-label">Your share message · no answer words</label>
+        <textarea id="share-preview" readonly rows="9" spellcheck="false"></textarea>
+        <p id="share-status" class="notes-help" role="status"></p>
+      </div>
       <div class="result-actions">
-        <button id="share-button" class="btn-primary" type="button">Share results</button>
+        <button id="continue-easy" class="btn-primary hidden" type="button">Continue in easy mode</button>
+        <button id="reveal-answers" class="btn-game hidden" type="button">Reveal answers</button>
+        <button id="share-button" class="btn-primary" type="button">Copy results</button>
         <button id="result-close" class="btn-sm" type="button">Close</button>
       </div>
     </div>

@@ -1,0 +1,153 @@
+/* Shared shell palette. Existing game colours (flags, category tiles, blue
+   Jeopardy cards, portraits and Scattergories accents) retain their meaning. */
+:root {
+  --site-bg:#f5f7fb; --site-surface:#fff; --site-inset:#e6ebf2; --site-hover:#dbe3ef;
+  --site-text:#182133; --site-muted:#556173; --site-border:#bcc8d8;
+  --site-accent:#1764ad; --site-success:#176e3a; --site-danger:#b32732;
+}
+:root[data-theme="dark"] {
+  --site-bg:#1a1f2e; --site-surface:#2d3748; --site-inset:#4a5568; --site-hover:#3a4a61;
+  --site-text:#e0e6ed; --site-muted:#a9b2c0; --site-border:#64748b;
+  --site-accent:#79b8ef; --site-success:#68d391; --site-danger:#fc8181;
+}
+#btn-theme-toggle { display:none; }
+.site-theme-picker { display:inline-flex; align-items:center; gap:6px; margin:0; color:var(--site-text); font:12px/1.3 system-ui,sans-serif; white-space:nowrap; text-transform:none; letter-spacing:normal; }
+.site-theme-select { width:auto; max-width:100px; min-height:32px; padding:4px 6px; border:1px solid var(--site-border); border-radius:5px; background:var(--site-surface); color:var(--site-text); font:inherit; cursor:pointer; }
+.site-theme-select:focus-visible { outline:3px solid var(--site-accent); outline-offset:2px; }
+[data-site-page="home"] footer .site-theme-picker, [data-site-page="crossword"] footer .site-theme-picker { margin-right:20px; margin-bottom:12px; }
+
+/* Landing pages. */
+:is([data-site-page="home"],[data-site-page="crossword"]) body { background:var(--site-bg); color:var(--site-text); }
+:is([data-site-page="home"],[data-site-page="crossword"]) :is(h1,.card) { color:var(--site-text); }
+:is([data-site-page="home"],[data-site-page="crossword"]) .card { background:var(--site-surface); }
+:is([data-site-page="home"],[data-site-page="crossword"]) .card:hover { background:var(--site-hover); border-color:var(--site-accent); }
+:is([data-site-page="home"],[data-site-page="crossword"]) :is(footer,.card-desc) { color:var(--site-muted); }
+:is([data-site-page="home"],[data-site-page="crossword"]) :is(footer a,.back-link) { color:var(--site-accent); }
+
+/* The two country quizzes share their original dark palette and now have
+   corresponding light surfaces, including loading, pause and result states. */
+:is([data-site-page="flags"],[data-site-page="tld"]) :is(body,#loading-overlay,#pause-overlay) { background-color:var(--site-bg); color:var(--site-text); }
+:is([data-site-page="flags"],[data-site-page="tld"]) :is(.timer,.progress,#loading-message,#pause-message,.results-content h2,.label,.missed-flags h3,.country-name,.missed-country) { color:var(--site-text); }
+:is([data-site-page="flags"],[data-site-page="tld"]) :is(.back-to-puzzles,footer,#loading-count,#pause-hint) { color:var(--site-muted); }
+:is([data-site-page="flags"],[data-site-page="tld"]) :is(.results-content,#country-input,#loading-bar-container) { background:var(--site-surface); color:var(--site-text); border-color:var(--site-border); }
+:is([data-site-page="flags"],[data-site-page="tld"]) :is(button,.stat,.missed-flag,.missed-item) { background:var(--site-inset); color:var(--site-text); }
+:is([data-site-page="flags"],[data-site-page="tld"]) button:hover { background:var(--site-hover); }
+:is([data-site-page="flags"],[data-site-page="tld"]) :is(.hint-btn,.hint-area img) { border-color:var(--site-border); }
+:is([data-site-page="flags"],[data-site-page="tld"]) :is(.feedback.correct,.country-label,.flag-name,.timer.timer-flash,.tld-item.solved .tld-text,#country-input.solved,#country-input:disabled) { color:var(--site-success); }
+:is([data-site-page="flags"],[data-site-page="tld"]) #country-input::placeholder { color:var(--site-muted); opacity:1; }
+:is([data-site-page="flags"],[data-site-page="tld"]) #country-input.solved::placeholder { color:var(--site-success); }
+:is([data-site-page="flags"],[data-site-page="tld"]) .feedback.incorrect { color:var(--site-danger); }
+:is([data-site-page="flags"],[data-site-page="tld"]) :is(footer a,.tld-text,.missed-tld) { color:var(--site-accent); }
+:is([data-site-page="flags"],[data-site-page="tld"]) .give-up-small { background:#b32732; color:#fff; }
+:is([data-site-page="flags"],[data-site-page="tld"]) .give-up-small:hover { background:#90232c; }
+:is([data-site-page="flags"],[data-site-page="tld"]) #play-again-btn { background:#1764ad; color:#fff; }
+:is([data-site-page="flags"],[data-site-page="tld"]) #play-again-btn:hover { background:#154f86; }
+:is([data-site-page="flags"],[data-site-page="tld"]) .previous-pb { color:var(--site-muted)!important; }
+:is([data-site-page="flags"],[data-site-page="tld"]) body.celebration footer { background:var(--site-surface); }
+
+/* Keep quiz controls within small phone widths; flag art is never recoloured. */
+:is([data-site-page="flags"],[data-site-page="tld"]) .input-section { width:min(530px,calc(100% - 24px)); gap:10px; }
+:is([data-site-page="flags"],[data-site-page="tld"]) #country-input { width:100%; min-width:0; flex:1; }
+:is([data-site-page="flags"],[data-site-page="tld"]) .nav-btn { flex:0 0 50px; padding:0; }
+:is([data-site-page="flags"],[data-site-page="tld"]) :is(.flag-item.prev.solved .flag-name,.flag-item.next.solved .flag-name,.tld-item.prev.solved .tld-text,.tld-item.next.solved .tld-text,.tld-item.current.solved .tld-text) { color:var(--site-success); }
+:is([data-site-page="flags"],[data-site-page="tld"]) .hint-btn:hover { color:var(--site-text); }
+:is([data-site-page="flags"],[data-site-page="tld"]) :is(button,input):focus-visible { outline:3px solid var(--site-accent); outline-offset:3px; }
+@media (max-width:768px) {
+  :is([data-site-page="flags"],[data-site-page="tld"]) .nav-btn { flex-basis:40px; }
+  [data-site-page="flags"] .flag-item img { max-width:calc(100vw - 32px); }
+}
+
+/* Deadlock retains the original portrait cards, red elimination marks and dark
+   hero artwork. Only the surrounding chrome, setup and readable intel change. */
+[data-theme="light"] .deadlock-mode { background:var(--site-bg); color:var(--site-text); }
+[data-theme="light"] .deadlock-mode .app-header { background:var(--site-surface); color:var(--site-text); border-color:var(--site-border); }
+[data-theme="light"] .deadlock-mode :is(.back-link,.header-title p) { color:var(--site-muted); }
+[data-theme="light"] .game-view[data-preset="deadlock"] { color:var(--site-text); }
+[data-theme="light"] [data-preset="deadlock"] :is(.game-toolbar,.secret-dock) { background:var(--site-surface); border-color:var(--site-border); }
+[data-theme="light"] [data-preset="deadlock"] :is(.board-identity-label,.board-progress,.board-instructions,.board-heading>p,.source-note) { color:var(--site-muted); }
+[data-theme="light"] [data-preset="deadlock"] :is(.board-identity strong,.board-heading h2) { color:var(--site-text); }
+[data-theme="light"] [data-preset="deadlock"] :is(.board-identity select,.btn,.secret-peek,.secret-content) { background:var(--site-inset); color:var(--site-text); }
+[data-theme="light"] [data-preset="deadlock"] :is(.btn-secondary,.source-note a) { color:#765600; }
+[data-theme="light"] [data-preset="deadlock"] .btn-danger { color:var(--site-danger); }
+[data-theme="light"] [data-preset="deadlock"] .secret-cover { background:var(--site-inset); color:var(--site-muted); }
+[data-theme="light"] .board-workspace[data-preset="deadlock"] { background:var(--site-surface); border-color:var(--site-border); }
+[data-theme="light"] [data-preset="deadlock"] .roster-pane,
+[data-theme="light"] [data-preset="deadlock"] .roster-pane::after { background:var(--site-bg); }
+[data-theme="light"] :is(.hero-panel,.hero-intel,.secret-setup-panel) { background:var(--site-surface); color:var(--site-text); border-color:var(--site-border); scrollbar-color:var(--site-muted) var(--site-surface); }
+[data-theme="light"] :is(.hero-panel .hero-playstyle,.hero-panel .ability p,.secret-setup-heading>p:last-child,.secret-setup-actions p) { color:var(--site-muted); }
+[data-theme="light"] :is(.ability-heading-row h3,.hero-panel .ability h4,.secret-setup-heading h2) { color:var(--site-text); }
+[data-theme="light"] .hero-panel .ability { background:var(--site-bg); border-color:var(--site-border); }
+[data-theme="light"] .ability-icon { background:var(--site-text); }
+[data-theme="light"] .ability-number { background:var(--site-inset); color:var(--site-text); }
+[data-theme="light"] .secret-setup-heading .eyebrow { color:#765600; }
+@media (max-width:820px) {
+  .deadlock-mode .app-header { grid-template-columns:32px minmax(0,1fr) auto; gap:10px; }
+  .deadlock-mode .header-side, .deadlock-mode .header-title { min-width:0; }
+}
+
+/* Jeopardy's control surfaces adapt; its blue/gold game board remains branded. */
+[data-view="jeopardy-control"] { --j-muted:#aaa; --j-surface:#1a1a30; --j-inset:#12122a; --j-text:#fff; --j-gold:#c8a832; }
+[data-theme="light"] [data-view="jeopardy-control"] { --j-muted:var(--site-muted); --j-surface:var(--site-inset); --j-inset:var(--site-bg); --j-text:var(--site-text); --j-gold:#765600; }
+[data-theme="light"] body[data-view="jeopardy-control"] { background:var(--site-bg); color:var(--site-text); }
+[data-theme="light"] [data-view="jeopardy-control"] :is(.topbar,.section,.cat-body,.clue-row,.preview-card,.final-team-ctrl,.result-row) { background:var(--site-surface); border-color:var(--site-border); }
+[data-theme="light"] [data-view="jeopardy-control"] :is(.topbar h1,.section h2,.score-team .name,.preview-cat,.final-team-ctrl h4,.clue-row .val,.buzz-rank-ctrl) { color:#765600; }
+[data-theme="light"] [data-view="jeopardy-control"] :where(.tab:not(.active),.topbar-btn,.btn-gray,.cat-header,.score-team,.rbtn:not(.sel-correct):not(.sel-incorrect),.reveal-btn:not(.revealed),.player-chip,.buzz-entry-ctrl,.media-embedded-note,.clue-drag-handle) { background:var(--site-inset); color:var(--site-text); border-color:var(--site-border); }
+[data-theme="light"] [data-view="jeopardy-control"] :is(input,textarea,select) { background:var(--site-surface); color:var(--site-text); border-color:var(--site-border); }
+[data-theme="light"] [data-view="jeopardy-control"] :is(label,.cat-header .toggle,.preview-label,.wager-info,.clue-editor-help,.sfx-label,.result-row .rname) { color:var(--site-muted); }
+[data-theme="light"] [data-view="jeopardy-control"] :is(.preview-q,.buzz-name-ctrl) { color:var(--site-text); }
+[data-theme="light"] [data-view="jeopardy-control"] :is(.preview-a,.final-revealed,.player-chip.connected) { color:var(--site-success); }
+[data-theme="light"] [data-view="jeopardy-control"] :is(.end-blocked,.score.neg,.topbar-btn.danger) { color:var(--site-danger); }
+[data-theme="light"] [data-view="jeopardy-control"] .result-row.res-correct { background:#e4f2e9; border-color:var(--site-success); }
+[data-theme="light"] [data-view="jeopardy-control"] .result-row.res-incorrect { background:#fbe9e9; border-color:var(--site-danger); }
+[data-theme="light"] [data-view="jeopardy-control"] :is(.result-row.buzz-first,.result-row.res-skip,.buzz-entry-ctrl:first-child) { background:#fff3cf; }
+[data-theme="light"] [data-view="jeopardy-control"] .buzzer-status.disconnected { background:var(--site-inset); color:var(--site-muted); }
+[data-theme="light"] [data-view="jeopardy-control"] :is(.score-team.active-turn,.preview-card.on-display,.clue-row.drop-target,.rbtn.sel-none,.rbtn.sel-skip) { border-color:#765600; }
+[data-theme="light"] [data-view="jeopardy-control"] .rbtn.sel-skip { background:#fff3cf; color:#765600; }
+[data-theme="light"] [data-view="jeopardy-control"] .preview-dd { color:#924600; }
+[data-theme="light"] [data-view="jeopardy-control"] .buzzer-status.open { background:#e4f2e9; color:var(--site-success); }
+[data-theme="light"] [data-view="jeopardy-control"] .buzzer-status.locked { background:#fbe9e9; color:var(--site-danger); }
+[data-theme="light"] [data-view="jeopardy-control"] .topbar-btn:hover { background:var(--site-hover); }
+[data-view="jeopardy-control"] .topbar-right { flex-wrap:wrap; }
+@media (max-width:700px) {
+  [data-view="jeopardy-control"] .result-row { flex-direction:column; align-items:stretch; }
+  [data-view="jeopardy-control"] .result-row .rbtns { flex-wrap:wrap; }
+  [data-view="jeopardy-control"] .rbtns .rbtn { flex:1 1 70px; min-width:0; }
+}
+
+/* Keep buzzer status/order in their own rows, never over the clue or category. */
+[data-view="jeopardy-display"] .screen-container { order:1; }
+[data-view="jeopardy-display"] .scoreboard { order:3; }
+[data-view="jeopardy-display"] .buzzer-top-overlay { position:relative; order:0; flex-shrink:0; padding:8px; }
+[data-view="jeopardy-display"] .buzzer-top-overlay:not(:has(.show)) { display:none; }
+[data-view="jeopardy-display"] .buzzer-badge { font-size:clamp(12px,1.8vw,24px); padding:8px 24px; }
+[data-view="jeopardy-display"] .buzz-order { position:static; transform:none; order:2; flex-shrink:0; flex-direction:row; flex-wrap:wrap; justify-content:center; max-height:25dvh; overflow-y:auto; pointer-events:auto; padding:8px; }
+[data-view="jeopardy-display"] .buzz-order:empty { display:none; }
+[data-view="jeopardy-display"] .buzz-player-name { overflow-wrap:anywhere; }
+
+/* Audience display: light shell/scorecards, recognisable blue clue/board cards.
+   The explicit blank/blackout screen deliberately remains black in either mode. */
+[data-theme="light"] body[data-view="jeopardy-display"] { background:var(--site-bg); color:var(--site-text); }
+[data-theme="light"] [data-view="jeopardy-display"] :is(#screen-logo,#screen-board,#screen-final) { background:var(--site-bg); }
+[data-theme="light"] [data-view="jeopardy-display"] .logo-title { color:#172f90; text-shadow:none; animation:none; }
+[data-theme="light"] [data-view="jeopardy-display"] :is(.logo-buzzer-code,.final-title,.final-timer,.ftc-name,.ftc-newscore,.sb-name,.winner-label,.winner-name,.room-code-float .code) { color:#765600; text-shadow:none; }
+[data-theme="light"] [data-view="jeopardy-display"] :is(.logo-buzzer-code span,.final-category,.final-question,.ftc-answer,.winner-score-final,.winner-team-score) { color:var(--site-text); text-shadow:none; }
+[data-theme="light"] [data-view="jeopardy-display"] :is(.scoreboard,.sb-team,.final-team-card) { background:var(--site-surface); border-color:var(--site-border); }
+[data-theme="light"] [data-view="jeopardy-display"] :is(.sb-team.active,.final-team-card.revealed) { border-color:#765600; }
+[data-theme="light"] [data-view="jeopardy-display"] :is(.ftc-label,.ftc-hidden,.winner-team-name,.room-code-float .label) { color:var(--site-muted); }
+[data-theme="light"] [data-view="jeopardy-display"] :is(.ftc-wager,.dd-wager) { color:#924600; text-shadow:none; }
+[data-theme="light"] [data-view="jeopardy-display"] .ftc-result.correct { color:var(--site-success); }
+[data-theme="light"] [data-view="jeopardy-display"] :is(.ftc-result.incorrect,.sb-score.neg,.final-timer.urgent) { color:var(--site-danger); }
+[data-theme="light"] [data-view="jeopardy-display"] :is(.board-cat,.clue-question) { color:#fff; }
+[data-theme="light"] [data-view="jeopardy-display"] #screen-winner>div { background:var(--site-bg)!important; }
+[data-theme="light"] [data-view="jeopardy-display"] .winner-name { animation:none; }
+[data-theme="light"] [data-view="jeopardy-display"] #screen-dd { background:#f8e5e5; }
+[data-theme="light"] [data-view="jeopardy-display"] :is(.dd-text,.dd-team) { color:#8b2020; text-shadow:none; }
+[data-theme="light"] [data-view="jeopardy-display"] .buzz-entry { background:var(--site-surface); border-color:var(--site-border); }
+[data-theme="light"] [data-view="jeopardy-display"] .buzz-entry:first-child { background:#fff3cf; border-color:#765600; }
+[data-theme="light"] [data-view="jeopardy-display"] .buzz-player-name { color:var(--site-text); }
+[data-theme="light"] [data-view="jeopardy-display"] :is(.buzz-rank,.buzz-entry:first-child .buzz-rank) { color:#765600; }
+[data-theme="light"] [data-view="jeopardy-display"] .buzzer-badge.open { background:#e4f2e9; color:var(--site-success); }
+[data-theme="light"] [data-view="jeopardy-display"] .audio-prompt { background:rgba(245,247,251,.96); }
+[data-theme="light"] [data-view="jeopardy-display"] .audio-prompt-box { color:var(--site-text); }
+[data-theme="light"] [data-view="jeopardy-display"] .audio-prompt-box .msg { color:#765600; }
+[data-theme="light"] [data-view="jeopardy-display"] .audio-prompt-box .sub { color:var(--site-muted); }

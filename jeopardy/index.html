@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="/assets/theme.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jeopardy — Control Panel</title>
@@ -177,8 +178,9 @@
     .final-team-ctrl .frow label{width:100%;padding-top:0;}
   }
 </style>
+<link rel="stylesheet" href="/assets/theme.css">
 </head>
-<body>
+<body data-view="jeopardy-control">
 
 <div class="topbar">
   <h1>Jeopardy Control</h1>
@@ -187,6 +189,7 @@
     <button class="tab" onclick="switchTab('game')">Game</button>
   </div>
   <div class="topbar-right">
+    <span data-theme-picker></span>
     <button class="topbar-btn" onclick="openDisplay()">Open Display</button>
     <button class="topbar-btn danger" onclick="resetBoard()">Reset Board</button>
     <button class="topbar-btn danger" onclick="resetGame()">Reset All</button>
@@ -221,7 +224,7 @@
         <div id="board-editor"></div>
       </div>
       <div class="section">
-        <h2 style="cursor:pointer;" onclick="var b=document.getElementById('final-setup-editor');b.style.display=b.style.display==='none'?'':'none';this.querySelector('span').textContent=b.style.display==='none'?'&#x25B6;':'&#x25BC;';">Final Jeopardy <span style="font-size:.7rem;color:#888;">&#x25B6;</span></h2>
+        <h2 style="cursor:pointer;" onclick="var b=document.getElementById('final-setup-editor');b.style.display=b.style.display==='none'?'':'none';this.querySelector('span').textContent=b.style.display==='none'?'&#x25B6;':'&#x25BC;';">Final Jeopardy <span style="font-size:.7rem;color:var(--j-muted);">&#x25B6;</span></h2>
         <div id="final-setup-editor" style="display:none;"></div>
       </div>
     </div>
@@ -244,7 +247,7 @@
         </div>
         <div style="margin-top:10px;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-            <span style="font-size:.75rem;color:#888;text-transform:uppercase;letter-spacing:1px;">Categories</span>
+            <span style="font-size:.75rem;color:var(--j-muted);text-transform:uppercase;letter-spacing:1px;">Categories</span>
             <button class="btn btn-gold btn-sm" onclick="revealNextCategory()" style="padding:3px 8px;">Next</button>
             <button class="btn btn-gray btn-sm" onclick="revealAllCategories()" style="padding:3px 8px;">All</button>
             <button class="btn btn-gray btn-sm" onclick="hideAllCategories()" style="padding:3px 8px;">Hide</button>
@@ -276,7 +279,7 @@
       </div>
 
       <div class="section" id="sfx-section">
-        <h2 style="cursor:pointer;" onclick="var b=document.getElementById('sfx-controls');b.style.display=b.style.display==='none'?'':'none';this.querySelector('.toggle-arrow').textContent=b.style.display==='none'?'&#x25B6;':'&#x25BC;';">Sound Effects <span class="toggle-arrow" style="font-size:.7rem;color:#888;">&#x25B6;</span> <span id="sfx-audio-status" style="font-size:.65rem;font-weight:400;"></span></h2>
+        <h2 style="cursor:pointer;" onclick="var b=document.getElementById('sfx-controls');b.style.display=b.style.display==='none'?'':'none';this.querySelector('.toggle-arrow').textContent=b.style.display==='none'?'&#x25B6;':'&#x25BC;';">Sound Effects <span class="toggle-arrow" style="font-size:.7rem;color:var(--j-muted);">&#x25B6;</span> <span id="sfx-audio-status" style="font-size:.65rem;font-weight:400;"></span></h2>
         <div id="sfx-controls" style="display:none;"></div>
       </div>
 
@@ -866,9 +869,9 @@ function renderCluePanel(){
 
   // Media info
   if(clue.media&&clue.media.type&&clue.media.url){
-    var mInfo=document.createElement('div');mInfo.style.cssText='margin:6px 0;padding:6px 10px;background:#1a1a30;border-radius:4px;font-size:.75rem;';
-    var mLabel=document.createElement('span');mLabel.style.color='#888';mLabel.textContent=clue.media.type.toUpperCase()+': ';
-    var mUrl=document.createElement('span');mUrl.style.color='#aaa';mUrl.textContent=clue.media.url;
+    var mInfo=document.createElement('div');mInfo.style.cssText='margin:6px 0;padding:6px 10px;background:var(--j-surface);border-radius:4px;font-size:.75rem;';
+    var mLabel=document.createElement('span');mLabel.style.color='var(--j-muted)';mLabel.textContent=clue.media.type.toUpperCase()+': ';
+    var mUrl=document.createElement('span');mUrl.style.color='var(--j-muted)';mUrl.textContent=clue.media.url;
     mInfo.appendChild(mLabel);mInfo.appendChild(mUrl);
     if(clue.media.type==='image'){
       var mThumb=document.createElement('img');mThumb.src=clue.media.url;mThumb.style.cssText='display:block;max-width:100%;max-height:80px;margin-top:6px;border-radius:4px;';
@@ -896,7 +899,7 @@ function renderCluePanel(){
 
   // ── DD Wager controls ──
   if(isDD && isOnDisplay){
-    var wagerSection=document.createElement('div');wagerSection.style.cssText='margin:12px 0;padding:10px;background:#1a1a30;border-radius:6px;';
+    var wagerSection=document.createElement('div');wagerSection.style.cssText='margin:12px 0;padding:10px;background:var(--j-surface);border-radius:6px;';
     var wl=document.createElement('label');wl.textContent='Wager';wagerSection.appendChild(wl);
 
     var wr=document.createElement('div');wr.className='wager-row';
@@ -979,7 +982,7 @@ function renderCluePanel(){
       var cur = game.clueResults[ddTeam] || null;
 
       var resultsLabel=document.createElement('div');
-      resultsLabel.style.cssText='font-size:.75rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:10px;width:100%;flex-basis:100%;';
+      resultsLabel.style.cssText='font-size:.75rem;color:var(--j-muted);text-transform:uppercase;letter-spacing:1px;margin-top:10px;width:100%;flex-basis:100%;';
       resultsLabel.textContent=ddName + ' \u2014 Daily Double ($' + pointsVal + ')';
       btns.appendChild(resultsLabel);
 
@@ -1024,7 +1027,7 @@ function renderCluePanel(){
       });
 
       var resultsLabel=document.createElement('div');
-      resultsLabel.style.cssText='font-size:.75rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:10px;width:100%;flex-basis:100%;';
+      resultsLabel.style.cssText='font-size:.75rem;color:var(--j-muted);text-transform:uppercase;letter-spacing:1px;margin-top:10px;width:100%;flex-basis:100%;';
       resultsLabel.textContent='Team Results ($'+pointsVal+')' + (buzzOrder.length > 0 ? ' \u2014 sorted by buzz order' : '');
       btns.appendChild(resultsLabel);
 
@@ -1240,17 +1243,17 @@ function renderFinalPanel(){
   var f=game.final;
 
   // Category / Question / Answer (read-only, set in Setup tab)
-  var setupDiv=document.createElement('div');setupDiv.style.cssText='margin-bottom:12px;padding:10px;background:#12122a;border-radius:6px;';
+  var setupDiv=document.createElement('div');setupDiv.style.cssText='margin-bottom:12px;padding:10px;background:var(--j-inset);border-radius:6px;';
   function mkInfo(label,val){
     var row=document.createElement('div');row.style.cssText='margin-bottom:4px;';
-    var lb=document.createElement('span');lb.style.cssText='color:#888;font-size:.75rem;text-transform:uppercase;letter-spacing:1px;';lb.textContent=label+': ';
-    var vl=document.createElement('span');vl.style.cssText='color:#fff;font-size:.85rem;';vl.textContent=val||'(not set)';
+    var lb=document.createElement('span');lb.style.cssText='color:var(--j-muted);font-size:.75rem;text-transform:uppercase;letter-spacing:1px;';lb.textContent=label+': ';
+    var vl=document.createElement('span');vl.style.cssText='color:var(--j-text);font-size:.85rem;';vl.textContent=val||'(not set)';
     row.appendChild(lb);row.appendChild(vl);return row;
   }
   setupDiv.appendChild(mkInfo('Category',f.category));
   setupDiv.appendChild(mkInfo('Question',f.question));
   setupDiv.appendChild(mkInfo('Answer',f.answer));
-  var editNote=document.createElement('div');editNote.style.cssText='font-size:.65rem;color:#555;margin-top:6px;';
+  var editNote=document.createElement('div');editNote.style.cssText='font-size:.65rem;color:var(--j-muted);margin-top:6px;';
   editNote.textContent='Edit these in the Setup tab';
   setupDiv.appendChild(editNote);
   el.appendChild(setupDiv);
@@ -1273,7 +1276,7 @@ function renderFinalPanel(){
   // Timer controls (clue phase)
   if(f.phase==='clue'){
     var timerDiv=document.createElement('div');timerDiv.className='btn-group';timerDiv.style.marginBottom='12px';
-    var timerLabel=document.createElement('span');timerLabel.style.cssText='font-size:1.1rem;font-weight:700;color:#c8a832;min-width:40px;';
+    var timerLabel=document.createElement('span');timerLabel.style.cssText='font-size:1.1rem;font-weight:700;color:var(--j-gold);min-width:40px;';
     timerLabel.textContent=f.timer+'s';
     var startBtn=document.createElement('button');startBtn.className='btn btn-green btn-sm';startBtn.textContent='Start';
     startBtn.addEventListener('click',function(){
@@ -1527,7 +1530,7 @@ function renderBuzzerUI(){
       s.textContent='Connected \u2014 Room: '+buzzer.gameCode;
       setupStatus.appendChild(s);
       connectBtn.style.display='none';disconnectBtn.style.display='';
-      var pi=document.createElement('div');pi.style.cssText='margin-top:8px;font-size:.8rem;color:#888;';
+      var pi=document.createElement('div');pi.style.cssText='margin-top:8px;font-size:.8rem;color:var(--j-muted);';
       pi.textContent=buzzer.players.length+' player(s) connected';
       setupInfo.appendChild(pi);
       if(buzzer.players.length>0){
@@ -1593,7 +1596,7 @@ function renderBuzzerUI(){
     while(boEl.firstChild) boEl.removeChild(boEl.firstChild);
     var order=game.buzzerOrder||[];
     if(order.length>0){
-      var h=document.createElement('div');h.style.cssText='font-size:.75rem;color:#888;margin:6px 0 4px;text-transform:uppercase;letter-spacing:1px;';
+      var h=document.createElement('div');h.style.cssText='font-size:.75rem;color:var(--j-muted);margin:6px 0 4px;text-transform:uppercase;letter-spacing:1px;';
       h.textContent='Buzz Order';boEl.appendChild(h);
       var list=document.createElement('div');list.className='buzz-order-list';
       order.forEach(function(name,i){

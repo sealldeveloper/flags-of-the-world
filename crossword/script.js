@@ -915,11 +915,32 @@ function getCurrentClue() {
   return list.find(cl => cl.num === num) ?? null;
 }
 
+function positionNativeInput(keepVisible = false) {
+  const input = document.getElementById('xw-mobile-input');
+  const cell = getCellEl(state.selRow, state.selCol);
+  if (!input || !cell) return;
+  let rect = cell.getBoundingClientRect();
+  const viewport = window.visualViewport;
+  const top = viewport?.offsetTop || 0;
+  const bottom = top + (viewport?.height || innerHeight);
+  // Keep the actual focused input by the selected cell, not underneath the
+  // keyboard. Scroll only when needed; never shrink the grid to keyboard height.
+  if (keepVisible && document.activeElement === input) {
+    const safeTop = top + (document.getElementById('active-clue-bar')?.offsetHeight || 0) + 8;
+    const delta = rect.bottom > bottom - 12 ? rect.bottom - bottom + 12 : rect.top < safeTop ? rect.top - safeTop : 0;
+    if (delta) { window.scrollBy(0, delta); rect = cell.getBoundingClientRect(); }
+  }
+  input.style.bottom = 'auto';
+  input.style.top = `${Math.max(top + 4, Math.min(rect.top + 4, bottom - 20))}px`;
+  input.style.left = `${Math.max(0, rect.left + 4)}px`;
+}
+
 function focusGridInput() {
-  // Wide touch-only tablets still need a native keyboard; phones use the dock.
-  const target = navigator.maxTouchPoints > 0 && window.innerWidth > 768
-    ? document.getElementById('xw-mobile-input') : dom.grid;
+  const touchInput = navigator.maxTouchPoints > 0 || matchMedia('(pointer: coarse)').matches;
+  const target = touchInput ? document.getElementById('xw-mobile-input') : dom.grid;
+  if (touchInput) positionNativeInput();
   target?.focus({ preventScroll: true });
+  if (touchInput) positionNativeInput(true);
 }
 
 function selectCell(r, c, dir = null) {
@@ -939,11 +960,11 @@ function selectCell(r, c, dir = null) {
 function onCellClick(r, c) {
   if (isBlack(r, c)) return;
   ensureTimerStarted();
-  focusGridInput();
 
   if (r === state.selRow && c === state.selCol) {
-    // Toggle direction
+    // Toggle direction and open the device keyboard in this tap gesture.
     toggleDirection();
+    focusGridInput();
   } else {
     // If clicked cell has no across word but has down word, switch to down
     const hasAcross = state.cellToAcross[cellKey(r, c)] != null;
@@ -1030,8 +1051,12 @@ function onKeyDown(e) {
     return;
   }
 
-  // Shift shortcuts
-  if (e.shiftKey && !e.ctrlKey && !e.metaKey) {
+  // A native input owns printable text (including mobile auto-capitalisation).
+  // Its input/composition events insert letters once, not both here and there.
+  if (isMobileInput && /^[a-zA-Z]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) return;
+
+  // Shift shortcuts are for grid focus, not a capital letter from the keyboard.
+  if (!isMobileInput && e.shiftKey && !e.ctrlKey && !e.metaKey) {
     switch (e.key) {
       case 'C':
         e.preventDefault();
@@ -1921,7 +1946,7 @@ dom.btnGo.addEventListener('click', () => {
 // Lock mode
 dom.chkLock.addEventListener('change', () => {
   state.lockMode = dom.chkLock.checked;
-  localStorage.setItem('xw-lock-mode', state.lockMode ? '1' : '0');
+  writeSetting('xw-lock-mode', state.lockMode ? '1' : '0');
   pushHistory();
   if (!state.lockMode) {
     // Unlock everything and clear all highlights
@@ -1938,9 +1963,9 @@ dom.chkLock.addEventListener('change', () => {
 // Arrow-changes-direction toggle
 dom.chkArrowDir.addEventListener('change', () => {
   state.arrowDir = dom.chkArrowDir.checked;
-  localStorage.setItem('xw-arrow-dir', state.arrowDir ? '1' : '0');
+  writeSetting('xw-arrow-dir', state.arrowDir ? '1' : '0');
 });
-if (localStorage.getItem('xw-arrow-dir') === '1') {
+if (readSetting('xw-arrow-dir') === '1') {
   state.arrowDir = true;
   dom.chkArrowDir.checked = true;
 }
@@ -1948,9 +1973,9 @@ if (localStorage.getItem('xw-arrow-dir') === '1') {
 // Overtype toggle
 dom.chkOvertype.addEventListener('change', () => {
   state.overtype = dom.chkOvertype.checked;
-  localStorage.setItem('xw-overtype', state.overtype ? '1' : '0');
+  writeSetting('xw-overtype', state.overtype ? '1' : '0');
 });
-if (localStorage.getItem('xw-overtype') === '1') {
+if (readSetting('xw-overtype') === '1') {
   state.overtype = true;
   dom.chkOvertype.checked = true;
 }
@@ -2041,29 +2066,16 @@ dom.btnRetry.addEventListener('click', () => {
 });
 
 // ============================================================
-// THEME TOGGLE
+// APPEARANCE AND SETTINGS
 // ============================================================
-const btnThemeToggle = document.getElementById('btn-theme-toggle');
-const iconSun  = document.getElementById('icon-sun');
-const iconMoon = document.getElementById('icon-moon');
-
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('xw-theme', theme);
-  iconSun.style.display  = theme === 'light' ? ''     : 'none';
-  iconMoon.style.display = theme === 'light' ? 'none' : '';
-}
-
-btnThemeToggle.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme') || 'light';
-  applyTheme(current === 'light' ? 'dark' : 'light');
-});
-
-/// Load saved theme (default: light)
-applyTheme(localStorage.getItem('xw-theme') || 'light');
+// The shared head script follows the system before the first paint. Only an
+// explicit choice writes a preference; denied browser storage remains usable.
+function applyTheme(theme) { window.PuzzleTheme.setPreference(theme); }
+function readSetting(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
+function writeSetting(key, value) { try { localStorage.setItem(key, value); } catch (_) { /* Session-only settings. */ } }
 
 // Load saved lock-mode setting (default: on)
-if (localStorage.getItem('xw-lock-mode') === '0') {
+if (readSetting('xw-lock-mode') === '0') {
   state.lockMode = false;
   dom.chkLock.checked = false;
 }
@@ -2079,8 +2091,9 @@ function updateHeaderHeight() {
   const h = document.getElementById('app-header')?.offsetHeight ?? 0;
   document.documentElement.style.setProperty('--header-h', `${h}px`);
 }
-const headerObserver = new ResizeObserver(updateHeaderHeight);
+const headerObserver = new ResizeObserver(() => { updateHeaderHeight(); fitGrid(); });
 headerObserver.observe(document.getElementById('app-header'));
+headerObserver.observe(document.getElementById('toolbar'));
 updateHeaderHeight();
 
 // Fit grid to available space — compute --cell-size so the entire
@@ -2134,67 +2147,79 @@ gridObserver.observe(document.getElementById('clue-panels'));
 window.addEventListener('resize', fitGrid);
 window.addEventListener('load', () => requestAnimationFrame(fitGrid));
 // Re-fit when virtual keyboard opens/closes on mobile
-window.visualViewport?.addEventListener('resize', fitGrid);
+window.visualViewport?.addEventListener('resize', () => {
+  fitGrid();
+  requestAnimationFrame(() => positionNativeInput(true));
+});
+window.visualViewport?.addEventListener('scroll', () => positionNativeInput());
 
 // ============================================================
-// MOBILE VIRTUAL KEYBOARD INPUT
+// DEVICE KEYBOARD INPUT
 // ============================================================
 {
-  const mobileInput = document.getElementById('xw-mobile-input');
-  if (mobileInput) {
-    // Capture letter input from the virtual keyboard
-    mobileInput.addEventListener('input', () => {
-      const val = mobileInput.value;
-      mobileInput.value = ''; // clear immediately so next keypress works
-      if (!val || !state.puzzleId) return;
-      // Take the last typed character (handles IME and autocorrect edge cases)
-      const ch = val.slice(-1).toUpperCase();
-      if (/^[A-Z]$/.test(ch)) handleLetterKey(ch);
+  const input = document.getElementById('xw-mobile-input');
+  if (input) {
+    // A sentinel lets keyboards emit Backspace even when no letter is buffered.
+    const sentinel = '\u200b';
+    const reset = () => { input.value = sentinel; input.setSelectionRange(1, 1); };
+    const canEdit = () => state.puzzleId && !dom.puzzleLayout.classList.contains('hidden') && dom.modalOverlay.classList.contains('hidden') && dom.winOverlay.classList.contains('hidden');
+    const commit = () => {
+      const text = input.value.replaceAll(sentinel, '');
+      reset();
+      if (!canEdit()) return;
+      if (text === ' ') { toggleDirection(); return; }
+      for (const letter of text.toUpperCase()) if (/^[A-Z]$/.test(letter)) handleLetterKey(letter);
+    };
+    input.addEventListener('focus', reset);
+    input.addEventListener('blur', reset); // Do not steal focus or reopen a dismissed keyboard.
+    input.addEventListener('beforeinput', event => {
+      if (!event.cancelable || event.isComposing) return;
+      if (event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward') {
+        event.preventDefault();
+        if (canEdit()) event.inputType === 'deleteContentBackward' ? handleBackspace() : handleDelete();
+        reset();
+      } else if (event.inputType === 'insertLineBreak' || event.inputType === 'insertParagraph') {
+        event.preventDefault();
+        if (canEdit()) goToNextWord();
+        reset();
+      }
     });
-
-    // Special keys bubble to the single document handler. Handling them here
-    // as well would move/delete twice per physical keypress.
-
-    // Keep the hidden input clear and re-focused when blurred unintentionally
-    mobileInput.addEventListener('blur', () => {
-      mobileInput.value = '';
+    input.addEventListener('input', event => {
+      if (event.isComposing) return;
+      if (event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward') {
+        if (canEdit()) event.inputType === 'deleteContentBackward' ? handleBackspace() : handleDelete();
+        reset();
+      } else commit();
     });
+    // Some keyboards commit before compositionend, others send a final input
+    // afterwards. Reading the buffer (not event.data) prevents duplicate letters.
+    input.addEventListener('compositionend', commit);
+    reset();
   }
 }
 
-// Shared touch controls for all crossword sources. No native keyboard means
-// the board remains visible and every device has next/previous and delete keys.
 dom.grid.tabIndex = 0;
 dom.grid.setAttribute('aria-label', 'Crossword grid. Type letters; Enter or Tab for next clue, Shift for previous.');
-const keyboard = document.createElement('div');
-keyboard.id = 'xw-keyboard';
-keyboard.setAttribute('aria-label', 'Crossword keyboard');
-const addKey = (row, label, action, title = label) => {
+// Inline clue navigation is not a keyboard and never covers the board.
+const navigation = document.createElement('nav');
+navigation.id = 'xw-clue-nav';
+navigation.setAttribute('aria-label', 'Clue navigation');
+for (const [label, title, action] of [
+  ['← Previous', 'Previous clue', goToPrevWord],
+  ['Across / Down', 'Switch direction', toggleDirection],
+  ['Next →', 'Next clue', goToNextWord],
+]) {
   const button = document.createElement('button');
-  button.type = 'button';
-  button.textContent = label;
+  button.type = 'button'; button.className = 'btn-sm'; button.textContent = label;
   button.setAttribute('aria-label', title);
+  button.addEventListener('pointerdown', event => event.preventDefault());
   button.addEventListener('click', () => {
     if (!state.puzzleId || !dom.modalOverlay.classList.contains('hidden') || !dom.winOverlay.classList.contains('hidden')) return;
-    action();
-    dom.grid.focus({ preventScroll: true });
+    action(); focusGridInput();
   });
-  row.appendChild(button);
-};
-const navigation = document.createElement('div');
-navigation.className = 'keyboard-row';
-addKey(navigation, '← Previous', goToPrevWord, 'Previous clue');
-addKey(navigation, 'Across / Down', toggleDirection, 'Switch direction');
-addKey(navigation, 'Next →', goToNextWord, 'Next clue');
-keyboard.appendChild(navigation);
-for (const letters of ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM']) {
-  const row = document.createElement('div');
-  row.className = 'keyboard-row';
-  for (const letter of letters) addKey(row, letter, () => handleLetterKey(letter));
-  if (letters === 'ZXCVBNM') addKey(row, '⌫', handleBackspace, 'Delete letter');
-  keyboard.appendChild(row);
+  navigation.appendChild(button);
 }
-dom.puzzleLayout.appendChild(keyboard);
+dom.puzzleLayout.insertBefore(navigation, document.getElementById('puzzle-body'));
 const toolsToggle = document.createElement('button');
 toolsToggle.id = 'xw-tools-toggle';
 toolsToggle.className = 'btn-sm';

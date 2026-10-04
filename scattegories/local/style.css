@@ -11,7 +11,7 @@
   color-scheme: light;
 }
 
-:root[data-inverted="true"] {
+:root[data-theme="dark"] {
   --ink: #f4f1e9;
   --paper: #151515;
   --surface: #242424;
@@ -901,6 +901,7 @@ textarea:focus-visible {
 
   .categories-header {
     align-items: end;
+    flex-wrap: wrap;
     padding-bottom: 8px;
   }
 

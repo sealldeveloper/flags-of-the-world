@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
+  <script src="/assets/theme.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NYT Mini Crossword — seall.dev</title>
   <link rel="icon" href="../crossword/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../crossword/style.css">
+  <link rel="stylesheet" href="/assets/theme.css">
 </head>
 <body>
   <!-- ===== HEADER ===== -->
@@ -140,7 +142,7 @@
   </div>
 
   <input id="xw-mobile-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
-    inputmode="text" aria-hidden="true" tabindex="-1"
+    inputmode="text" enterkeyhint="next" aria-label="Crossword letter input" aria-describedby="active-clue-text" tabindex="-1"
     style="position:fixed;bottom:0;left:0;width:1px;height:1px;opacity:0;border:none;padding:0;font-size:16px;pointer-events:none;">
 
   <!-- NYT source adapter — must be defined BEFORE the shared script -->
