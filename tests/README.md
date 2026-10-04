@@ -28,3 +28,12 @@ These scripts default to port **18764**; set `BASE_URL` to your actual server UR
 - `node tests/themes-browser.cjs`: every published local game/launcher and Jeopardy audience display; OS light/dark changes, remembered manual choices, return to System, cross-tab propagation, System defaults despite old theme settings, denied theme storage, responsive screenshots and representative interactive states. Screenshots: `/tmp/published-themes`. External country-flag images use a deterministic SVG fixture, and unrelated remote services/fonts are blocked; this is not a CDN, remote Scattergories or buzzer integration test.
 
 All use disposable browser profiles and local archives, not production progress. None include unpublished games. Review the generated screenshots; passing geometry assertions alone is not visual confirmation.
+
+## Installable app and daily library
+
+- `TZ=Australia/Sydney node --test tests/daily.test.mjs` (also run with `TZ=America/Los_Angeles`): local-calendar boundaries, every archived daily payload, exact-date validation, old/new progress, Connections continuation/reveal outcomes, download fallback, cancellation, quota failures, overlay retries, and cache-update isolation.
+- `node tests/app-browser.cjs`: same browser environment and port **18764** as above. Uses a temporary **persistent Chromium profile**, real service workers and Cache Storage, and Chromium installability diagnostics. Checks unplayed downloads, native crossword saves, Connections standard→easy outcomes, old saves, cross-tab changes, history filters, offline navigation and a cold browser restart, blocked storage, install help, responsive light/dark layouts, focus and hover. Screenshots default to `/tmp/puzzle-app`. The profile is removed after the test; existing user profiles are not used.
+
+- `node tests/app-update-browser.cjs`: starts its own loopback server with in-memory deployment versions. Verifies an interrupted install, a waiting update that needs an explicit click, survival of puzzle data/native saves/theme choices/unrelated caches, stalled-network fallback and unknown-route isolation. It never rewrites site files; screenshots default to `/tmp/puzzle-app-updates`.
+
+The browser test does not click a real operating-system install sheet or certify physical iOS/Android installation. Party-game external artwork/media and remote buzzers are not offline guarantees. See `../assets/APP.md` for cache boundaries and update behaviour.

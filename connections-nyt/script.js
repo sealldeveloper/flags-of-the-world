@@ -92,11 +92,8 @@ function recentDates(count) {
 
 async function loadArchiveManifest() {
   try {
-    const response = await fetch('./puzzles/manifest.json', { cache: 'no-cache' });
-    if (!response.ok) return [];
-    const dates = await response.json();
-    if (!Array.isArray(dates)) return [];
-    return dates.filter(isDateId);
+    const daily = await import('/assets/daily.mjs');
+    return await daily.loadManifest(daily.gameFor('connections'));
   } catch (_) {
     return [];
   }
@@ -206,6 +203,7 @@ function saveProgress() {
     continuedFromStandard: state.continuedFromStandard,
     completed: state.completed,
     lost: state.lost,
+    updatedAt: Date.now(),
   };
   const saved = writeStored(progressKey(), JSON.stringify(progress));
   dom.storageStatus.textContent = saved ? 'Progress saved on this browser.' : 'Couldn’t save progress. Keep this tab open; browser storage may be full or blocked.';
@@ -289,34 +287,14 @@ async function loadPuzzle(dateId, updateUrl = true) {
   const requestSequence = ++state.requestSequence;
   if (state.requestController) state.requestController.abort();
   state.requestController = new AbortController();
+  const requestController = state.requestController;
   showLoading();
 
   try {
-    let puzzleData = null;
-
-    if (state.archivedDates.has(dateId)) {
-      const [year, month] = dateId.split('-');
-      try {
-        const archivedResponse = await fetch(`./puzzles/${year}/${month}/${dateId}.json`, {
-          signal: state.requestController.signal,
-        });
-        if (archivedResponse.ok) puzzleData = await archivedResponse.json();
-      } catch (error) {
-        if (error.name === 'AbortError') throw error;
-      }
-    }
-
-    if (!puzzleData) {
-      const response = await fetch(`${CONNECTIONS_API}/${dateId}`, {
-        signal: state.requestController.signal,
-        cache: 'no-store',
-      });
-      if (!response.ok) {
-        if (response.status === 404) throw new Error('No Connections puzzle was found for that date.');
-        throw new Error(`The puzzle service returned HTTP ${response.status}.`);
-      }
-      puzzleData = await response.json();
-    }
+    const daily = await import('/assets/daily.mjs');
+    const puzzleData = await daily.loadPuzzle('connections', dateId, {
+      signal: requestController.signal, api: CONNECTIONS_API,
+    });
 
     const puzzle = parsePuzzle(puzzleData, dateId);
     if (requestSequence !== state.requestSequence) return;

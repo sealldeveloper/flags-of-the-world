@@ -499,7 +499,9 @@ function buildClues(acrossCluesRaw, downCluesRaw, acrossStarts, downStarts) {
 // ============================================================
 // LOAD & INITIALIZE PUZZLE
 // ============================================================
+let puzzleLoadSequence = 0;
 async function loadPuzzle(id) {
+  const sequence = ++puzzleLoadSequence;
   showLoading(`Loading puzzle ${formatPuzzleId(id)}...`);
   stopTimer();
   winShown = false;
@@ -525,9 +527,11 @@ async function loadPuzzle(id) {
     // Preserve original NYT date for cross-linking.
     data.nytDate = data.puzzleId;
     data.puzzleId = String(id);
+    if (sequence !== puzzleLoadSequence) return;
     const saved = loadProgressFromStorage(data.puzzleId);
     initPuzzleFromData(data, saved);
   } catch (err) {
+    if (sequence !== puzzleLoadSequence) return;
     console.error(err);
     showError(`Failed to load puzzle: ${err.message}`);
   }
@@ -628,6 +632,7 @@ function initPuzzleFromData(data, savedProgress = null) {
   const url = new URL(window.location);
   url.searchParams.set('puzzle', puzzleId);
   history.replaceState(null, '', url);
+  saveProgressToStorage(); // Backfill daily completion metadata for existing saves.
 }
 
 // ============================================================
@@ -1590,7 +1595,17 @@ function storageKey(id) { return `${SRC?.storagePrefix ?? 'xw'}-progress-${id}`;
 
 function saveProgressToStorage() {
   if (!state.puzzleId) return;
+  let total=0, filled=0, correct=0, assisted=0;
+  for (let r=0;r<state.height;r++) for (let c=0;c<state.width;c++) {
+    if (isBlack(r,c)) continue;
+    total++;
+    if (state.userGrid[r][c]) filled++;
+    if (isCellCorrect(r,c)) correct++;
+    if (state.revealed[r][c]) assisted++;
+  }
   const payload = {
+    dailySummary: {version:1,total,filled,complete:total>0&&correct===total,assisted},
+    updatedAt: Date.now(),
     userGrid:  state.userGrid,
     revealed:  state.revealed,
     locked:    state.locked,

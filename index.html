@@ -1,151 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="/assets/theme.js"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>seall.dev — Games & Puzzles</title>
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1f2e;
-            min-height: 100vh;
-            color: #e0e6ed;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 60px 20px 40px;
-        }
-
-        h1 {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 48px;
-            color: #e0e6ed;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 900px;
-        }
-
-        .card {
-            background: #2d3748;
-            border-radius: 12px;
-            padding: 28px 24px;
-            text-decoration: none;
-            color: #e0e6ed;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            border: 2px solid transparent;
-            transition: border-color 0.2s, transform 0.15s, background 0.2s;
-        }
-
-        .card:hover {
-            border-color: #4299e1;
-            background: #3a4a61;
-            transform: translateY(-3px);
-        }
-
-        .card-icon {
-            font-size: 2.5rem;
-            line-height: 1;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
-        footer {
-            margin-top: auto;
-            padding-top: 48px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
-            color: #9ca3af;
-        }
-
-        footer a {
-            color: #4299e1;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-    </style>
-    <link rel="stylesheet" href="/assets/theme.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script src="/assets/theme.js"></script>
+  <title>Games & daily puzzles — seall.dev</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/app.webmanifest">
+  <link rel="apple-touch-icon" href="/assets/app-icon-192.png">
+  <meta name="theme-color" content="#f5f7fb">
+  <link rel="stylesheet" href="/assets/theme.css">
+  <link rel="stylesheet" href="/assets/library.css">
+  <script src="/assets/app.js" defer></script>
+  <script src="/assets/library.mjs" type="module"></script>
 </head>
 <body>
-    <h1>assorted puzzles</h1>
-
-    <div class="grid">
-        <a class="card" href="/flags/">
-            <div class="card-icon" id="flags-icon"></div>
-            <div class="card-title">Flags of the World</div>
-        </a>
-        <a class="card" href="/crossword/">
-            <div class="card-icon">✏️</div>
-            <div class="card-title">Crosswords</div>
-        </a>
-        <a class="card" href="/connections-nyt/">
-            <div class="card-icon">🟨</div>
-            <div class="card-title">NYT Connections</div>
-        </a>
-        <a class="card" href="/tld/">
-            <div class="card-icon" id="tld-icon" style="font-family:'Courier New',monospace;font-size:1.6rem;font-weight:bold;color:#4299e1"></div>
-            <div class="card-title">Country TLDs</div>
-        </a>
-    </div>
-
-    <h1 style="margin-top:48px;">games and gameshows</h1>
-
-    <div class="grid">
-        <a class="card" href="/jeopardy/">
-            <div class="card-icon">❓</div>
-            <div class="card-title">Jeopardy</div>
-        </a>
-        <a class="card" href="/deadlock-guess-who/">
-            <div class="card-icon">👤</div>
-            <div class="card-title">Deadlock Guess Who</div>
-        </a>
-        <a class="card" href="/scattegories/">
-            <div class="card-icon">🔤</div>
-            <div class="card-title">Scattegories</div>
-        </a>
-    </div>
-
-    <footer><span data-theme-picker></span> Made by <a href="https://seall.dev" target="_blank">seall.dev</a></footer>
-
-    <script>
-        // Pick a random country and show its flag emoji + matching TLD
-        const COUNTRY_TLD_PAIRS = [
-            {code:'FR',tld:'.fr'},{code:'DE',tld:'.de'},{code:'JP',tld:'.jp'},
-            {code:'TV',tld:'.tv'},{code:'ME',tld:'.me'},{code:'LY',tld:'.ly'},
-            {code:'CO',tld:'.co'},{code:'FM',tld:'.fm'},{code:'TO',tld:'.to'},
-            {code:'LA',tld:'.la'},{code:'BR',tld:'.br'},{code:'IN',tld:'.in'},
-            {code:'AU',tld:'.au'},{code:'CA',tld:'.ca'},{code:'IT',tld:'.it'},
-            {code:'ES',tld:'.es'},{code:'RU',tld:'.ru'},{code:'CN',tld:'.cn'},
-            {code:'MX',tld:'.mx'},{code:'NG',tld:'.ng'},{code:'ZA',tld:'.za'},
-            {code:'SE',tld:'.se'},{code:'NO',tld:'.no'},{code:'NZ',tld:'.nz'},
-            {code:'KR',tld:'.kr'},{code:'SG',tld:'.sg'},{code:'CH',tld:'.ch'},
-            {code:'PL',tld:'.pl'},{code:'AR',tld:'.ar'},{code:'EG',tld:'.eg'},
-        ];
-        const pair = COUNTRY_TLD_PAIRS[Math.floor(Math.random() * COUNTRY_TLD_PAIRS.length)];
-        const flagEmoji = String.fromCodePoint(...[...pair.code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
-        document.getElementById('flags-icon').textContent = flagEmoji;
-        document.getElementById('tld-icon').textContent = pair.tld;
-    </script>
+  <header class="library-header">
+    <div><a class="site-name" href="/">puzzle.seall.dev</a><h1>Games & daily puzzles</h1></div>
+    <div class="header-actions"><span data-theme-picker></span><button id="install-app" type="button">Install app</button></div>
+  </header>
+  <main>
+    <section aria-labelledby="daily-heading">
+      <div class="section-heading"><div><h2 id="daily-heading">Daily games</h2><p>Three daily puzzles. Your progress stays on this device.</p></div><span id="daily-total" class="day-total" aria-live="polite">Loading progress…</span></div>
+      <div class="daily-toolbar">
+        <div class="date-controls"><button id="previous-day" aria-label="Previous day" type="button">←</button><label for="daily-date">Date</label><input id="daily-date" type="date" required><button id="next-day" aria-label="Next day" type="button">→</button><button id="today" type="button">Today</button></div>
+        <button id="save-day" type="button">Save this day offline</button>
+      </div>
+      <p id="daily-message" class="status-message" role="status">Loading the archive and saved progress…</p>
+      <div id="daily-grid" class="daily-grid" aria-live="polite">
+        <a class="card" href="/crossword-nyt/"><h3>NYT Crossword</h3><p>Full-size daily crossword</p></a>
+        <a class="card" href="/crossword-nytmini/"><h3>NYT Mini</h3><p>A smaller daily crossword</p></a>
+        <a class="card" href="/connections-nyt/"><h3>NYT Connections</h3><p>Find four groups of four</p></a>
+      </div>
+      <details class="history" id="daily-history">
+        <summary>Daily archive & progress</summary>
+        <div class="history-toolbar"><p>Finished includes revealed answers. Downloading a puzzle does not mark it started.</p><label>Show <select id="history-filter"><option value="all">All days</option><option value="unfinished">Still to do</option><option value="finished">All three finished</option><option value="saved">Downloaded days</option></select></label></div>
+        <div class="history-scroll" tabindex="0" aria-label="Daily progress by date"><table><caption class="sr-only">Daily progress by date and game</caption><thead><tr><th scope="col">Date</th><th scope="col">Crossword</th><th scope="col">Mini</th><th scope="col">Connections</th><th scope="col">Offline</th></tr></thead><tbody id="history-rows"></tbody></table></div>
+        <p class="table-hint">Scroll sideways to see all games and downloads.</p>
+        <p id="history-empty" hidden>No days match this filter.</p><button id="more-days" type="button" hidden>Show more days</button>
+      </details>
+      <noscript><p>JavaScript is required for daily progress and the games. The links above remain available.</p></noscript>
+    </section>
+    <section aria-labelledby="quiz-heading"><div class="section-heading"><div><h2 id="quiz-heading">Quizzes</h2><p>No daily reset. Play whenever you like.</p></div></div><div class="game-grid">
+      <a class="card" href="/flags/"><span class="card-icon" aria-hidden="true">🌍</span><h3>Flags of the World</h3><p>Name the country from its flag.</p><small>Flag images need a connection</small></a>
+      <a class="card" href="/tld/"><span class="card-icon code-icon" aria-hidden="true">.nz</span><h3>Country TLDs</h3><p>Match internet domains to countries.</p><small>Flag hints need a connection</small></a>
+    </div></section>
+    <section aria-labelledby="social-heading"><div class="section-heading"><div><h2 id="social-heading">Multiplayer & party games</h2><p>For playing with other people, not a daily checklist.</p></div></div><div class="game-grid">
+      <a class="card" href="/jeopardy/"><span class="card-icon" aria-hidden="true">❓</span><h3>Jeopardy</h3><p>Host a quiz with a separate audience display.</p><small>Online buzzers and external media need a connection</small></a>
+      <a class="card" href="/scattegories/local/"><span class="card-icon" aria-hidden="true">🔤</span><h3>Scattergories</h3><p>A shared letter, categories and a timer.</p><small>Self-hosted game · credit to Swellgarfo</small></a>
+      <a class="card" href="/deadlock-guess-who/"><span class="card-icon" aria-hidden="true">👤</span><h3>Deadlock Guess Who</h3><p>Pick a secret hero and play with a friend.</p><small>Hero artwork needs a connection</small></a>
+    </div></section>
+    <section aria-labelledby="archive-heading"><div class="section-heading"><div><h2 id="archive-heading">Crossword archive</h2><p>Reprints, separate from the three daily games.</p></div></div><div class="game-grid">
+      <a class="card" href="/crossword-seattle/"><span class="card-icon" aria-hidden="true">✏️</span><h3>Seattle Times crossword</h3><p>Syndicated NYT crosswords from the archive.</p></a>
+    </div></section>
+    <section class="app-notice" aria-labelledby="offline-heading"><h2 id="offline-heading">Take your puzzles with you</h2><p id="app-status" role="status">Setting up offline access…</p><p>Opening a daily puzzle saves a copy when storage is available. Use “Save this day offline” for unplayed puzzles too. Saves are browser-local, not account-synced; your browser may clear them.</p><div class="notice-actions"><button id="keep-downloads" type="button">Request persistent storage</button><button id="app-update" type="button" hidden>Update app</button></div><p id="storage-message" role="status"></p></section>
+  </main>
+  <footer>Made by <a href="https://seall.dev" target="_blank" rel="noreferrer">seall.dev</a> · <a href="/scattegories/">Scattergories original & attribution</a></footer>
+  <dialog id="install-help" aria-labelledby="install-heading"><h2 id="install-heading">Install the games app</h2><p>In Chrome or Edge, use the browser’s <strong>Install app</strong> menu. On iPhone or iPad, open this site in Safari, choose <strong>Share → Add to Home Screen</strong>, then open it from the new icon. On Mac, Safari offers <strong>File → Add to Dock</strong>.</p><p>Installation support depends on your browser. Download daily puzzles before going offline. Installing does not sync or transfer saves between browsers.</p><form method="dialog"><button>Close</button></form></dialog>
 </body>
 </html>

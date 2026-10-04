@@ -2,6 +2,10 @@
 <html lang="en" data-theme="light">
 <head>
   <script src="/assets/theme.js"></script>
+  <link rel="manifest" href="/app.webmanifest">
+  <link rel="apple-touch-icon" href="/assets/app-icon-192.png">
+  <meta name="theme-color" content="#f5f7fb">
+  <script src="/assets/app.js" defer></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NYT Mini Crossword — seall.dev</title>
@@ -13,7 +17,7 @@
   <!-- ===== HEADER ===== -->
   <header id="app-header">
     <div class="header-left">
-      <a href="/crossword/" class="back-link">&#8592; crosswords</a>
+      <a href="/" class="back-link">&#8592; daily games</a>
       <div class="puzzle-selector-wrap">
         <label for="puzzle-select">Puzzle:</label>
         <select id="puzzle-select" title="Select puzzle"></select>
@@ -152,11 +156,14 @@
   const NYT_API = 'https://nyt-crossword-proxy.my-account-306.workers.dev/nyt/mini';
 
   // Generate date IDs for the last N days
+  function localPuzzleDate(d = new Date()) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
   function recentDates(n) {
     const ids = [];
     const d = new Date();
     for (let i = 0; i < n; i++) {
-      ids.push(d.toISOString().slice(0, 10)); // YYYY-MM-DD
+      ids.push(localPuzzleDate(d)); // YYYY-MM-DD
       d.setDate(d.getDate() - 1);
     }
     return ids;
@@ -273,11 +280,8 @@
     },
 
     loadPuzzleList: async function() {
-      var archived = [];
-      try {
-        var res = await fetch('./puzzles/manifest.json');
-        if (res.ok) archived = await res.json();
-      } catch(e) {}
+      var daily = await import('/assets/daily.mjs');
+      var archived = await daily.loadManifest(daily.gameFor('mini'));
       var recent = recentDates(90);
       var all = [].concat(recent);
       archived.forEach(function(id) { if (all.indexOf(id) === -1) all.push(id); });
@@ -310,26 +314,15 @@
     },
 
     loadPuzzle: async function(id) {
-      var json;
-      if (window._nytArchived && window._nytArchived.has(id)) {
-        var parts = id.split('-');
-        var localUrl = './puzzles/' + parts[0] + '/' + parts[1] + '/' + id + '.json';
-        try {
-          var localRes = await fetch(localUrl);
-          if (localRes.ok) { json = await localRes.json(); return parseNYTPuzzle(json, id); }
-        } catch(e) {}
-      }
-      var res = await fetch(NYT_API + '/' + id);
-      if (!res.ok) throw new Error('NYT API returned ' + res.status);
-      json = await res.json();
-      return parseNYTPuzzle(json, id);
+      var daily = await import('/assets/daily.mjs');
+      return parseNYTPuzzle(await daily.loadPuzzle('mini', id, {api:NYT_API}), id);
     },
   };
 
   document.addEventListener('DOMContentLoaded', function() {
     var dp = document.getElementById('puzzle-date');
     if (!dp) return;
-    dp.max = new Date().toISOString().slice(0, 10);
+    dp.max = localPuzzleDate();
     dp.addEventListener('change', function() {
       if (this.value && typeof loadPuzzle === 'function') loadPuzzle(this.value);
     });
