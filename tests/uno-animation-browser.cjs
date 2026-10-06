@@ -1,0 +1,50 @@
+// Real iroh host and WebGL. Controlled deals and paused clocks are test-only:
+// screenshots sample the actual renderer's trajectories, never CSS stand-ins.
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright'),assert=require('node:assert/strict'),fs=require('node:fs');
+const out=process.env.SCREENSHOT_DIR||'/tmp/uno-animations';fs.mkdirSync(out,{recursive:true});
+(async()=>{const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,args:['--enable-unsafe-swiftshader']});let p;try{
+ const errors=[];p=await browser.newPage({viewport:{width:1024,height:900}});p.setDefaultTimeout(30000);p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept());
+ await p.goto((process.env.BASE_URL||'http://127.0.0.1:18764')+'/uno/');await p.evaluate(async()=>{
+  const {Room}=await import('./room.mjs'),{CardTable}=await import('./scene.mjs'),{TablePresentation}=await import('./presentation.mjs');
+  const open=Room.prototype.open;Room.prototype.open=function(...a){window.r=this;return open.apply(this,a);};
+  const update=CardTable.prototype.update;CardTable.prototype.update=function(...a){window.table=this;return update.apply(this,a);};
+  const next=TablePresentation.prototype.next;TablePresentation.prototype.next=function(...a){window.presenter=this;return next.apply(this,a);};
+  const bc=Room.prototype.broadcast;Room.prototype.broadcast=function(...a){const result=bc.apply(this,a);clearTimeout(this.botTimer);return result;};
+  window.freeze=()=>{clearTimeout(presenter.timer);clearTimeout(r.botTimer);clearTimeout(r.settleTimer);cancelAnimationFrame(table.frameId);table.frameId=0;};
+ });
+ async function shot(name){await p.screenshot({path:`${out}/${name}.png`});assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));}
+ await p.locator('#name').fill('Animation host');await p.locator('#create').click();await p.locator('#room').waitFor({state:'visible'});await p.locator('#add-bot').click();await p.locator('#add-bot').click();await p.locator('#start').click();
+ await p.waitForFunction(()=>window.table?.animations.some(a=>a.kind==='deal'));
+ const deal=await p.evaluate(()=>{freeze();const a=table.animations.filter(a=>a.kind==='deal'&&a.owner===r.self),start=a[0].startTime;table.lastTime=start+350;table.frame(start+350);return {count:a.length,delays:a.map(x=>x.startTime-start),duration:a[0].duration,visible:a.filter(x=>x.mesh.visible).length};});
+ assert.equal(deal.count,7);assert.equal(deal.duration,1000);assert(deal.delays.every((d,i)=>Math.abs(d-i*100)<15));assert(deal.visible>=3&&deal.visible<=4);await shot('opening-overlapping-flights');
+ async function fixture(value='5',actor=0,seats=3){await p.evaluate(async({value,actor,seats})=>{
+  freeze();presenter.reset();table.stop();const {createDeck}=await import('./engine.mjs'),{DEFAULT_RULES}=await import('./rules.mjs');const s=r.state;s.phase='lobby';while(s.players.length<seats)r.execute(r.self,{type:'bot'});s.players=s.players.slice(0,seats);
+  const deck=createDeck(),take=(colour,value)=>{const i=deck.findIndex(c=>c.colour===colour&&c.value===value);if(i<0)throw Error('bad test deal');return deck.splice(i,1)[0];};
+  s.players.forEach((q,i)=>{q.hand=[take(i===actor&&['wild','draw4'].includes(value)?'wild':'red',i===actor?value:String(i+1)),take('blue',String(i+1)),take('green',String(i+1))];q.unoCalled=false;q.ready=true;});
+  Object.assign(s,{deck,discard:[take('red','9')],colour:'red',phase:'playing',turn:actor,direction:1,debt:0,drawn:null,unoWindow:null,winner:null,lastPlayedBy:null,effects:null,rules:{...DEFAULT_RULES,sevenZero:['0','7'].includes(value)},round:s.round+1,notice:'Animation comparison deal'});s.revision++;r.actionTiming=null;r.broadcast();window.before=r.view;
+ },{value,actor,seats});await p.waitForFunction(()=>table.active&&document.body.dataset.presenting==='false');}
+ async function play(value,actor=0){await p.evaluate(({value,actor})=>{const q=r.state.players[actor];window.sourceSize=(actor===0?table.cards.get(q.hand[0].id):table.players.get(q.id).children.at(-1)).getWorldScale(new (table.camera.position.constructor)()).toArray();r.execute(q.id,{type:'play',cardId:q.hand[0].id,...(['wild','draw4'].includes(value)?{colour:'blue'}:{}),...(value==='7'?{target:r.state.players[(actor+1)%r.state.players.length].id}:{})},r.state.revision);r.broadcast();},{value,actor});await p.waitForFunction(()=>table.animations.some(a=>a.kind==='play'));}
+ async function samplePlay(name){const proof=await p.evaluate(()=>{freeze();const a=table.animations.find(a=>a.kind==='play'),scale=a.startScale.clone().multiply(a.mesh.parent.getWorldScale(a.startScale.clone()));const exact=scale.toArray().every((v,i)=>Math.abs(v-sourceSize[i])<.001);table.lastTime=a.startTime+a.duration*.55;table.frame(table.lastTime);return {exact,duration:a.duration,curved:!!a.curve,travel:a.start.distanceTo(a.target),inFlight:a.mesh.userData.flying};});assert(proof.exact&&proof.curved&&proof.inFlight&&proof.travel>1);assert.equal(proof.duration,500);await shot(name);}
+ async function stage(kind,phase){await p.evaluate(async({kind,phase})=>{freeze();const {presentationFrames}=await import('./presentation.mjs');const f=presentationFrames(before,r.view).find(f=>f.view.presentation.kind===kind&&(!phase||f.view.presentation.phase===phase));if(!f)throw Error('missing stage '+kind);presenter.render(f.view,true,false,true);freeze();const now=performance.now()+Math.min(500,f.duration*.5);table.lastTime=now;table.frame(now);},{kind,phase});}
+ for(const [w,h,theme]of [[1920,1080,'light'],[1024,900,'dark'],[390,844,'light'],[320,740,'dark']]){
+  await p.setViewportSize({width:w,height:h});await p.evaluate(t=>document.documentElement.dataset.theme=t,theme);
+  await fixture('5');if(w===1920){await p.locator('#draw').hover();await p.waitForFunction(()=>{const t=table.deck.children.at(-1);return t.position.z>t.userData.baseZ+.1;});await shot('deck-hover');await p.mouse.move(1,100);}await play('5');await samplePlay(`self-play-${w}`);
+  await fixture('5',1);await play('5',1);await samplePlay(`opponent-play-${w}`);
+  await fixture('5');await p.evaluate(()=>{r.execute(r.self,{type:'draw'},r.state.revision);r.broadcast();});await p.waitForFunction(()=>table.animations.some(a=>a.kind==='draw'));await p.evaluate(()=>{freeze();const a=table.animations.find(a=>a.kind==='draw');table.lastTime=a.startTime+a.duration*.5;table.frame(table.lastTime);});await shot(`normal-draw-${w}`);
+  for(const value of ['skip','reverse','draw2','draw4','wild','7','0']){await fixture(value);await play(value);await p.evaluate(()=>{freeze();const a=table.animations.find(a=>a.kind==='play');table.lastTime=a.startTime+a.duration;table.frame(table.lastTime);});await stage(['7','0'].includes(value)?value==='7'?'swap':'rotate':'cue',['7','0'].includes(value)?'select':undefined);assert(await p.evaluate(()=>table.effects.pulses.length>0));await shot(`cue-${value}-${w}`);
+   if(value==='7'||value==='0'){await stage(value==='7'?'swap':'rotate',value==='7'?'outbound':'flight');await shot(`transfer-${value}-${w}`);}
+  }
+  await fixture('5',0,8);await p.evaluate(()=>{freeze();table.frame(performance.now());});const b=await p.evaluate(()=>table.pileBounds);assert(Math.abs((b.left+b.right)/2-w/2)<6);await shot(`centred-eight-seats-${w}`);
+ }
+ // Real modal selection uses entrance + reversed exit; stale exits cannot
+ // close a newly opened chooser for a different turn/revision.
+ await fixture('wild');await p.locator('#hand .wild.symbol-wild').click();await p.locator('#choice').waitFor({state:'visible'});
+ await p.evaluate(()=>Promise.allSettled([...document.querySelectorAll('#choices button')].flatMap(b=>b.getAnimations()).map(a=>a.finished)));await shot('animated-colour-chooser');
+ await p.locator('#choices [data-colour="blue"]').click();await p.locator('#choice').waitFor({state:'hidden'});await p.waitForFunction(()=>r.state.colour==='blue'&&document.body.dataset.presenting==='false'&&r.view.revealMs<=0);
+ await fixture('wild');await p.locator('#hand .wild.symbol-wild').click();await p.locator('#choice').waitFor({state:'visible'});
+ await p.evaluate(()=>{document.querySelector('#choices [data-colour="blue"]').click();window.oldChoiceAnimations=[...document.querySelectorAll('#choices button')].flatMap(b=>b.getAnimations()).map(a=>a.finished.catch(()=>{}));});
+ await fixture('7');await p.locator('#choice').waitFor({state:'hidden'});await p.locator('#hand .red.symbol-7').click();await p.locator('#choice').waitFor({state:'visible'});await p.evaluate(()=>Promise.allSettled(oldChoiceAnimations));assert.match(await p.locator('#choice-title').textContent(),/Swap hands/);assert(await p.locator('#choice').isVisible());await shot('new-chooser-survives-stale-exit');await p.locator('#choice').getByRole('button',{name:'Cancel',exact:true}).click();await p.locator('#choice').waitFor({state:'hidden'});assert.equal(await p.evaluate(()=>r.state.players[0].hand.length),3);
+ // Reduced motion keeps the host's phases while removing all card flight.
+ await fixture('skip');await p.evaluate(()=>{table.reduced=true;const q=r.state.players[0];r.execute(q.id,{type:'play',cardId:q.hand[0].id},r.state.revision);r.broadcast();freeze();});assert.equal(await p.evaluate(()=>table.animations.length),0);await stage('cue');await shot('reduced-motion-cue');assert(await p.locator('#draw').isDisabled());
+ assert.deepEqual(errors,[]);await p.locator('#settings-toggle').click();await p.locator('#leave').click();await p.locator('#entry').waitFor({state:'visible'});console.log('PASS fast overlapping deal, size-preserving curved self/opponent tosses, draws, all action callouts, transfers, centred piles, deck hover, animated and stale-safe choices, reduced motion; four viewports; no browser errors');
+}catch(e){if(p){await p.screenshot({path:`${out}/failure.png`}).catch(()=>{});console.error('browser state',await p.locator('#error').textContent().catch(()=>'(unavailable)'));}throw e;}finally{await browser.close();}})().catch(e=>{console.error(e);process.exit(1);});

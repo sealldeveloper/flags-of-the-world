@@ -1,33 +1,42 @@
 // Ordered, recipient-private presentation of an already validated host action.
 // Game authority stays in the engine; animation never invents or submits moves.
-export const TIMING = Object.freeze({deal:400,draw:800,play:1100,select:1000,outbound:1000,pause:500,inbound:1000,rotate:1500,settle:600,jump:1500,unoCall:3000,unoCatch:5000});
+export const TIMING = Object.freeze({deal:100,dealFlight:1000,draw:1100,play:600,reflow:450,cue:1600,select:1000,outbound:1000,pause:500,inbound:1000,rotate:1500,settle:250,jump:1500,unoCall:3000,unoCatch:5000});
+export const dealDuration = count => Math.max(0,count-1)*TIMING.deal+TIMING.dealFlight;
+export function playCue(event) {
+  const value=event.card.value,colour=event.colour;
+  if(['skip','reverse','draw2','draw4'].includes(value))return {kind:value,colour};
+  if(value==='wild')return {kind:'colour',colour};
+  return null;
+}
 export function effectDuration(effects) {
-  return (effects?.events || []).reduce((ms,e)=>ms+(e.kind==='deal'?e.count*TIMING.deal:e.kind==='draw'?e.count*TIMING.draw:e.kind==='play'?TIMING.play:e.kind==='swap'?TIMING.select+TIMING.outbound+TIMING.pause+TIMING.inbound+TIMING.settle:e.kind==='rotate'?TIMING.select+TIMING.rotate+TIMING.settle:0),TIMING.settle);
+  return (effects?.events || []).reduce((ms,e)=>ms+(e.kind==='deal'?dealDuration(e.count):e.kind==='draw'?e.count*TIMING.draw:e.kind==='play'?TIMING.play+(playCue(e)?TIMING.cue:0):e.kind==='swap'?TIMING.select+TIMING.outbound+TIMING.pause+TIMING.inbound+TIMING.settle:e.kind==='rotate'?TIMING.select+TIMING.rotate+TIMING.settle:0),TIMING.settle);
 }
 export function presentationFrames(previous,next,reduced=false) {
   const hold=()=>next.phase==='playing'&&next.revealMs>0?[{duration:next.revealMs,view:{...next,presentation:{kind:'wait'},legal:[]}}]:[];
   if (!previous || previous.self!==next.self || !next.effects || (previous.round===next.round&&previous.effects?.revision===next.effects.revision)) return hold();
   const dealing=next.effects.events.some(e=>e.kind==='deal');
   if(!dealing&&(previous.phase!=='playing'||previous.round!==next.round))return hold();
-  let hand=dealing?[]:previous.hand.map(c=>({...c})), top=dealing?next.top:previous.top, colour=dealing?next.colour:previous.colour;
+  let hand=dealing?[]:previous.hand.map(c=>({...c})), top=dealing?next.top:previous.top, colour=dealing?next.colour:previous.colour, debt=dealing?0:previous.debt,actor=dealing?next.turn:previous.turn,direction=dealing?next.direction:previous.direction;
   const counts=new Map(previous.players.map(p=>[p.id,dealing?0:p.count])), frames=[];
-  const stage=(presentation,duration)=>frames.push({duration,view:{...next,phase:'playing',turn:presentation.player||presentation.from||next.turn,winner:null,top,colour,hand:hand.map(c=>({...c})),players:next.players.map(p=>({...p,count:counts.get(p.id)??p.count})),legal:[],drawn:null,presentation}});
+  const stage=(presentation,duration)=>frames.push({duration,view:{...next,phase:'playing',turn:presentation.player||presentation.from||actor,direction,winner:null,top,colour,debt,hand:hand.map(c=>({...c})),players:next.players.map(p=>({...p,count:counts.get(p.id)??p.count})),legal:[],drawn:null,presentation}});
   for(const e of (next.effects.events||[]).slice(0,8)) {
     if(e.kind==='deal') {
-      for(let i=1;i<=e.count;i++) {
-        hand=next.hand.slice(0,i);next.players.forEach(p=>counts.set(p.id,i));
-        stage({kind:'deal',step:i,total:e.count},TIMING.deal);
-      }
+      hand=next.hand.map(c=>({...c}));next.players.forEach(p=>counts.set(p.id,p.count));
+      stage({kind:'deal',total:e.count},dealDuration(e.count));
     } else if(e.kind==='draw') {
+      debt=0;actor=e.player;
       for(let i=0;i<Math.min(108,e.count);i++) {
         if(e.player===next.self&&e.cards?.[i])hand.push({...e.cards[i]});
         counts.set(e.player,(counts.get(e.player)||0)+1);
         stage({kind:'draw',player:e.player,step:i+1,total:e.count},TIMING.draw);
       }
     } else if(e.kind==='play') {
+      actor=e.player;
       if(e.player===next.self)hand=hand.filter(c=>c.id!==e.card.id);
-      counts.set(e.player,Math.max(0,(counts.get(e.player)||0)-1));top=e.card;colour=e.colour;
+      counts.set(e.player,Math.max(0,(counts.get(e.player)||0)-1));top=e.card;colour=e.card.colour==='wild'?'wild':e.colour;
       stage({kind:'play',player:e.player},TIMING.play);
+      colour=e.colour;debt=next.debt;direction=next.direction;
+      const cue=playCue(e);if(cue)stage({kind:'cue',cue,player:e.player},TIMING.cue);
     } else if(e.kind==='swap') {
       for(const phase of ['select','outbound','pause','inbound'])stage({kind:'swap',from:e.from,to:e.to,phase},TIMING[phase]);
       const from=counts.get(e.from);counts.set(e.from,counts.get(e.to));counts.set(e.to,from);

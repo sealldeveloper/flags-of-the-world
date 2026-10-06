@@ -60,7 +60,7 @@ theme(localStorage.getItem('xw-theme') || 'light');
 $('theme').onclick = () => theme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
 $('credits').onclick = () => { $('settings-panel').close(); $('credits-dialog').showModal(); };
 $('credits-dialog').addEventListener('close',()=>$('settings-toggle').focus());
-function motion(enabled){localStorage.setItem('uno-motion',enabled?'on':'off');if(table3d)table3d.reduced=!enabled;$('motion').textContent=`Motion: ${enabled?'on':'off'}`;$('motion').setAttribute('aria-pressed',String(enabled));}
+function motion(enabled){document.body.dataset.motion=enabled?'on':'off';localStorage.setItem('uno-motion',enabled?'on':'off');if(table3d)table3d.reduced=!enabled;$('motion').textContent=`Motion: ${enabled?'on':'off'}`;$('motion').setAttribute('aria-pressed',String(enabled));}
 motion(localStorage.getItem('uno-motion')==='on'||(localStorage.getItem('uno-motion')!=='off'&&!matchMedia('(prefers-reduced-motion: reduce)').matches));
 $('motion').onclick=()=>motion($('motion').getAttribute('aria-pressed')!=='true');
 $('name').value = localStorage.getItem('uno-name') || '';
@@ -172,7 +172,7 @@ function makeCard(c, interactive = false) {
 }
 function render(v, connected = true, waiting = false, presenting = false) {
   if (!v) return;
-  const previousRevision = view?.revision;
+  const previousRevision = view?.revision, previousDebt=view?.debt;
   const enteringGame = view?.phase !== 'playing' && v.phase === 'playing';
   view = v; online = connected; pending = waiting; animating=presenting;
   document.body.classList.add('in-room'); $('history-toggle').hidden=false;
@@ -261,11 +261,12 @@ function render(v, connected = true, waiting = false, presenting = false) {
   $('direction-orbit').classList.toggle('reversed', v.direction === -1);
   $('self-name').textContent = `${me.name} · your hand`;
   const name=id=>v.players.find(p=>p.id===id)?.name||'Player',effect=v.presentation;
-  $('notice').textContent = effect?.kind==='deal'?`Dealing card ${effect.step} of 7…`:effect?.kind==='play'?`${name(effect.player)} plays ${cardLabel(v.top)}…`:effect?.kind==='settle'?'Letting the cards settle…':!animating&&v.unoWindow?`${name(v.unoWindow.player)}: call UNO!${v.unoCatchable?' Others can now catch a missed call for +2.':''}`:effect?.kind==='draw'?`${name(effect.player)} draws a card (${effect.step}).`:effect?.kind==='swap'?`${name(effect.from)} → ${name(effect.to)} · ${effect.phase==='select'?'Selected for a hand swap':effect.phase==='pause'?'Returning the other hand next…':'Swapping hands…'}`:effect?.kind==='rotate'?`All hands pass ${effect.direction===1?'clockwise':'counterclockwise'}${effect.phase==='select'?' — get ready.':'…'}`:jumpWindow?'Jump-in window — match the colour and number.':v.autoDraw?`${current.name} ${v.debt?`draws ${v.debt} automatically`:'has no playable card — drawing automatically'}.`:v.notice;
+  $('notice').textContent = effect?.kind==='deal'?'Dealing seven cards — quick opening deal…':effect?.kind==='cue'?v.notice:effect?.kind==='play'?`${name(effect.player)} plays ${cardLabel(v.top)}…`:effect?.kind==='settle'?'Letting the cards settle…':!animating&&v.unoWindow?`${name(v.unoWindow.player)}: call UNO!${v.unoCatchable?' Others can now catch a missed call for +2.':''}`:effect?.kind==='draw'?`${name(effect.player)} draws a card (${effect.step}).`:effect?.kind==='swap'?`${name(effect.from)} → ${name(effect.to)} · ${effect.phase==='select'?'Selected for a hand swap':effect.phase==='pause'?'Returning the other hand next…':'Swapping hands…'}`:effect?.kind==='rotate'?`All hands pass ${effect.direction===1?'clockwise':'counterclockwise'}${effect.phase==='select'?' — get ready.':'…'}`:jumpWindow?'Jump-in window — match the colour and number.':v.autoDraw?`${current.name} ${v.debt?`draws ${v.debt} automatically`:'has no playable card — drawing automatically'}.`:v.notice;
   $('discard').replaceChildren(...(v.top ? [makeCard(v.top)] : []));
-  $('current-colour').textContent = `${current?.name||'Player'}'s turn`;
+  $('current-colour').textContent = v.players.length>=4?`Turn: ${v.players.indexOf(current)+1}`:`${current?.name||'Player'}'s turn`;
   $('current-colour').setAttribute('aria-label',`${current?.name||'Player'}'s turn. Current colour: ${v.colour}.`);
   $('debt').textContent = v.debt ? `+${v.debt} cards` : '';
+  if(v.debt&&v.debt!==previousDebt&&document.body.dataset.motion==='on')$('debt').animate([{transform:'translateY(12px) scale(.4)',opacity:0},{transform:'translateY(0) scale(1.15)',opacity:1,offset:.7},{transform:'translateY(0) scale(1)',opacity:1}],{duration:400,easing:'ease-out'});
   $('draw').disabled = !turn || !!v.drawn || v.autoDraw;
   $('draw').textContent = v.autoDraw?(v.debt?`Drawing ${v.debt} automatically`:'Drawing automatically'):v.debt ? `Draw ${v.debt} cards` : v.rules.drawUntilPlayable ? 'Draw until playable' : 'Draw a card';
   $('drawn-decision').hidden = !v.drawn || animating || !online;
@@ -297,7 +298,15 @@ function render(v, connected = true, waiting = false, presenting = false) {
 }
 async function choose(title, options) {
   $('choice-title').textContent = title; $('choices').replaceChildren();
-  for (const [value,label] of options) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; if (COLOURS.includes(value)) button.dataset.colour = value; button.onclick = () => $('choice').close(value); $('choices').append(button); }
+  let closing=false;
+  const close=async value=>{
+    if(closing)return;closing=true;
+    const buttons=[...$('choices').children],first=buttons[0];buttons.forEach(b=>b.disabled=true);
+    if(document.body.dataset.motion==='on')await Promise.allSettled(buttons.map((b,i)=>b.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.4)'}],{duration:300,delay:(buttons.length-i-1)*50,easing:'ease-in',fill:'forwards'}).finished));
+    // A stale-turn cancellation or a newer chooser must never be closed by this one.
+    if($('choice').open&&$('choices').firstElementChild===first)$('choice').close(value);
+  };
+  for (const [value,label] of options) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.style.setProperty('--choice-delay',`${$('choices').children.length*50}ms`); if (COLOURS.includes(value)) button.dataset.colour = value; button.onclick = () => close(value); $('choices').append(button); }
   $('choice').returnValue = ''; $('choice').showModal();
   return new Promise(resolve => $('choice').addEventListener('close', () => resolve($('choice').returnValue), {once:true}));
 }

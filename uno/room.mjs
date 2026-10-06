@@ -28,7 +28,7 @@ export class Room {
     }, 8000);
     if (this.isHost) {
       this.self = token(); this.state = newRoom({id:this.self, name:this.name});
-      this.ticket = {v:2, ...this.transport.address(), room:token(), secret:token()};
+      this.ticket = {v:3, ...this.transport.address(), room:token(), secret:token()};
       decodeTicket(encodeTicket(this.ticket));
       this.onStatus('Hosting · iroh connected'); this.broadcast();
     } else {
@@ -62,7 +62,7 @@ export class Room {
     this.retryTimer = setTimeout(() => this.dial(), 500 * 2 ** this.retry);
   }
   send(id, message) {
-    try { this.transport.send(id, {v:2, room:this.ticket?.room, ...message}); }
+    try { this.transport.send(id, {v:3, room:this.ticket?.room, ...message}); }
     catch { this.transport.disconnect(id); }
   }
   ping(id,p) {
@@ -111,7 +111,7 @@ export class Room {
       } else if (e.connection === this.connection) this.reconnect();
     } else if (e.kind === 'message') {
       let m;
-      try { m = JSON.parse(e.data); if (!m || m.v !== 2 || m.room !== this.ticket.room || typeof m.type !== 'string') throw new Error(); }
+      try { m = JSON.parse(e.data); if (!m || m.v !== 3 || m.room !== this.ticket.room || typeof m.type !== 'string') throw new Error(); }
       catch { this.transport.disconnect(e.connection); return; }
       if (this.isHost) this.hostMessage(e.connection, m);
       else if (e.connection === this.connection) this.guestMessage(m);

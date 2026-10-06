@@ -7,7 +7,7 @@ import {validateAvatar,AVATAR_PATTERNS,avatarHex} from '../uno/profiles.mjs';
 function fixture(){const s=newRoom({id:'h',name:'Host'});for(const id of ['g','z'])s.players.push({id,name:id,ready:true,connected:true,bot:false,hand:[]});const d=createDeck(),take=(colour,value)=>d.splice(d.findIndex(c=>c.colour===colour&&c.value===value),1)[0];s.players[0].hand=[take('red','4'),take('blue','1')];s.players[1].hand=[take('red','4'),take('blue','4'),take('green','2')];s.players[2].hand=[take('green','3'),take('blue','3')];s.discard=[take('red','5')];Object.assign(s,{phase:'playing',round:1,colour:'red',deck:d});const r=new Room({onView:()=>{},onStatus:()=>{},onError:()=>{}});r.state=s;r.self='h';return {s,r};}
 test('only host can force start, readiness bypass does not bypass connection/minimum/phase gates',()=>{
  const {s,r}=fixture();s.phase='lobby';s.players[1].ready=false;assert.throws(()=>r.execute('h',{type:'start'}));assert.throws(()=>r.execute('g',{type:'start',force:true}));s.players[1].connected=false;assert.throws(()=>r.execute('h',{type:'start',force:true}));s.players[1].connected=true;
- r.execute('h',{type:'start',force:true});assert.equal(s.phase,'playing');assert(s.players.every(p=>p.hand.length===7));assert(r.timing().revealMs>3000);assert.throws(()=>r.execute('h',{type:'start',force:true}));assert.throws(()=>r.execute('h',{type:'draw'},s.revision),/moving/);
+ r.execute('h',{type:'start',force:true});assert.equal(s.phase,'playing');assert(s.players.every(p=>p.hand.length===7));assert(r.timing().revealMs>effectDuration(r.state.effects)-100&&r.timing().revealMs<=effectDuration(r.state.effects));assert.throws(()=>r.execute('h',{type:'start',force:true}));assert.throws(()=>r.execute('h',{type:'draw'},s.revision),/moving/);
  const single=fixture();single.s.phase='lobby';single.s.players.length=1;assert.throws(()=>single.r.execute('h',{type:'start',force:true}));
 });
 test('second-last play keeps the actor turn; call then advances; all other actions are blocked',()=>{
@@ -30,8 +30,8 @@ test('jump-in is exact colour AND value, including after a UNO window, never arb
 });
 test('deal/play/draw presentation duration equals host lock, including reduced motion',()=>{
  const {s,r}=fixture();s.phase='lobby';const previous=viewFor(s,'h');r.execute('h',{type:'start'});const next=r.snapshotFor('h');
- for(const reduced of [false,true]){const frames=presentationFrames(previous,next,reduced);assert.equal(frames.reduce((n,f)=>n+f.duration,0),effectDuration(s.effects));assert.deepEqual(frames.slice(0,7).map(f=>f.view.hand.length),[1,2,3,4,5,6,7]);assert(frames.every(f=>f.view.legal.length===0));}
- assert(TIMING.play>=1000&&TIMING.draw>=700&&TIMING.rotate>=1400);
+ for(const reduced of [false,true]){const frames=presentationFrames(previous,next,reduced);assert.equal(frames.reduce((n,f)=>n+f.duration,0),effectDuration(s.effects));assert.equal(frames[0].view.presentation.kind,'deal');assert.equal(frames[0].view.hand.length,7);assert.equal(frames[0].duration,6*TIMING.deal+TIMING.dealFlight);assert(frames[0].duration<2000);assert(frames.every(f=>f.view.legal.length===0));}
+ assert(TIMING.play>=500&&TIMING.draw>=700&&TIMING.rotate>=1400&&TIMING.deal===100);
 });
 test('custom colour is strict 6-digit hex or a legacy preset; pattern remains allowlisted',()=>{
  assert.deepEqual(validateAvatar({colour:'#A1B2C3',pattern:'hearts'}),{colour:'#a1b2c3',pattern:'hearts'});assert.equal(avatarHex('orange'),'#ff3b00');assert.equal(AVATAR_PATTERNS.length,12);

@@ -12,7 +12,7 @@ test('0 presents every private hand rotation in both directions, for 2–8 seats
   for(let i=0;i<n;i++){
    const next=viewFor(s,s.players[i].id),frames=presentationFrames(before[i],next);
    assert.deepEqual(frames.map(f=>f.view.presentation.phase||f.view.presentation.kind),['play','select','flight','settle','settle']);
-   assert.equal(frames[1].view.presentation.direction,direction);assert.equal(frames[2].duration,TIMING.rotate);
+   assert.equal(frames[1].view.presentation.direction,direction);assert.equal(frames[2].duration,TIMING.rotate);assert(frames.every(f=>f.view.turn==='a'),'retain the zero player through the complete transfer and settle');
    assert.equal(effectDuration(next.effects),frames.reduce((ms,f)=>ms+f.duration,0));
    const old=before[i].hand.filter(c=>c.id!=='zero');assert.deepEqual(frames[2].view.hand,old);
    assert.deepEqual(frames[3].view.hand,next.hand);assert(next.players.every(p=>!('hand' in p)));

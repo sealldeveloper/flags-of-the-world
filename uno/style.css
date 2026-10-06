@@ -72,7 +72,9 @@ footer{max-width:1560px;margin:auto;padding:0 20px calc(20px + env(safe-area-ins
  .in-game #table-status{width:min(520px,60vw)}
 }
 .crowded-table .in-game #table-status{width:min(320px,26vw)}
+.in-game .seat-name{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .crowded-table #current-colour{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media(max-width:600px){.dense-table .in-game .notice{max-height:2.8em}.crowded-table .in-game #notice{display:none}}
 @media(max-width:400px){.playing .site-header{flex-wrap:nowrap;gap:4px}.playing .header-tools{gap:4px}.playing .site-header>a,.playing .site-header button{font-size:.6rem;padding:4px 6px;white-space:nowrap}}
 .in-room #puzzles-link{display:none}
 .icon-button{display:inline-flex;align-items:center;justify-content:center;width:44px;min-height:44px;padding:10px;flex-shrink:0}
@@ -88,4 +90,9 @@ footer{max-width:1560px;margin:auto;padding:0 20px calc(20px + env(safe-area-ins
 #action-history{list-style:none;margin:0;padding:0;max-height:55dvh;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
 #action-history li{padding:12px 4px;border-top:1px solid var(--border);overflow-wrap:anywhere}
 #action-history p{margin:4px 0 0}.history-round{color:var(--muted);font-size:.72rem;font-weight:600}
+body[data-motion="on"] .in-game:is([data-effect="play"],[data-effect="draw"],[data-effect="deal"]) #table-status{opacity:0}
+@keyframes choice-pop{from{opacity:0;transform:translateY(12px) scale(.65)}70%{opacity:1;transform:translateY(0) scale(1.04)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes result-pop{from{opacity:0;transform:translateY(20px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+body[data-motion="on"] #choice[open] .choices button{animation:choice-pop 300ms both!important;animation-delay:var(--choice-delay,0ms)!important}
+body[data-motion="on"] #round-result[open]{animation:result-pop 300ms ease-out both!important}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
