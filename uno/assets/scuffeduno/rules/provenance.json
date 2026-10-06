@@ -1,0 +1,45 @@
+{
+  "description": "Original ScuffedUNO rule-selector artwork. Permission to redistribute is unverified; local preview only.",
+  "files": [
+    {
+      "file": "stacking.png",
+      "url": "https://scuffeduno.online/img/stacking.11fb6c80.png",
+      "bytes": 206771,
+      "sha256": "22cbc1c5307b39c317edabea6568a66cc6a2e9aca8bc02c58f1a94c0b4920bb5",
+      "retrievedAt": "2026-10-04T02:28:28.877301+00:00",
+      "modifications": "None"
+    },
+    {
+      "file": "force-play.png",
+      "url": "https://scuffeduno.online/img/force-play.a8ad5d25.png",
+      "bytes": 47593,
+      "sha256": "c5a5b390f81d453722b44caea26205f747432d00cd1eb6d6b23a1610d6ed6d75",
+      "retrievedAt": "2026-10-04T02:28:28.917333+00:00",
+      "modifications": "None"
+    },
+    {
+      "file": "draw-to-play.png",
+      "url": "https://scuffeduno.online/img/draw-to-play.682fac45.png",
+      "bytes": 74480,
+      "sha256": "45f750ded8d1825d5c814f6cbf797f8d90d7ac34ad7b5be48271d58f1ec675aa",
+      "retrievedAt": "2026-10-04T02:28:29.076682+00:00",
+      "modifications": "None"
+    },
+    {
+      "file": "jump-in.png",
+      "url": "https://scuffeduno.online/img/jump-in.e8bb45bc.png",
+      "bytes": 68685,
+      "sha256": "9c7b0a9ce1239d3a3515658a447aed11afcf7973bc23691e3a410eed94f8597d",
+      "retrievedAt": "2026-10-04T02:28:29.119707+00:00",
+      "modifications": "None"
+    },
+    {
+      "file": "seven-zero.png",
+      "url": "https://scuffeduno.online/img/seven0.d518bf01.png",
+      "bytes": 81701,
+      "sha256": "273b1faec9e9a68e63dc251c62638b6a3268fb52401b537ea05017fac4891fc9",
+      "retrievedAt": "2026-10-04T02:28:29.280553+00:00",
+      "modifications": "None"
+    }
+  ]
+}

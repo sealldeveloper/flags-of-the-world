@@ -1,0 +1,10 @@
+{
+  "package": "qrcode-generator",
+  "version": "2.0.4",
+  "source": "https://registry.npmjs.org/qrcode-generator/-/qrcode-generator-2.0.4.tgz",
+  "licenseSource": "https://raw.githubusercontent.com/kazuhikoarase/qrcode-generator/master/LICENSE",
+  "files": {
+    "qrcode.mjs": "ea91d7118a5395289170da848b7c6758b996163bfbccf312591ab65a4911b7c0",
+    "LICENSE": "3a850fa5f08101db6f40676c2786e10bd2cd5fff7b12ffdf1e0c434d4e49d90c"
+  }
+}

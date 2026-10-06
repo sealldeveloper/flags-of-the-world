@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="A private, browser-hosted card table using iroh peer connections.">
+  <title>Scuffed UNO · iroh port — seall.dev</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js"}}</script>
+</head>
+<body>
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div id="scene-loading" role="status" hidden>Loading 3D table…</div>
+  <header class="site-header"><a href="../">← puzzles</a><strong>Scuffed UNO <span class="tag">iroh port · local preview</span></strong><div class="header-tools"><button id="credits" type="button">Credits</button><button id="theme" type="button" aria-label="Switch colour theme">Dark theme</button></div></header>
+  <main>
+    <div class="status-row"><span id="connection" role="status">Not connected</span><button id="leave" type="button" hidden>Leave room</button></div>
+    <p id="error" class="error" role="alert" hidden></p>
+    <section id="entry" class="panel">
+      <div class="entry-hero">
+        <img class="game-logo" src="./assets/scuffeduno/logo-iroh-edition.svg" alt="ScuffedUNO — IROH EDITION">
+        <p class="creator-line">Original game by <a href="https://freddienelson.co.uk/" target="_blank" rel="noopener noreferrer">Freddie Nelson</a></p>
+        <h1>Your friends. Your rules.</h1>
+        <p>2–8 players · Private group lobbies · Bots</p>
+        <span class="network-badge">Connected by iroh. Hosted by you.</span>
+      </div>
+      <form id="entry-form">
+        <h2>Let's play!</h2>
+        <label for="name">Your name</label><input id="name" maxlength="32" autocomplete="nickname" placeholder="Display name" required>
+        <div class="entry-actions"><button id="create" class="primary" type="submit">Create group lobby</button><button id="resume" type="button" hidden>Rejoin previous lobby</button></div>
+        <div class="join-block"><label for="invite-input">Have an invite?</label><textarea id="invite-input" rows="3" maxlength="4096" spellcheck="false" placeholder="Paste an invite link or ticket"></textarea><button id="join" type="button">Join group lobby</button></div>
+      </form>
+      <aside class="credits-panel" aria-labelledby="creator-heading">
+        <p class="credits-kicker">Full credit to the original creator</p>
+        <h2 id="creator-heading">ScuffedUNO was created by <a href="https://freddienelson.co.uk/" target="_blank" rel="noopener noreferrer">Freddie Nelson</a>.</h2>
+        <p>This <strong>IROH EDITION</strong> is an unofficial networking adaptation using ScuffedUNO’s classic artwork and following its 3D presentation. Credit for the original game and assets belongs to its creator and original contributors—not this port.</p>
+        <a class="original-link" href="https://scuffeduno.online/" target="_blank" rel="noopener noreferrer">Play the original ScuffedUNO ↗</a>
+      </aside>
+      <p class="fine">The host's browser runs the room and must stay open. Browser traffic is encrypted through public iroh relays. The host is trusted with the deck and hands. Unofficial iroh port using ScuffedUNO's classic artwork. No accounts or original game servers.</p>
+    </section>
+    <section id="room" hidden>
+      <div class="room-heading"><div><p class="eyebrow" id="room-label">Private lobby</p><h1 id="phase-title">Waiting for players</h1></div><div class="room-actions"><button id="show-results" type="button" hidden>Round results</button><button id="copy-invite" type="button">Copy link</button><button id="show-invite" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="invite-panel">Share lobby</button></div></div>
+      <div class="room-grid">
+        <section class="panel" id="rules-panel">
+          <h2 id="lobby-name" class="lobby-name">Your room</h2>
+          <p class="lobby-count">Players <strong id="seat-count">1 / 8</strong></p>
+          <p class="lobby-private">Private · iroh</p>
+          <h3 class="rules-title">Rules <small id="rules-instruction">(click to toggle)</small></h3>
+          <div id="rule-toggles" role="group" aria-label="Game options"></div>
+          <div class="controls lobby-controls"><button id="ready" type="button">Ready</button><button id="start" class="primary" type="button">Start Game</button></div>
+          <p class="fine" id="lobby-help"></p>
+          <p class="fine">Rule changes reset guest readiness. Settings are locked during a round.</p>
+          <details><summary>Rule details &amp; how to play</summary><dl id="rule-descriptions"></dl><p>Click or tap a matching card to play it immediately. Click the deck to draw instead, or let a no-choice turn draw automatically. A wild opens the colour picker; a 7 opens the swap picker when that rule is enabled. Use Play / Keep above a playable drawn card. Force Play removes Keep. Keyboard: Tab to a card or the deck, then Enter or Space. Each house rule is independent. Draw penalties are automatic unless you can stack another matching draw card; then choose the stack or click the deck to take the penalty. Paying a penalty consumes your turn. Draw till playable stops at the first playable draw, not when an older card in your hand matches.</p><p>Outside a +4 stack, Wild +4 is legal only when you hold no card of the current colour. Jump-ins require the exact colour and number. A short window after the played-card animation gives other players time to jump in before the next normal action. No jump-ins during draw penalties or drawn-card choices. No bluffing/challenges or missed-UNO penalties in this preview. Press UNO with one card, or arm it before playing from two cards. Calls are shared with the room; bots call automatically. A swap or rotation requires a fresh call. Two-player Reverse skips the other player. Empty your hand to win.</p><p>With 7–0 enabled, hand swaps and rotations resolve before checking for a winner. New rounds begin with the host and a number card.</p></details></section>
+        <section class="panel seats-panel" aria-labelledby="players-heading"><div class="seats-heading"><h2 id="players-heading">Players</h2><button id="edit-profile" type="button" aria-haspopup="dialog">Your profile</button></div><div id="players-home"><ul id="players" role="list"></ul><button id="add-bot" type="button"><span aria-hidden="true">+</span>Add Bot</button></div></section>
+      </div>
+      <section id="table" class="panel table" hidden aria-label="Card table">
+        <div id="opponent-zone"></div>
+        <div class="table-heading"><h2 id="turn-label">Your turn</h2></div>
+        <div id="table-status"><span id="current-colour" class="colour-label"></span><span id="direction"></span><p id="notice" class="notice" aria-live="polite"></p></div>
+        <svg id="swap-arrow" aria-hidden="true" hidden><defs><marker id="swap-tip" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#ffdf74"/></marker></defs><path id="swap-path" fill="none" stroke="#ffdf74" stroke-width="4" marker-end="url(#swap-tip)"/><g id="rotate-paths" fill="none" stroke="#ffdf74" stroke-width="4" marker-end="url(#swap-tip)"></g></svg>
+        <div class="pile-area"><div id="direction-orbit" aria-hidden="true"><span>➜</span><span>➜</span></div><div><span class="pile-label">Discard</span><div id="discard"></div></div><div class="draw-area"><span id="debt"></span><button id="draw" type="button">Draw a card</button></div></div>
+        <div id="drawn-decision" role="group" aria-label="Play or keep the drawn card" hidden><button id="drawn-play" class="primary" type="button">Play</button><button id="pass" type="button">Keep</button></div>
+        <div id="uno-controls"><button id="call-uno" type="button" aria-pressed="false" title="Call UNO with one card, or arm it before playing from two cards">UNO!</button></div>
+        <div class="hand-heading"><h2><span id="self-name">Your hand</span> <span id="hand-count"></span></h2><span id="hand-help" class="muted">Tap a card to play. Tap the deck to draw.</span></div>
+        <div id="hand" class="hand" role="group" aria-label="Your cards"></div>
+      </section>
+    </section>
+    <dialog id="round-result" aria-labelledby="result-title" aria-describedby="result-summary">
+      <p class="credits-kicker" id="result-round"></p>
+      <h2 id="result-title"></h2>
+      <p id="result-summary"></p>
+      <ul id="result-players" aria-label="Cards remaining"></ul>
+      <p id="result-help" class="fine"></p>
+      <div class="dialog-actions"><button id="result-rematch" class="primary" type="button">Play again</button><button id="result-close" type="button">Back to lobby</button></div>
+    </dialog>
+    <dialog id="credits-dialog" aria-labelledby="credits-dialog-title"><form method="dialog">
+      <p class="credits-kicker">Full credit to the original creator</p>
+      <h2 id="credits-dialog-title">ScuffedUNO by Freddie Nelson</h2>
+      <p>The original game was created by <a href="https://freddienelson.co.uk/" target="_blank" rel="noopener noreferrer">Freddie Nelson</a>. The game’s classic artwork is reused here with credit to its creator and original contributors.</p>
+      <p><strong>IROH EDITION</strong> is an unofficial networking adaptation. It is not an official ScuffedUNO release or an endorsement by the original creator.</p>
+      <p><a href="https://scuffeduno.online/" target="_blank" rel="noopener noreferrer">Play the original ScuffedUNO ↗</a></p>
+      <button type="submit">Back to the game</button>
+    </form></dialog>
+    <dialog id="profile-dialog" aria-labelledby="profile-title">
+      <form id="profile-form">
+        <h2 id="profile-title">Your lobby profile</h2>
+        <fieldset id="profile-fields" class="profile-fields">
+          <div class="profile-identity"><span id="profile-preview" class="seat-avatar" aria-hidden="true"></span><div><label for="profile-name">Display name</label><input id="profile-name" maxlength="32" autocomplete="nickname" required><span id="profile-preview-name" class="fine"></span></div></div>
+          <fieldset class="avatar-field"><legend>Pattern</legend><div id="avatar-patterns" class="avatar-options"></div></fieldset>
+          <fieldset class="avatar-field"><legend>Colour</legend><div id="avatar-colours" class="avatar-options"></div></fieldset>
+        </fieldset>
+        <p id="profile-error" class="form-error" role="alert"></p>
+        <div class="dialog-actions"><button id="profile-save" class="primary" type="submit">Save profile</button><button id="profile-cancel" type="button">Cancel</button></div>
+        <p class="fine">Your name and avatar are shared with this lobby. Change them between rounds—no account needed.</p>
+      </form>
+    </dialog>
+    <dialog id="invite-panel" aria-labelledby="invite-title">
+      <h2 id="invite-title">Share your iroh lobby</h2>
+      <p class="fine">This link contains the host’s iroh address and a private room key. Share only with your group. Keep the host tab open; new players join between rounds.</p>
+      <p id="local-invite-warning" class="local-warning" hidden>This local preview link only works on this computer. Phones and other computers need the game at a shared HTTPS address.</p>
+      <label for="invite-output">Private invite link</label><textarea id="invite-output" rows="3" readonly spellcheck="false"></textarea>
+      <p id="share-status" class="fine" role="status"></p>
+      <div class="dialog-actions"><button id="copy-link" class="primary" type="button">Copy link</button><button id="native-share" type="button" hidden>Share…</button><button id="toggle-qr" type="button" aria-expanded="false" aria-controls="invite-qr">Show QR code</button></div>
+      <div id="invite-qr" hidden><img id="qr-image" alt="QR code for this private iroh lobby invite"><p id="qr-status" class="fine" role="status"></p></div>
+      <button id="close-invite" class="dialog-close" type="button">Done</button>
+    </dialog>
+    <dialog id="choice" aria-labelledby="choice-title"><form method="dialog"><h2 id="choice-title">Choose a colour</h2><div id="choices" class="choices"></div><button value="cancel" type="submit">Cancel</button></form></dialog>
+  </main>
+  <footer>Static site · Browser-hosted · iroh only · Keep the host tab in the foreground on mobile.</footer>
+  <noscript>This game needs JavaScript and WebAssembly enabled.</noscript>
+  <script type="module" src="./ui.mjs"></script>
+</body>
+</html>

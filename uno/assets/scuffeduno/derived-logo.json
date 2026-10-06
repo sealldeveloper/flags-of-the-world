@@ -1,0 +1,10 @@
+{
+  "file": "logo-iroh-edition.svg",
+  "sha256": "723c7c7a88a3b3654428d8c88bd8b5519eb779d85cfa234dab9e10c944d7cdb6",
+  "source": "logo.webp",
+  "source_sha256": "0f00577792db6c57125c21b24b2ec24d22a0abdb49b97f327c588481d77d6b88",
+  "modification": "Unmodified upstream logo embedded beside a new IROH EDITION badge. Text uses locally outlined Poppins SemiBold glyphs.",
+  "generator": "scripts/make-uno-logo.py",
+  "original_creator": "Freddie Nelson",
+  "creator_reference": "https://freddienelson.co.uk/"
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "file": "classic.webp",
+    "url": "https://scuffeduno.online/img/classic.8b70f9be.webp",
+    "sha256": "782b1cdcdc55f0c05be38d02b073a6d289d3ffc5d02ae1c18f333ebcaa89575b",
+    "bytes": 185624,
+    "fetchedAt": "2026-10-03T16:18:34.228649+00:00"
+  },
+  {
+    "file": "logo.webp",
+    "url": "https://scuffeduno.online/img/logo.18f632e4.webp",
+    "sha256": "0f00577792db6c57125c21b24b2ec24d22a0abdb49b97f327c588481d77d6b88",
+    "bytes": 20190,
+    "fetchedAt": "2026-10-03T16:18:34.291550+00:00"
+  },
+  {
+    "file": "avatar.webp",
+    "url": "https://scuffeduno.online/images/shop-items/pfp/pfp_orange_dots.webp",
+    "bytes": 790,
+    "sha256": "755e718e07db6b0204af82b49e7c1c9b9c32a0a9818574629064faa6e79d5c09",
+    "fetchedAt": "2026-10-03T16:24:29.763764+00:00"
+  },
+  {
+    "file": "avatar-border.webp",
+    "url": "https://scuffeduno.online/images/shop-items/pfp_border/pfp_border_white.webp",
+    "bytes": 472,
+    "sha256": "14ee51fd8725f875a8c7bad3a369fd0131cdeb1076472b40196080f3cccf4986",
+    "fetchedAt": "2026-10-03T16:24:30.003255+00:00"
+  }
+]

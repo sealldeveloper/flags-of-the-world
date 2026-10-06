@@ -1,0 +1,82 @@
+# Local verification
+
+UNO remains uncommitted, unpushed and undeployed. The original baseline used Git HEAD `2e88e52`; subsequent published-game/PWA commits did not include UNO (current committed HEAD: `ef25a14`).
+
+## Baseline transport/game verification (before the 3D presentation)
+
+- Rust → WASM release build: iroh 1.0.0, rustc 1.99.0, wasm-bindgen 0.2.122, locked dependencies; generated locally served module is approximately 2.7 MiB.
+- 13 Node engine/protocol tests, including 20 seeded complete games spanning 2–8 seats and all exposed rule combinations; card conservation, invalid actions, private views, stacking, swaps/rotation, duplicate/stale commands, and ticket validation.
+- Chromium, **real iroh**: three isolated browser contexts joining one group, readiness reset after rule changes, private seven-card dealing, 18 synchronized turn actions, wild colour choice, guest reload/new-endpoint seat resume, and host closure.
+- Full eight-seat lobby: add bots to capacity, reject ninth seat, remove a bot, admit a guest, start and observe a bot turn.
+- Complete game with both house rules enabled: 34 turn updates, hand-swap dialog, winner screen, then a successful seven-card rematch.
+- Firefox, **real iroh**: host/join/ready/deal/draw/close.
+- UI/error states: malformed invite, missing WASM (explicit test fault injection; no fake networking fallback), loading, keyboard focus/hover, guest admission rejection, host-closed state.
+- Screenshots/overflow checks at 1920×1080, 1024×768, 390×844, and 320×740 in light/dark; visual inspection of lobby/table/entry and interactive states. Fixed mobile action-bar overlap and narrow action-button wrapping found during review.
+- JS syntax checks and `git diff --check`.
+
+The final integration run observed eight real iroh relay WebSocket connections. The WebSocket framing belongs to iroh's browser relay transport, not a separate application/signaling backend. Address lookup/discovery is explicitly disabled in the Rust endpoint.
+
+Screenshots are local development artifacts in `/tmp/uno-visual`; tests default to that directory and can regenerate them. No production game data or accounts were used.
+
+## Earlier CSS visual pass (superseded)
+
+Recreated the reference's red tabletop, purple/pink lobby controls, grey/white player panels, dotted avatars, white card borders, handwritten faces, card-back fans, and direction ring with original CSS artwork. Poppins and Kalam are hosted locally with their OFL notices. Networking and game rules were not changed for this pass.
+
+Re-ran the real iroh group test, eight-seat admission and gameplay, guest resume, full round/rematch, and Firefox smoke test. The final CSS was recaptured at 1920, 1024, 390, and 320 pixels in both themes, including long/unbroken player names and eight-player mobile tables. Inspected the screenshots; corrected action-symbol sizing and a fixed-background paint issue on tall pages. The final Chromium multiplayer and visual/error-state runs passed. Screenshots: `/tmp/uno-restyled-final`.
+
+## 3D port and attribution (before the expanded lobby)
+
+- Replaced the CSS card table with a real Three.js 0.160.1/WebGL scene: dimensional rounded cards, perspective camera, reflected opponents/deck, glowing directional arrows, and animated dealing/plays. The renderer receives only the recipient-filtered view. The original application, Socket.IO client, and account features are not included.
+- Verified all four upstream asset SHA-256 hashes, all 63 card crops pixel-for-pixel against the classic atlas, and all 11 vendored Three.js files against their manifest. The upstream logo remains unmodified; the separate IROH EDITION SVG and generator have their own provenance record.
+- Compared against a successfully loaded original ScuffedUNO table. Inspected desktop, tablet, 390-pixel and 320-pixel mobile views, long names, and dense eight-player tables. Portrait framing and the compact player HUD are deliberate usability adaptations, not a reproduction of the original's clipped portrait viewport.
+- Fixed card-surface depth fighting, bloom-texture binding, mobile hand sizing, dense player-label overlap, and unloaded-texture flashes on rematch. All classic textures now load before the first 3D table is shown.
+- `tests/uno-3d.cjs` passed real WebGL rendering, motion, five viewport sizes, visible card hit regions, hover/focus/selection, play/draw, in-game credits, and asynchronous leave. Reduced-motion runs are covered separately by the group/round tests.
+- The completed Chromium group run used 12 real iroh relay WebSockets and passed admission, readiness, private hands, turns, guest resume, host closure, and eight-player checks. A complete round passed 85 turn updates, eight choice dialogs, winner view, and rematch. Firefox host/join/ready/deal/draw/close also passed with the WebGL table.
+- Runtime inspection confirmed only local asset requests, iroh's four allowlisted HTTPS `/ping` probes, and iroh relay WebSockets. No ScuffedUNO servers, account services, advertising, analytics, or CDN requests are made.
+- The IROH EDITION logo, prominent Freddie Nelson credit, author/original-game links, and entry/in-game Credits dialog were browser-tested in both themes. `tests/uno-credits.cjs` additionally checks header-button contrast and four responsive sizes. Original authorship was checked against <https://freddienelson.co.uk/>.
+- Artifacts: `/tmp/uno-3d-final/`; original comparison captures: `/tmp/scuffed-port-reference/`. Final review uses screenshots, not just DOM geometry.
+
+Intermittent iroh endpoint-online timeouts occurred during retesting, including one startup retry in the completed animated-UI run. The HTTP relay probes were independently reachable with 200 responses; the timeout cause was not established. The application reports the failure and permits a retry; tests never substitute fake networking. Artwork attribution is not redistribution permission: see `assets/scuffeduno/README.md`.
+
+## Final direct controls, profiles, sharing, and expanded rules
+
+- Removed the select/confirm interaction: a card click, tap, Enter, or Space now plays directly; the deck is the draw target. Wild/7-swap choices are the only play dialogs. The duplicate play/draw bar is gone, and deck hit targets are at least 44 pixels.
+- The complete final run passed real-iroh mouse/touch/keyboard play, draw/pass, wild/swap choices, Escape/Cancel, repeated activation, disabled cards, and disconnect during a choice. Animated WebGL checks at five widths and group/privacy/resume/eight-seat checks passed again. This supersedes the earlier run interrupted for the expanded feature request.
+- Current pure verification: **27 passing tests** (`uno-engine.test.mjs` and `uno-rules-profiles.test.mjs`). Includes all 32 combinations of the five switches in seeded 2–8-player games, jump-ins, draw exhaustion, forced choices, +4 stacking, card conservation, profile validation/ownership, distinct default avatars, and host-only locked rule changes.
+- `tests/uno-lobby-rules.cjs` is the new real-iroh browser/visual verification entry point. It independently decodes QR pixels with test-only ZXing, checks profile edits/resume, and uses clearly marked deterministic host-owned game deals to reach rule edge cases. No production fixture endpoint or mock transport is added.
+- Lobby browser checks passed distinct automatic avatars, self-only name/pattern/colour changes, readiness retention, literal rendering of markup-like names, and profile persistence across reload/resume. Host-only rule changes, all five independent switches, readiness resets, and in-round locking passed.
+- QR checks passed independent pixel decoding at 1920, 1024, 390, and 320 pixels in both themes, joining a third real peer through the decoded link, guest sharing of the host ticket, actual clipboard copy, denied-clipboard fallback, and native-share payload handling (OS-share stub only). Fixed same-document invite navigation and fractional QR rendering found during testing; QR modules now use whole display pixels and explicit SVG dimensions.
+- Controlled host deals passed real-network jump-ins, draw-till-playable, forced ordinary plays, mandatory wild/7 choices, +4 stacking, and stale jump-choice cancellation. Test fixtures reset both the discard and its current colour; they do not change production behaviour or substitute transport.
+- Full round/rematch passed **33 turn updates and two choice dialogs** with 7–0 and stacking. Firefox passed host/join/ready/deal/deck draw/direct keyboard card play/close. Edition credits, entry themes/focus/hover, malformed invites, loading, and deliberate WASM-load failure also passed.
+- Inspected the final 95 screenshot artifacts/contact sheets in `/tmp/uno-lobby-rules/` and `/tmp/uno-complete-review-*.jpg`. Includes mobile/desktop/tablet, both themes, eight-seat/long-name layouts, avatar selection/focus, scrollable share dialogs, QR codes, card hover/focus/motion, mandatory choices, game end, and rematch. The narrow avatar thumbnails were corrected during review. Short share dialogs scroll internally to expose the QR and close control.
+- Final suite: background task `b617d4e02`, exit 0. Both pure-test files plus `uno-lobby-rules.cjs`, `uno-controls.cjs`, `uno-3d.cjs`, `uno-browser.cjs`, `uno-round.cjs`, `uno-firefox.cjs`, `uno-credits.cjs`, and `uno-states.cjs` passed. `git diff --check` passed; the vendored QR encoder and MIT licence hashes were verified.
+
+## Original lobby option-selector restyle
+
+- Inspected the original live lobby at desktop and mobile widths. Reused its five actual 512×512 rule illustrations, matching the three-column ordering, square grey-bordered tiles, captions, and grayscale/70%-opacity off state. All five local file hashes, sizes, and dimensions match `assets/scuffeduno/rules/provenance.json`. No original application code or remote image requests were added.
+- Matched the surrounding rules/sidebar, room title/count, large player/avatar and Add Bot tiles, and Start Game placement. Kept private eight-seat iroh rooms, all five independent default-off rules, readiness, profiles, and sharing. Public/team/account/ad/chat controls are intentionally absent; narrow screens stack the options above the players rather than reproducing the original's clipped mobile view.
+- `tests/uno-lobby-visual.cjs` passed with real iroh peers: exact local illustrations/order, three columns, checked/off states, mouse and genuine Tab/Space operation, host-only rule changes, peer synchronization, rule descriptions, one/two/eight-seat layouts, and six widths (1920, 1440, 1024, 768, 390, 320) in both themes. DOM tab order follows visual order. Focus and hover contrast meet 3:1; caption text meets 4.5:1. Final interaction-capture run: `b2045e124`, exit 0.
+- Reviewed the 41 new selector/lobby screenshots through `/tmp/uno-option-review-{0..5}.jpg` and individual full-size captures, including both keyboard-focus and actual retained-hover states, long names, eight seats, guest-locked choices, and expanded rule descriptions. Captures are in `/tmp/uno-lobby-options-final/`. Increased narrow-screen caption size and improved focus contrast during review; screenshots/tests were regenerated afterward.
+- Final application files passed 27 pure tests, real-iroh profile/share/QR/rule-edge-case tests, direct-control checks, and animated WebGL checks in `bbf265900`. An earlier entire restyle regression (`bfc379e50`) passed before the final focus/caption refinements. The final combined run later hit its 900-second limit during a headless Chromium gameplay screenshot after fonts loaded; its cause is unestablished. A separate subsequent attempt (`bd210f000`) failed guest startup with the already observed public-iroh-relay reachability error. The group integration and round tests now have a 30-second default operation timeout rather than allowing an indefinite screenshot wait. Neither failure is hidden or counted as a passing complete run.
+- The remaining checks subsequently passed in `b7e25cd9f` (exit 0): real-iroh group/private hands/resume/eight-seat play, a full round and rematch (26 turn updates), Firefox direct-keyboard-play multiplayer, credits, and loading/error/theme states. Review also caught the Add Bot tile preceding players after returning from the table; player-list restoration now prepends the list, with a regression assertion in `tests/uno-round.cjs`.
+- After resuming the interrupted final check, `b40a98cdc` passed the corrected player-tile ordering, a complete round (31 turn updates, one choice dialog), rematch, Firefox multiplayer/direct keyboard play, syntax, whitespace, and unstaged-change checks. Inspected the regenerated round-end and rematch screenshots: players remain before Add Bot and the 3D table still renders correctly. The preview server was restarted at the same localhost URL. Nothing was committed or deployed.
+
+## Zero rotation, explicit UNO and round results (2026-10-05)
+
+- Added directional, simultaneous card-back flights for 0 rotations with 7–0 enabled. Counts/private hands settle only after the flight; the host waits for the complete presentation. Reduced motion keeps ordering without flights.
+- Added a persistent UNO button: call with one card or pre-arm the next play from two cards. The host validates and broadcasts calls, including out-of-turn calls. Draws/transfers/rematches reset stale calls; bots call automatically. No missed-call penalties were introduced.
+- Added recipient-specific win/loss dialogs after the last animation, eight-seat public card-count summaries, host rematch, guest waiting guidance, and dismiss/reopen controls.
+- `ba3efab81`: all **43 pure tests passed**, including 2–8-seat rotations in both directions, winner-after-transfer timing, private views, atomic/invalid UNO calls, reset semantics, and preservation of host presentation/jump deadlines.
+- `bd1d86993`: `tests/uno-finish-browser.cjs` passed with real iroh peers and real WebGL. Verified both rotation directions, card-back-only flights, reduced motion, host/guest/manual/pre-armed UNO, keyboard activation, responsive card/button hit regions, own/opponent wins, last-card-zero recipient wins, modal dismissal/reopen, and seven-card rematches. Controlled host deals and temporary test-only bot scheduling suppression reach rare states; neither transport nor production validation is mocked.
+- Inspected all 31 screenshots in `/tmp/uno-finish-fixes` via `/tmp/uno-finish-review/sheet-{00..05}.jpg`: 1920, 1024, 390 and 320-pixel widths; light/dark; eight-seat results; disabled/hovered/keyboard-armed/called UNO; selected/in-flight rotation. No new clipping or overlap in the UNO control or result dialog.
+- Separate shuffled full-round/bot regression is pending. Earlier suite results do not certify every feature of this updated build.
+
+## Not verified / not claimed
+
+- Separate physical devices on separate networks; local tests used isolated browser profiles on one workstation through actual public relays.
+- Safari/iOS, mobile OS background suspension, adverse network switching, or prolonged relay outages.
+- Physical-camera QR scanning or a native mobile OS share sheet. QR pixel decoding is verified; OS-share payload handling used a test stub. Localhost invite links still require the same computer; other devices need a shared HTTPS origin.
+- Competitive anti-cheat, host migration, persistent rooms, or full ScuffedUNO feature parity.
+- A public deployment. The local Python server serves static assets only.
+
+See `README.md` for exact test entry points and requirements.
