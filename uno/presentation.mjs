@@ -1,17 +1,24 @@
 // Ordered, recipient-private presentation of an already validated host action.
 // Game authority stays in the engine; animation never invents or submits moves.
-export const TIMING = Object.freeze({draw:420,play:420,select:850,outbound:520,pause:300,inbound:520,rotate:900,settle:220,jump:1200});
+export const TIMING = Object.freeze({deal:400,draw:800,play:1100,select:1000,outbound:1000,pause:500,inbound:1000,rotate:1500,settle:600,jump:1500,unoCall:3000,unoCatch:5000});
 export function effectDuration(effects) {
-  return (effects?.events || []).reduce((ms,e)=>ms+(e.kind==='draw'?e.count*TIMING.draw:e.kind==='play'?TIMING.play:e.kind==='swap'?TIMING.select+TIMING.outbound+TIMING.pause+TIMING.inbound+TIMING.settle:e.kind==='rotate'?TIMING.select+TIMING.rotate+TIMING.settle:0),0);
+  return (effects?.events || []).reduce((ms,e)=>ms+(e.kind==='deal'?e.count*TIMING.deal:e.kind==='draw'?e.count*TIMING.draw:e.kind==='play'?TIMING.play:e.kind==='swap'?TIMING.select+TIMING.outbound+TIMING.pause+TIMING.inbound+TIMING.settle:e.kind==='rotate'?TIMING.select+TIMING.rotate+TIMING.settle:0),TIMING.settle);
 }
 export function presentationFrames(previous,next,reduced=false) {
   const hold=()=>next.phase==='playing'&&next.revealMs>0?[{duration:next.revealMs,view:{...next,presentation:{kind:'wait'},legal:[]}}]:[];
-  if (!previous || previous.self!==next.self || previous.phase!=='playing' || previous.round!==next.round || next.effects?.revision!==next.revision || previous.revision===next.revision) return hold();
-  let hand=previous.hand.map(c=>({...c})), top=previous.top, colour=previous.colour;
-  const counts=new Map(previous.players.map(p=>[p.id,p.count])), frames=[];
-  const stage=(presentation,duration)=>frames.push({duration,view:{...next,phase:'playing',winner:null,top,colour,hand:hand.map(c=>({...c})),players:next.players.map(p=>({...p,count:counts.get(p.id)??p.count})),legal:[],drawn:null,presentation}});
+  if (!previous || previous.self!==next.self || !next.effects || (previous.round===next.round&&previous.effects?.revision===next.effects.revision)) return hold();
+  const dealing=next.effects.events.some(e=>e.kind==='deal');
+  if(!dealing&&(previous.phase!=='playing'||previous.round!==next.round))return hold();
+  let hand=dealing?[]:previous.hand.map(c=>({...c})), top=dealing?next.top:previous.top, colour=dealing?next.colour:previous.colour;
+  const counts=new Map(previous.players.map(p=>[p.id,dealing?0:p.count])), frames=[];
+  const stage=(presentation,duration)=>frames.push({duration,view:{...next,phase:'playing',turn:presentation.player||presentation.from||next.turn,winner:null,top,colour,hand:hand.map(c=>({...c})),players:next.players.map(p=>({...p,count:counts.get(p.id)??p.count})),legal:[],drawn:null,presentation}});
   for(const e of (next.effects.events||[]).slice(0,8)) {
-    if(e.kind==='draw') {
+    if(e.kind==='deal') {
+      for(let i=1;i<=e.count;i++) {
+        hand=next.hand.slice(0,i);next.players.forEach(p=>counts.set(p.id,i));
+        stage({kind:'deal',step:i,total:e.count},TIMING.deal);
+      }
+    } else if(e.kind==='draw') {
       for(let i=0;i<Math.min(108,e.count);i++) {
         if(e.player===next.self&&e.cards?.[i])hand.push({...e.cards[i]});
         counts.set(e.player,(counts.get(e.player)||0)+1);
@@ -34,6 +41,7 @@ export function presentationFrames(previous,next,reduced=false) {
       stage({kind:'rotate',direction,phase:'settle'},TIMING.settle);
     }
   }
+  stage({kind:'settle'},TIMING.settle);
   return frames;
 }
 export class TablePresentation {
@@ -59,7 +67,7 @@ export class TablePresentation {
     const next=this.queue.shift();if(!next)return;
     const frames=presentationFrames(this.current,next,this.reduced),serial=this.serial;
     const duration=frames.reduce((ms,f)=>ms+f.duration,0),windowMs=Math.max(0,(next.jumpWindowMs||0)-duration);
-    if(windowMs>0)frames.push({duration:windowMs,view:{...next,presentation:{kind:'jump-window'},legal:next.self===next.turn?[]:next.legal}});
+    if(windowMs>0&&!next.unoWindow)frames.push({duration:windowMs,view:{...next,presentation:{kind:'jump-window'},legal:next.self===next.turn?[]:next.legal}});
     this.busy=frames.length>0;
     const advance=()=>{
       if(serial!==this.serial)return;

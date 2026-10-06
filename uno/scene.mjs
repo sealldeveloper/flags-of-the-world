@@ -1,7 +1,6 @@
 // Local Three.js presentation adapter. Receives only the recipient-filtered view;
 // never reads Room.state, transports, the deck, or opponents' card identities.
 import * as THREE from './vendor/three/three.module.js';
-import {Reflector} from './vendor/three/addons/objects/Reflector.js';
 import {EffectComposer} from './vendor/three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from './vendor/three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from './vendor/three/addons/postprocessing/UnrealBloomPass.js';
@@ -42,7 +41,7 @@ export class CardTable {
   constructor(canvas, {onError = ()=>{}} = {}) {
     this.canvas=canvas; this.onError=onError; this.active=false; this.cards=new Map(); this.players=new Map();
     this.textures=new Map(); this.texturePromises=[]; this.faces=new Map(); this.discards=[]; this.animations=[]; this.hover=null;
-    this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.reduced=localStorage.getItem('uno-motion')==='off'||(localStorage.getItem('uno-motion')!=='on'&&matchMedia('(prefers-reduced-motion: reduce)').matches);
     this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
     this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
     this.renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -58,27 +57,8 @@ export class CardTable {
     this.pile=new THREE.Group();this.scene.add(this.pile);
     this.deck=new THREE.Group();this.scene.add(this.deck);
     this.ring=new THREE.Group();this.scene.add(this.ring);
-    this.reflector=new Reflector(new THREE.PlaneGeometry(500,500),{textureWidth:1024,textureHeight:1024,clipBias:.2,color:0x888888,multisample:0});
-    const target=this.reflector.getRenderTarget();target.depthTexture=new THREE.DepthTexture(1024,1024);
-    target.depthTexture.type=THREE.UnsignedIntType;
-    this.reflector.material.uniforms.tDepth={value:target.depthTexture};
-    this.reflector.material.fragmentShader=`
-      #include <packing>
-      uniform sampler2D tDiffuse; uniform sampler2D tDepth; varying vec4 vUv;
-      void main(){
-        vec4 reflection=texture2DProj(tDiffuse,vUv);
-        float depth=texture2DProj(tDepth,vUv).x;
-        float linearDepth=viewZToOrthographicDepth(perspectiveDepthToViewZ(depth,0.1,300.0),0.1,300.0);
-        gl_FragColor=vec4(reflection.rgb,clamp(1.0-linearDepth*12000.0,0.0,0.65));
-        #include <colorspace_fragment>
-      }`;
-    this.reflector.material.transparent=true;
-    const before=this.reflector.onBeforeRender;
-    this.reflector.onBeforeRender=(renderer,scene,camera,...rest)=>{
-      const visible=this.hand.visible;this.hand.visible=false;
-      try{before.call(this.reflector,renderer,scene,camera,...rest);}finally{this.hand.visible=visible;}
-    };
-    this.reflector.rotation.x=-PI/2;this.scene.add(this.reflector);
+    // No mirror pass: projected seat geometry intersected the old reflector and
+    // produced floating card fragments. Avoid its extra full-scene render too.
     const renderTarget=()=>new THREE.WebGLRenderTarget(innerWidth,innerHeight,{type:THREE.HalfFloatType,depthTexture:new THREE.DepthTexture(innerWidth,innerHeight,THREE.UnsignedIntType)});
     this.bloom=new EffectComposer(this.renderer,renderTarget()); this.bloom.renderToScreen=false;
     this.bloom.addPass(new RenderPass(this.scene,this.camera));
@@ -135,9 +115,12 @@ export class CardTable {
   }
   update(view,{online,pending}={}) {
     const previous=this.view, added=[];
-    const effectKey=`${view.round}:${view.revision}:${view.presentation?.kind}:${view.presentation?.phase}:${view.presentation?.step}`;
+    const effectKey=JSON.stringify([view.round,view.self,view.turn,view.legal,online,view.hand.map(c=>c.id),view.players.map(p=>[p.id,p.count]),view.top?.id,view.presentation?.kind,view.presentation?.phase,view.presentation?.step]);
+    // Pending/ack/latency and UNO snapshots must not teleport an in-flight mesh
+    // back to its layout target. Rebind the rebuilt DOM without rebuilding geometry.
+    if(this.active&&effectKey===this.effectKey){this.view=view;this.canAct=online&&!pending&&!view.presentation&&view.phase==='playing';this.bindTargets();this.projectControls();return;}
     if(effectKey!==this.effectKey){for(const a of this.animations){a.mesh.position.copy(a.target);a.mesh.quaternion.copy(a.targetRotation);a.mesh.userData.flying=false;}this.animations=[];this.effectKey=effectKey;}
-    const source=this.cards.get(view.top?.id)||this.players.get(view.lastPlayedBy || previous?.turn)?.children.at(-1);
+    const source=this.cards.get(view.top?.id)||this.players.get(view.presentation?.player || view.lastPlayedBy || previous?.turn)?.children.at(-1);
     const playedFrom=source?.getWorldPosition(new V()), playedRotation=source?.getWorldQuaternion(new THREE.Quaternion());
     let newDiscard=null;
     if(previous?.self!==view.self)this.round=null;
@@ -148,7 +131,6 @@ export class CardTable {
     this.scale=count>5?Math.max(.8,2.2-.1*(count-5)):2.35;
     this.width=5.6*this.scale;this.height=8.9*this.scale;
     this.radius=Math.min(130,70+6*(count-1));this.floor=-this.height/2;
-    this.reflector.position.y=this.floor;
     if(this.playerCount!==count){
       this.playerCount=count;
       for(const child of [...this.ring.children]){this.ring.remove(child);child.geometry.dispose();child.material.dispose();}
@@ -191,8 +173,8 @@ export class CardTable {
     this.layout();this.bindTargets();this.updateSwap();
     if(!this.reduced&&!['swap','rotate'].includes(view.presentation?.kind)){
       const deckPosition=this.deck.getWorldPosition(new V()),deckRotation=this.deck.getWorldQuaternion(new THREE.Quaternion());
-      added.forEach((mesh,i)=>this.fly(mesh,deckPosition,deckRotation,i*32,view.presentation?.kind==='draw'?330:500));
-      if(newDiscard&&playedFrom&&previous?.round===view.round)this.fly(newDiscard,playedFrom,playedRotation);
+      added.forEach((mesh,i)=>this.fly(mesh,deckPosition,deckRotation,view.presentation?.kind==='deal'?0:i*20,view.presentation?.kind==='draw'?TIMING.draw*.85:TIMING.deal*.85));
+      if(newDiscard&&playedFrom&&previous?.round===view.round)this.fly(newDiscard,playedFrom,playedRotation,0,TIMING.play*.85);
     }
     this.draw();
   }
@@ -211,7 +193,7 @@ export class CardTable {
   }
   layout(){
     if(!this.view)return;
-    const w=innerWidth,h=innerHeight;this.w=w;this.h=h;
+    const w=innerWidth,h=innerHeight;this.w=w;this.h=h;this.ring.visible=w>=600;
     this.renderer.setSize(w,h,false);this.bloom.setSize(w/2,h/2);this.composer.setSize(w,h);
     // Turn ownership must never change the camera, hand size, or perspective.
     this.camera.aspect=w/h;this.camera.zoom=1;
@@ -227,25 +209,21 @@ export class CardTable {
     const span=Math.min(this.width*6,2*distance*Math.tan(this.camera.fov*PI/360)*this.camera.aspect/this.camera.zoom*.86);
     const n=this.view.hand.length,spacing=Math.min(this.width,span/Math.max(1,n));
     this.view.hand.forEach((c,i)=>{const mesh=this.cards.get(c.id);mesh.position.set(((n-1)/2-i)*spacing,0,i*.015);});
-    const others=this.view.players.filter(p=>p.id!==this.view.self);
-    const start=-Math.min(85,47+5*(this.playerCount-1))*PI/180;
-    others.forEach((p,i)=>{
-      const angle=others.length===1?0:start+(-2*start)*i/(others.length-1),group=this.players.get(p.id);
-      group.position.set(-Math.sin(angle)*this.radius,0,-Math.cos(angle)*this.radius);group.lookAt(new V(0,0,this.camera.position.z));
+    // Rotate the fixed lobby order around the viewer, never around the current turn.
+    const selfIndex=this.view.players.findIndex(p=>p.id===this.view.self);
+    const ordered=[...this.view.players.slice(selfIndex),...this.view.players.slice(0,selfIndex)];
+    const hudWidth=Math.min(180,Math.max(74,w*(this.playerCount>5?.22:.27)));
+    const centreY=125+(h-300)/2,rx=Math.min(w*.38,w/2-hudWidth/2-8),ry=Math.max(40,Math.min((h-360)*.40,centreY-(w<600?200:240)));
+    ordered.slice(1).forEach((p,i)=>{
+      const angle=2*PI*(i+1)/this.playerCount,group=this.players.get(p.id);
+      group.scale.setScalar(1);
+      group.position.copy(this.screenPoint(w/2-rx*Math.sin(angle),centreY+ry*Math.cos(angle),150));group.quaternion.copy(this.camera.quaternion);
+      this.scene.updateMatrixWorld(true);
+      const b=this.bounds(group),targetWidth=Math.min(180,w*(this.playerCount>5?.22:.28)),targetHeight=w<600?55:90;
+      if(p.count)group.scale.setScalar(Math.min(targetWidth/(b.right-b.left),targetHeight/(b.bottom-b.top)));
     });
     const d=this.deckParameters();this.deck.position.set(-Math.sin(d.angle)*d.dist,this.floor+d.scale*.9,-Math.cos(d.angle)*d.dist);this.deck.rotation.set(-PI/2,0,-d.angle*d.rotation);
     this.scene.updateMatrixWorld(true);
-    if(w<h){
-      const objects=[this.deck,...this.players.values()];
-      const extent=Math.max(...objects.map(obj=>{const b=this.bounds(obj);return Math.max(w/2-b.left,b.right-w/2);}));
-      if(extent>w/2-12){
-        this.camera.zoom*=((w/2-12)/extent);this.camera.updateProjectionMatrix();
-        const visibleHeight=2*distance*Math.tan(this.camera.fov*PI/360)/this.camera.zoom;
-        this.hand.position.set(0,0,-distance);this.hand.rotation.set(0,0,0);this.camera.updateMatrixWorld(true);
-        this.hand.lookAt(new V(0,18,-5));this.hand.translateY(-visibleHeight/2+this.height*.67+5);
-        this.scene.updateMatrixWorld(true);
-      }
-    }
     // Table framing must not shrink the local hand to the size of remote seats.
     if(w<=600&&this.view.hand.length){
       const measured=this.bounds(this.hand),factor=Math.min(3,(w*.9)/(measured.right-measured.left),Math.min(160,h*.2)/(measured.bottom-measured.top));
@@ -256,7 +234,16 @@ export class CardTable {
     const pixelsPerUnit=h*this.camera.zoom/(2*distance*Math.tan(this.camera.fov*PI/360));
     if(Number.isFinite(handBottom))this.hand.position.y+=(handBottom-desiredBottom)/pixelsPerUnit;
     this.scene.updateMatrixWorld(true);
+    // Keep the central piles between the stable seats, independent of player count.
+    this.deck.position.copy(this.screenPoint(w*.58,centreY-45,150));
+    this.pile.position.copy(this.screenPoint(w*.42,centreY-45,150));
+    this.scene.updateMatrixWorld(true);
+    this.seatBounds=new Map(this.view.players.map(p=>[p.id,this.bounds(p.id===this.view.self?this.hand:this.players.get(p.id))]));
     this.projectControls();
+  }
+  screenPoint(x,y,depth) {
+    const height=2*depth*Math.tan(this.camera.fov*PI/360)/this.camera.zoom;
+    return this.camera.localToWorld(new V((x/this.w-.5)*height*this.camera.aspect,(.5-y/this.h)*height,-depth));
   }
   project(v){const p=v.clone().project(this.camera);return {x:(p.x+1)*this.w/2,y:(1-p.y)*this.h/2};}
   bounds(object){
@@ -280,13 +267,11 @@ export class CardTable {
     const debt=document.getElementById('debt');if(debt){debt.style.left=`${Math.max(8,Math.min(this.w-debt.offsetWidth-8,cx-debt.offsetWidth/2))}px`;debt.style.top=`${Math.max(110,top-28)}px`;}
     const decision=document.getElementById('drawn-decision'),drawn=this.cards.get(this.view.drawn);
     if(decision&&drawn&&!decision.hidden){const b=this.bounds(drawn);decision.style.left=`${Math.max(8,Math.min(this.w-decision.offsetWidth-8,(b.left+b.right-decision.offsetWidth)/2))}px`;decision.style.top=`${Math.max(116,b.top-decision.offsetHeight-12)}px`;}
-    const status=document.getElementById('table-status');if(status){const hand=this.bounds(this.hand),pile=this.bounds(this.pile),handTop=Number.isFinite(hand.top)?hand.top:this.h-100;status.style.top=`${Math.max(this.h*.4,Math.min(Math.max(pile.bottom+14,this.h*.54),handTop-status.offsetHeight-(decision&&!decision.hidden?decision.offsetHeight+24:18)))}px`;}
+    const status=document.getElementById('table-status');if(status){const hand=this.bounds(this.hand),pile=this.bounds(this.pile),handTop=Number.isFinite(hand.top)?hand.top:this.h-100;status.style.top=`${Math.max(this.h*.4,Math.min(Math.max(pile.bottom+14,this.h*.54),handTop-status.offsetHeight-(decision&&!decision.hidden?decision.offsetHeight+100:90)))}px`;}
     for(const p of this.view.players){
-      if(p.id===this.view.self)continue;
-      const group=this.players.get(p.id),anchor=this.project(group.position.clone().add(new V(0,this.height*1.35,0)));
+      const self=p.id===this.view.self,group=self?this.hand:this.players.get(p.id),b=this.seatBounds?.get(p.id)||this.bounds(group),anchor=self?{x:Number.isFinite(b.left)?(b.left+b.right)/2:this.w/2,y:this.h-100}:this.project(group.position);
       const el=document.querySelector(`#players [data-seat-id="${CSS.escape(p.id)}"]`);
-      if(el&&this.view.players.length>=4){el.style.left='';el.style.top='';continue;}
-      if(el){const half=el.offsetWidth/2;el.style.left=`${Math.max(half+12,Math.min(this.w-half-12,anchor.x))}px`;el.style.top=`${Math.max(116,anchor.y-el.offsetHeight-8)}px`;}
+      if(el){el.style.width=`${Math.min(180,Math.max(74,this.w*(this.playerCount>5?.22:.27)))}px`;const half=el.offsetWidth/2;el.style.left=`${Math.max(half+4,Math.min(this.w-half-4,anchor.x))}px`;el.style.bottom='auto';el.style.top=`${Math.max(110,(Number.isFinite(b.top)?b.top:anchor.y)-el.offsetHeight-8)}px`;}
     }
     this.projectSwapArrow();
   }
@@ -372,9 +357,9 @@ export class CardTable {
   }
   draw(){
     if(!this.active)return;
-    const background=this.scene.background;this.scene.background=null;this.reflector.visible=false;
+    const background=this.scene.background;this.scene.background=null;
     this.camera.layers.set(1);this.bloom.render();this.camera.layers.set(0);
-    this.scene.background=background;this.reflector.visible=true;this.composer.render();this.canvas.dataset.rendered='true';
+    this.scene.background=background;this.composer.render();this.canvas.dataset.rendered='true';
   }
   stop(){this.active=false;cancelAnimationFrame(this.frameId);this.frameId=0;}
 }

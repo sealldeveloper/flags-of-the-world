@@ -30,17 +30,18 @@ export function newRoom(host) {
   return { phase:'lobby', players:[{...host, avatar:defaultAvatar(), ready:true, connected:true, bot:false, hand:[]}], rules:{...DEFAULT_RULES}, revision:0, round:0, deck:[], discard:[], turn:0, direction:1, debt:0, drawn:null, colour:null, winner:null, notice:'Invite friends or add bots to start.' };
 }
 export function player(state, id) { const p = state.players.find(p => p.id === id); if (!p) throw new Error('Seat not found'); return p; }
-export function startRound(state, random = randomIndex) {
+export function startRound(state, random = randomIndex, force = false) {
   if (state.phase === 'playing') throw new Error('Round already started');
   if (state.players.length < 2) throw new Error('At least two players are needed');
-  if (state.players.some(p => !p.connected || !p.ready)) throw new Error('Everyone must be connected and ready');
+  if (state.players.some(p => !p.connected || (!force && !p.ready))) throw new Error('Everyone must be connected and ready');
   state.deck = shuffle(createDeck(), random);
   for (const p of state.players) { p.hand = state.deck.splice(-7); p.unoCalled=false; }
   const first = state.deck.findIndex(c => /^\d$/.test(c.value));
   state.discard = [state.deck.splice(first, 1)[0]];
   state.colour = state.discard[0].colour;
   state.phase = 'playing'; state.turn = 0; state.direction = 1; state.debt = 0; state.drawn = null; state.winner = null; state.round++;
-  state.lastPlayedBy = null; state.effects = null; state.revision++; state.notice = 'Round started.';
+  state.lastPlayedBy = null; state.unoWindow = null; state.revision++;
+  state.effects = {revision:state.revision,events:[{kind:'deal',count:7}]}; state.notice = 'Dealing seven cards to each player.';
 }
 const advance = (s, steps = 1) => { s.turn = (s.turn + s.direction * steps + s.players.length * 2) % s.players.length; s.drawn = null; };
 function takeCards(s, p, count, random, effects = []) {
@@ -54,7 +55,7 @@ function takeCards(s, p, count, random, effects = []) {
   return received;
 }
 export function legalCard(s, p, c) {
-  if (s.phase !== 'playing' || !p.connected || !s.players[s.turn]?.connected) return false;
+  if (s.phase !== 'playing' || s.unoWindow || !p.connected || !s.players[s.turn]?.connected) return false;
   if (s.players[s.turn].id !== p.id) {
     const top=s.discard.at(-1);
     return !!s.rules.jumpIn && !s.debt && !s.drawn && /^\d$/.test(c.value) && c.colour===top.colour && c.value===top.value;
@@ -64,17 +65,27 @@ export function legalCard(s, p, c) {
   if (c.value === 'draw4') return !p.hand.some(other => other.colour === s.colour);
   return c.colour === 'wild' || c.colour === s.colour || c.value === s.discard.at(-1).value;
 }
-// A call is public, host-validated and independent of whose turn it is.
-// Keep the prior effects identity so a call cannot bypass an in-flight move's gate.
+// The second-last play retains its actor's turn until the bounded UNO window ends.
+export function finishUnoTurn(s) {
+  if (!s.unoWindow) return;
+  s.turn=s.unoWindow.nextTurn; s.unoWindow=null; s.revision++;
+}
 export function callUno(s,id) {
   const p=player(s,id);
-  if(s.phase!=='playing'||!p.connected)throw new Error('UNO can only be called during a connected round');
-  if(p.hand.length!==1)throw new Error('You need one card to call UNO');
-  if(p.unoCalled)throw new Error('UNO already called');
-  p.unoCalled=true;s.notice=`${p.name} called UNO!`;s.revision++;
+  if(s.phase!=='playing'||!p.connected||s.players[s.turn].id!==id||s.unoWindow?.player!==id)throw new Error('Call UNO on your turn after playing your second-last card');
+  if(p.hand.length!==1||p.unoCalled)throw new Error('UNO is not available');
+  p.unoCalled=true;s.notice=`${p.name} called UNO!`;finishUnoTurn(s);
+}
+export function catchUno(s,id,target,random=randomIndex) {
+  const caller=player(s,id),p=player(s,target);
+  if(s.phase!=='playing'||!caller.connected||id===target||s.unoWindow?.player!==target||p.hand.length!==1||p.unoCalled)throw new Error('There is no missed UNO to catch');
+  const events=[];takeCards(s,p,2,random,events);finishUnoTurn(s);
+  s.notice=`${caller.name} caught ${p.name} missing UNO — draw two!`;
+  s.effects={revision:s.revision,events};
 }
 export function applyAction(s, id, action, random = randomIndex) {
   if (s.phase !== 'playing') throw new Error('No active round');
+  if (s.unoWindow) throw new Error('Wait for the UNO call window');
   const p = player(s, id);
   if (!action || typeof action !== 'object') throw new Error('Invalid action');
   if (s.players[s.turn].id !== id && action.type !== 'play') throw new Error('It is not your turn');
@@ -118,14 +129,15 @@ function play(s,p,action,random,effects) {
     const swap = s.rules.sevenZero && card.value === '7';
     const target = swap ? s.players.find(q => q.id === action.target && q.id !== id) : null;
     if (swap && !target) throw new Error('Choose another player to swap with');
-    if (action.uno!==undefined&&typeof action.uno!=='boolean')throw new Error('Invalid UNO call');
+    if (action.uno!==undefined && action.uno!==false)throw new Error('Call UNO after playing your second-last card');
+    const hadTwo=p.hand.length===2;
     // All play/choice validation occurs before mutation, including a jump-in.
     if (jumping) s.turn=s.players.findIndex(q=>q.id===id);
     s.lastPlayedBy=id;
     effects.push({kind:'play',player:id,card:{...card},colour:card.colour==='wild'?action.colour:card.colour});
     if(swap)effects.push({kind:'swap',from:id,to:target.id});
     if(s.rules.sevenZero&&card.value==='0')effects.push({kind:'rotate',direction:s.direction});
-    p.hand.splice(index, 1); p.unoCalled=p.hand.length===1&&(action.uno===true||p.bot===true); s.discard.push(card); s.drawn = null;
+    p.hand.splice(index, 1); p.unoCalled=p.hand.length===1&&p.bot===true; s.discard.push(card); s.drawn = null;
     s.colour = card.colour === 'wild' ? action.colour : card.colour;
     s.notice = `${p.name} ${jumping ? 'jumped in with' : 'played'} ${cardLabel(card)}.`;
     if (swap) { [p.hand, target.hand] = [target.hand, p.hand]; p.unoCalled=target.unoCalled=false; s.notice += ` Swapped hands with ${target.name}.`; }
@@ -143,6 +155,9 @@ function play(s,p,action,random,effects) {
     if (card.value === 'draw4') s.debt += 4;
     advance(s, steps);
     const winner = s.players.find(q => !q.hand.length);
+    if (!winner && hadTwo && p.hand.length===1 && !p.bot && !swap && !(s.rules.sevenZero&&card.value==='0')) {
+      s.unoWindow={player:id,nextTurn:s.turn};s.turn=s.players.findIndex(q=>q.id===id);
+    }
     if (winner) {
       if (s.debt) { takeCards(s, s.players[s.turn], s.debt, random, effects); s.debt = 0; }
       s.winner = winner.id; s.phase = 'finished'; s.notice = `${winner.name} won the round!`;
@@ -157,6 +172,7 @@ export function viewFor(s, id) {
     top:s.discard.length ? {...s.discard.at(-1)} : null, turn:s.players[s.turn]?.id,
     direction:s.direction, colour:s.colour, debt:s.debt, drawn:s.drawn && s.players[s.turn]?.id === id ? s.drawn : null,
     winner:s.winner, notice:s.notice, lastPlayedBy:s.lastPlayedBy || null,
+    unoWindow:s.unoWindow?{player:s.unoWindow.player}:null,
     legal:p.hand.filter(c => legalCard(s, p, c)).map(c => c.id),
     effects:s.effects ? {revision:s.effects.revision,events:s.effects.events.map(e=>e.kind==='draw'?{kind:e.kind,player:e.player,count:e.count,...(e.player===id?{cards:e.cards.map(c=>({...c}))}:{})}:{...e,...(e.card?{card:{...e.card}}:{})})} : null,
   };

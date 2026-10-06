@@ -1,6 +1,15 @@
-# Local verification
+# Verification history
 
-UNO remains uncommitted, unpushed and undeployed. The original baseline used Git HEAD `2e88e52`; subsequent published-game/PWA commits did not include UNO (current committed HEAD: `ef25a14`).
+The baseline notes below describe the original local development. UNO was subsequently published in `00fcf8e`. The current interaction/pacing changes and their new test entry points are described in `RELEASE-2026-10-06.md`; historical pre-arming/out-of-turn UNO claims below do not apply to that release.
+
+## Current interaction, pacing and compact toolbar release (2026-10-06)
+
+- **54 pure tests passed**, including post-play UNO/catch timing, private two-card penalties, force-start restrictions, exact-number-and-colour jump-ins, conservation and bounded public-only action history.
+- `bad8f4baf` completed all four current browser suites: `uno-toolbar.cjs`, `uno-release-browser.cjs`, `uno-release-visual.cjs` and `uno-round.cjs`. Real iroh peers and WebGL passed invite/name joining, custom avatars, force-start, paced dealing/draws/plays, retained-turn UNO, missed-call catches, exact jump-ins, rotation, winner timing and rematch. A shuffled reduced-motion game completed 70 turn updates and four choice dialogs with 7–0 and stacking enabled, then dealt a new seven-card round.
+- Cog Settings contains motion, theme, credits and leave/end-room. The hamburger history drawer passed empty/dense/long-text/scroll checks, a 50-entry bound, safe literal text rendering, keyboard focus/Escape, and clearing on leave. Main-menu-only puzzles navigation, hidden healthy connection status, visible reconnection warnings and removal of the passive privacy footer were checked.
+- Responsive checks cover 1920, 1024, 390 and 320-pixel widths, both themes, and 2/4/8 seats. Screenshots under `/tmp/uno-release`, `/tmp/uno-release-controls`, `/tmp/uno-release-round` and `/tmp/uno-toolbar` were visually reviewed. The review corrected narrow eight-seat status/HUD overlap using numbered turn order and a bounded central status width.
+- Syntax and whitespace checks passed. Two earlier toolbar-script failures checked native-dialog close and asynchronous room leave before completion; the tests now wait for their observable completion rather than weakening application behavior.
+- Older scripts below describe historical controls and are not the current release gate. No physical-device, separate-network or Safari certification is implied.
 
 ## Baseline transport/game verification (before the 3D presentation)
 
@@ -77,6 +86,6 @@ Intermittent iroh endpoint-online timeouts occurred during retesting, including 
 - Safari/iOS, mobile OS background suspension, adverse network switching, or prolonged relay outages.
 - Physical-camera QR scanning or a native mobile OS share sheet. QR pixel decoding is verified; OS-share payload handling used a test stub. Localhost invite links still require the same computer; other devices need a shared HTTPS origin.
 - Competitive anti-cheat, host migration, persistent rooms, or full ScuffedUNO feature parity.
-- A public deployment. The local Python server serves static assets only.
+- The baseline did not test a public deployment. Subsequent deployment verification is recorded separately.
 
 See `README.md` for exact test entry points and requirements.

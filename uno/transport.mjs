@@ -7,9 +7,10 @@ export function decodeTicket(input) {
   if (!/^[A-Za-z0-9_-]+$/.test(raw)) throw new Error('Paste a full invite link or ticket');
   let t;
   try { t = JSON.parse(atob(raw.replaceAll('-','+').replaceAll('_','/'))); } catch { throw new Error('Invalid invite'); }
-  if (!t || t.v !== 1 || typeof t.host !== 'string' || !/^[a-z0-9]{52,64}$/.test(t.host) ||
+  if(t?.v!==2)throw new Error('This invite uses an older game version. Refresh and ask the host for a new lobby link.');
+  if (!t || typeof t.host !== 'string' || !/^[a-z0-9]{52,64}$/.test(t.host) ||
       !RELAYS.has(t.relay) || !/^[a-f0-9]{32}$/.test(t.room) || !/^[a-f0-9]{32}$/.test(t.secret)) throw new Error('Unsupported or invalid invite');
-  return {v:1, host:t.host, relay:t.relay, room:t.room, secret:t.secret};
+  return {v:2, host:t.host, relay:t.relay, room:t.room, secret:t.secret};
 }
 export const token = () => [...crypto.getRandomValues(new Uint8Array(16))].map(x => x.toString(16).padStart(2,'0')).join('');
 export class Transport {

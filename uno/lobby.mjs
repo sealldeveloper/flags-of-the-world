@@ -1,9 +1,9 @@
-import {AVATAR_COLOURS, AVATAR_PATTERNS, cleanName, paintAvatar} from './profiles.mjs';
+import {AVATAR_PATTERNS, cleanName, paintAvatar, avatarHex} from './profiles.mjs';
 const $=id=>document.getElementById(id);
 export class LobbyControls {
   constructor({getRoom,command}) {
     this.getRoom=getRoom; this.command=command;
-    for(const [group,items] of [['pattern',AVATAR_PATTERNS],['colour',AVATAR_COLOURS]]) for(const item of items){
+    for(const [group,items] of [['pattern',AVATAR_PATTERNS]]) for(const item of items){
       const label=document.createElement('label');label.className='avatar-option';
       const input=document.createElement('input');input.type='radio';input.name=`avatar-${group}`;input.value=item.id;input.required=true;
       const sample=document.createElement('span');sample.className=group==='pattern'?'seat-avatar pattern-thumb':'colour-swatch';sample.setAttribute('aria-hidden','true');
@@ -11,6 +11,7 @@ export class LobbyControls {
       const text=document.createElement('span');text.textContent=item.label;label.append(input,sample,text);$(`avatar-${group}s`).append(label);
       input.onchange=()=>this.preview();
     }
+    $('avatar-colour').oninput=()=>this.preview();
     $('profile-name').oninput=()=>this.preview();
     $('edit-profile').onclick=()=>this.openProfile();
     $('profile-form').onsubmit=e=>{e.preventDefault();this.saveProfile();};
@@ -29,7 +30,7 @@ export class LobbyControls {
     $('toggle-qr').onclick=()=>this.toggleQR();
     window.addEventListener('resize',()=>this.sizeQR());
   }
-  selection(){return {colour:document.querySelector('[name="avatar-colour"]:checked')?.value,pattern:document.querySelector('[name="avatar-pattern"]:checked')?.value};}
+  selection(){return {colour:$('avatar-colour').value,pattern:document.querySelector('[name="avatar-pattern"]:checked')?.value};}
   preview(){
     const avatar=this.selection();if(!avatar.colour||!avatar.pattern)return;
     paintAvatar($('profile-preview'),avatar);
@@ -40,7 +41,8 @@ export class LobbyControls {
     if(!this.me||!this.online||this.pending||this.view.phase==='playing')return;
     this.saving=null;this.profileBusy(false);$('profile-error').textContent='';
     $('profile-name').value=this.me.name;
-    for(const group of ['colour','pattern'])for(const input of document.querySelectorAll(`[name="avatar-${group}"]`))input.checked=input.value===this.me.avatar[group];
+    $('avatar-colour').value=avatarHex(this.me.avatar.colour);
+    for(const input of document.querySelectorAll('[name="avatar-pattern"]'))input.checked=input.value===this.me.avatar.pattern;
     this.preview();$('profile-dialog').showModal();
   }
   profileBusy(busy){$('profile-fields').disabled=busy;$('profile-save').disabled=busy;$('profile-cancel').disabled=busy;$('profile-save').textContent=busy?'Saving…':'Save profile';}

@@ -9,6 +9,7 @@ export const AVATAR_PATTERNS = [
   {id:'dots', label:'Dots'}, {id:'stripes', label:'Stripes'}, {id:'waves', label:'Waves'},
   {id:'checker', label:'Checker'}, {id:'rings', label:'Rings'}, {id:'crosses', label:'Crosses'},
   {id:'diamonds', label:'Diamonds'}, {id:'zigzag', label:'Zigzag'},
+  {id:'stars', label:'Stars'}, {id:'hearts', label:'Hearts'}, {id:'hexagons', label:'Hexagons'}, {id:'solid', label:'Solid'},
 ];
 export function cleanName(name) {
   if (typeof name !== 'string') throw new Error('Enter a display name');
@@ -17,8 +18,8 @@ export function cleanName(name) {
   return value;
 }
 export function validateAvatar(avatar) {
-  if (!avatar || !AVATAR_COLOURS.some(c => c.id === avatar.colour) || !AVATAR_PATTERNS.some(p => p.id === avatar.pattern)) throw new Error('Choose a supported avatar colour and pattern');
-  return {colour:avatar.colour, pattern:avatar.pattern};
+  if (!avatar || typeof avatar.colour!=='string' || (!/^#[0-9a-f]{6}$/i.test(avatar.colour)&&!AVATAR_COLOURS.some(c => c.id === avatar.colour)) || !AVATAR_PATTERNS.some(p => p.id === avatar.pattern)) throw new Error('Choose a supported avatar colour and pattern');
+  return {colour:avatar.colour.toLowerCase(), pattern:avatar.pattern};
 }
 export function defaultAvatar(index = 0) {
   return {colour:AVATAR_COLOURS[index % AVATAR_COLOURS.length].id, pattern:AVATAR_PATTERNS[index % AVATAR_PATTERNS.length].id};
@@ -30,9 +31,10 @@ export function nextAvatar(players) {
   }
   return defaultAvatar();
 }
+export const avatarHex = colour => AVATAR_COLOURS.find(c=>c.id===colour)?.hex || colour;
 export function paintAvatar(element, avatar) {
   const {colour,pattern}=validateAvatar(avatar);
   element.dataset.colour=colour; element.dataset.pattern=pattern;
-  element.style.setProperty('--avatar-colour',AVATAR_COLOURS.find(c=>c.id===colour).hex);
+  element.style.setProperty('--avatar-colour',avatarHex(colour));
   element.style.setProperty('--avatar-pattern',`url('./assets/avatars/${pattern}.svg')`);
 }

@@ -7,15 +7,18 @@
   <meta name="description" content="A private, browser-hosted card table using iroh peer connections.">
   <title>Scuffed UNO · iroh port — seall.dev</title>
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css">
-  <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js"}}</script>
+  <link rel="stylesheet" href="./style.css?v=20261006b">
+  <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","./ui.mjs":"./ui.mjs?v=20261006b","./engine.mjs":"./engine.mjs?v=20261006b","./room.mjs":"./room.mjs?v=20261006b","./presentation.mjs":"./presentation.mjs?v=20261006b","./scene.mjs":"./scene.mjs?v=20261006b","./transport.mjs":"./transport.mjs?v=20261006b","./profiles.mjs":"./profiles.mjs?v=20261006b","./lobby.mjs":"./lobby.mjs?v=20261006b","./rules.mjs":"./rules.mjs?v=20261006b","./history.mjs":"./history.mjs?v=20261006b"}}</script>
 </head>
 <body>
   <canvas id="scene" aria-hidden="true"></canvas>
   <div id="scene-loading" role="status" hidden>Loading 3D table…</div>
-  <header class="site-header"><a href="../">← puzzles</a><strong>Scuffed UNO <span class="tag">iroh port · local preview</span></strong><div class="header-tools"><button id="credits" type="button">Credits</button><button id="theme" type="button" aria-label="Switch colour theme">Dark theme</button></div></header>
+  <header class="site-header"><a id="puzzles-link" href="../">← puzzles</a><strong>Scuffed UNO <span class="tag">iroh edition</span></strong><div class="header-tools">
+    <button id="history-toggle" class="icon-button" type="button" aria-label="Recent actions" title="Recent actions" aria-haspopup="dialog" aria-controls="history-panel" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <button id="settings-toggle" class="icon-button" type="button" aria-label="Settings" title="Settings" aria-haspopup="dialog" aria-controls="settings-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-.6 2.4-2.1 1.2L4 6l-2 3.5 1.7 1.8v2.4L2 15.5 4 19l2.3-.6 2.1 1.2L9 22h4l.6-2.4 2.1-1.2 2.3.6 2-3.5-1.7-1.8v-2.4L20 9l-2-3-2.3.6-2.1-1.2L13 3Z"/><circle cx="11" cy="12.5" r="3"/></svg></button>
+  </div></header>
   <main>
-    <div class="status-row"><span id="connection" role="status">Not connected</span><button id="leave" type="button" hidden>Leave room</button></div>
+    <div class="status-row" hidden><span id="connection" role="status">Not connected</span></div>
     <p id="error" class="error" role="alert" hidden></p>
     <section id="entry" class="panel">
       <div class="entry-hero">
@@ -26,7 +29,7 @@
         <span class="network-badge">Connected by iroh. Hosted by you.</span>
       </div>
       <form id="entry-form">
-        <h2>Let's play!</h2>
+        <h2 id="entry-title">Let's play!</h2><p id="join-hint" hidden>You've opened a group invite. Choose your name to join.</p>
         <label for="name">Your name</label><input id="name" maxlength="32" autocomplete="nickname" placeholder="Display name" required>
         <div class="entry-actions"><button id="create" class="primary" type="submit">Create group lobby</button><button id="resume" type="button" hidden>Rejoin previous lobby</button></div>
         <div class="join-block"><label for="invite-input">Have an invite?</label><textarea id="invite-input" rows="3" maxlength="4096" spellcheck="false" placeholder="Paste an invite link or ticket"></textarea><button id="join" type="button">Join group lobby</button></div>
@@ -48,24 +51,36 @@
           <p class="lobby-private">Private · iroh</p>
           <h3 class="rules-title">Rules <small id="rules-instruction">(click to toggle)</small></h3>
           <div id="rule-toggles" role="group" aria-label="Game options"></div>
-          <div class="controls lobby-controls"><button id="ready" type="button">Ready</button><button id="start" class="primary" type="button">Start Game</button></div>
+          <div class="controls lobby-controls"><button id="ready" type="button">Ready</button><button id="start" class="primary" type="button">Start Game</button><button id="force-start" type="button" hidden>Force start — skip readiness</button></div>
           <p class="fine" id="lobby-help"></p>
           <p class="fine">Rule changes reset guest readiness. Settings are locked during a round.</p>
-          <details><summary>Rule details &amp; how to play</summary><dl id="rule-descriptions"></dl><p>Click or tap a matching card to play it immediately. Click the deck to draw instead, or let a no-choice turn draw automatically. A wild opens the colour picker; a 7 opens the swap picker when that rule is enabled. Use Play / Keep above a playable drawn card. Force Play removes Keep. Keyboard: Tab to a card or the deck, then Enter or Space. Each house rule is independent. Draw penalties are automatic unless you can stack another matching draw card; then choose the stack or click the deck to take the penalty. Paying a penalty consumes your turn. Draw till playable stops at the first playable draw, not when an older card in your hand matches.</p><p>Outside a +4 stack, Wild +4 is legal only when you hold no card of the current colour. Jump-ins require the exact colour and number. A short window after the played-card animation gives other players time to jump in before the next normal action. No jump-ins during draw penalties or drawn-card choices. No bluffing/challenges or missed-UNO penalties in this preview. Press UNO with one card, or arm it before playing from two cards. Calls are shared with the room; bots call automatically. A swap or rotation requires a fresh call. Two-player Reverse skips the other player. Empty your hand to win.</p><p>With 7–0 enabled, hand swaps and rotations resolve before checking for a winner. New rounds begin with the host and a number card.</p></details></section>
+          <details><summary>Rule details &amp; how to play</summary><dl id="rule-descriptions"></dl><p>Click or tap a matching card to play it immediately. Click the deck to draw instead, or let a no-choice turn draw automatically. A wild opens the colour picker; a 7 opens the swap picker when that rule is enabled. Use Play / Keep above a playable drawn card. Force Play removes Keep. Keyboard: Tab to a card or the deck, then Enter or Space. Each house rule is independent. Draw penalties are automatic unless you can stack another matching draw card; then choose the stack or click the deck to take the penalty. Paying a penalty consumes your turn. Draw till playable stops at the first playable draw, not when an older card in your hand matches.</p><p>Outside a +4 stack, Wild +4 is legal only when you hold no card of the current colour. Jump-ins require the exact colour and number. A short window after the played-card animation gives other players time to jump in before the next normal action. No jump-ins during draw penalties or drawn-card choices. No +4 bluffing challenges. After playing your second-last card, your turn stays open: you have three seconds to call UNO, then opponents have five seconds to catch a missed call for a two-card penalty. You can still call before they catch you. No pre-arming or out-of-turn calls. Bots call automatically; swaps and rotations do not open a call window. Two-player Reverse skips the other player. Empty your hand to win.</p><p>With 7–0 enabled, hand swaps and rotations resolve before checking for a winner. New rounds begin with the host and a number card.</p></details></section>
         <section class="panel seats-panel" aria-labelledby="players-heading"><div class="seats-heading"><h2 id="players-heading">Players</h2><button id="edit-profile" type="button" aria-haspopup="dialog">Your profile</button></div><div id="players-home"><ul id="players" role="list"></ul><button id="add-bot" type="button"><span aria-hidden="true">+</span>Add Bot</button></div></section>
       </div>
       <section id="table" class="panel table" hidden aria-label="Card table">
         <div id="opponent-zone"></div>
         <div class="table-heading"><h2 id="turn-label">Your turn</h2></div>
-        <div id="table-status"><span id="current-colour" class="colour-label"></span><span id="direction"></span><p id="notice" class="notice" aria-live="polite"></p></div>
+        <div id="table-status"><span id="current-colour" class="colour-label"></span><span id="direction"></span><p id="turn-order" aria-label="Turn order"></p><p id="notice" class="notice" aria-live="polite"></p></div>
         <svg id="swap-arrow" aria-hidden="true" hidden><defs><marker id="swap-tip" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#ffdf74"/></marker></defs><path id="swap-path" fill="none" stroke="#ffdf74" stroke-width="4" marker-end="url(#swap-tip)"/><g id="rotate-paths" fill="none" stroke="#ffdf74" stroke-width="4" marker-end="url(#swap-tip)"></g></svg>
         <div class="pile-area"><div id="direction-orbit" aria-hidden="true"><span>➜</span><span>➜</span></div><div><span class="pile-label">Discard</span><div id="discard"></div></div><div class="draw-area"><span id="debt"></span><button id="draw" type="button">Draw a card</button></div></div>
         <div id="drawn-decision" role="group" aria-label="Play or keep the drawn card" hidden><button id="drawn-play" class="primary" type="button">Play</button><button id="pass" type="button">Keep</button></div>
-        <div id="uno-controls"><button id="call-uno" type="button" aria-pressed="false" title="Call UNO with one card, or arm it before playing from two cards">UNO!</button></div>
+        <div id="uno-controls"><button id="call-uno" type="button" hidden aria-label="Call UNO" title="Call UNO before your turn ends"><img src="./assets/scuffeduno/uno-button.png" alt="UNO!" draggable="false"></button><button id="catch-uno" type="button" hidden>Catch missed UNO · +2</button></div>
         <div class="hand-heading"><h2><span id="self-name">Your hand</span> <span id="hand-count"></span></h2><span id="hand-help" class="muted">Tap a card to play. Tap the deck to draw.</span></div>
         <div id="hand" class="hand" role="group" aria-label="Your cards"></div>
       </section>
     </section>
+    <dialog id="settings-panel" class="toolbar-dialog" aria-labelledby="settings-title">
+      <div class="drawer-heading"><h2 id="settings-title">Settings</h2><button id="settings-close" class="icon-button" type="button" aria-label="Close settings">×</button></div>
+      <div class="settings-actions"><button id="motion" type="button" title="Animate card movement (game pacing always stays enabled)" aria-pressed="true">Motion: on</button><button id="theme" type="button" aria-label="Switch colour theme">Dark theme</button><button id="credits" type="button">Credits</button></div>
+      <p id="settings-status" class="fine" role="status">Not connected</p>
+      <button id="leave" class="leave-action" type="button" hidden>Leave room</button>
+    </dialog>
+    <dialog id="history-panel" class="toolbar-dialog" aria-labelledby="history-title">
+      <div class="drawer-heading"><h2 id="history-title">Recent actions</h2><button id="history-close" class="icon-button" type="button" aria-label="Close recent actions">×</button></div>
+      <p class="fine history-help">Newest first · last 50 public actions seen by this tab. The game keeps running.</p>
+      <p id="history-empty" class="muted">No actions yet. Start a round to see its turns here.</p>
+      <ol id="action-history" tabindex="0" aria-label="Recent public game actions"></ol>
+    </dialog>
     <dialog id="round-result" aria-labelledby="result-title" aria-describedby="result-summary">
       <p class="credits-kicker" id="result-round"></p>
       <h2 id="result-title"></h2>
@@ -88,7 +103,7 @@
         <fieldset id="profile-fields" class="profile-fields">
           <div class="profile-identity"><span id="profile-preview" class="seat-avatar" aria-hidden="true"></span><div><label for="profile-name">Display name</label><input id="profile-name" maxlength="32" autocomplete="nickname" required><span id="profile-preview-name" class="fine"></span></div></div>
           <fieldset class="avatar-field"><legend>Pattern</legend><div id="avatar-patterns" class="avatar-options"></div></fieldset>
-          <fieldset class="avatar-field"><legend>Colour</legend><div id="avatar-colours" class="avatar-options"></div></fieldset>
+          <fieldset class="avatar-field"><legend>Colour</legend><label for="avatar-colour">Choose any colour</label><input id="avatar-colour" name="avatar-colour" type="color" value="#ff3b00"></fieldset>
         </fieldset>
         <p id="profile-error" class="form-error" role="alert"></p>
         <div class="dialog-actions"><button id="profile-save" class="primary" type="submit">Save profile</button><button id="profile-cancel" type="button">Cancel</button></div>
@@ -109,6 +124,6 @@
   </main>
   <footer>Static site · Browser-hosted · iroh only · Keep the host tab in the foreground on mobile.</footer>
   <noscript>This game needs JavaScript and WebAssembly enabled.</noscript>
-  <script type="module" src="./ui.mjs"></script>
+  <script type="module" src="./ui.mjs?v=20261006b"></script>
 </body>
 </html>

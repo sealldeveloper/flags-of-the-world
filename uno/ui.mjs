@@ -4,10 +4,37 @@ import {RULES} from './rules.mjs';
 import {paintAvatar} from './profiles.mjs';
 import {LobbyControls} from './lobby.mjs';
 import {TablePresentation} from './presentation.mjs';
+import {decodeTicket} from './transport.mjs';
+import {RecentActions} from './history.mjs';
 const $ = id => document.getElementById(id);
 let room = null, view = null, online = false, pending = false, cardAction = null;
 let table3d = null, sceneLoading = null, lobbyControls = null, lastForcedChoice = null, animating = false;
-let unoArmed=false, resultRound=null;
+let incomingInvite='', resultRound=null;
+const recentActions = new RecentActions();
+function renderHistory() {
+  $('history-empty').hidden = recentActions.entries.length > 0;
+  const panel=$('action-history'), scroll=panel.scrollTop, height=panel.scrollHeight;
+  $('action-history').replaceChildren(...recentActions.entries.map(entry=>{
+    const li=document.createElement('li'), label=document.createElement('span'), text=document.createElement('p');
+    label.className='history-round'; label.textContent=`Round ${entry.round}`; text.textContent=entry.text;
+    li.append(label,text); return li;
+  }));
+  if(scroll>0)panel.scrollTop=scroll+panel.scrollHeight-height;
+}
+function connectionStatus(text) {
+  const healthy=['Hosting · iroh connected','Connected · iroh'].includes(text);
+  $('connection').textContent=text;
+  $('connection').parentElement.hidden=healthy||text==='Not connected';
+  $('settings-status').textContent=healthy?(room?.isHost?'Host · connected':'Connected'):text;
+}
+for(const kind of ['settings','history']) {
+  const panel=$(kind+'-panel'), toggle=$(kind+'-toggle');
+  toggle.onclick=()=>{panel.showModal();toggle.setAttribute('aria-expanded','true');};
+  $(kind+'-close').onclick=()=>panel.close();
+  panel.addEventListener('close',()=>{toggle.setAttribute('aria-expanded','false');if(!toggle.hidden)toggle.focus();});
+  panel.addEventListener('click',e=>{const r=panel.getBoundingClientRect();if(e.target===panel&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom))panel.close();});
+  toggle.setAttribute('aria-expanded','false');
+}
 const presentation = new TablePresentation(render,{reduced:matchMedia('(prefers-reduced-motion: reduce)').matches});
 function pingText(ms){return Number.isInteger(ms)?`${ms} ms`:'— ms';}
 function updateLatency(values){for(const el of document.querySelectorAll('#players .seat')){const ping=el.querySelector('.seat-ping');if(ping)ping.textContent=pingText(values[el.dataset.seatId]);}}
@@ -15,7 +42,7 @@ async function syncScene() {
   if (view?.phase !== 'playing') { table3d?.stop(); $('scene-loading').hidden = true; return; }
   if (!table3d) {
     $('scene-loading').hidden = false;
-    sceneLoading ||= import('./scene.mjs').then(async ({CardTable}) => { const scene = new CardTable($('scene'), {onError:error}); await scene.ready; table3d = scene; return scene; });
+    warmScene();
     try { await sceneLoading; }
     catch (e) { sceneLoading = null; $('scene-loading').textContent = '3D graphics unavailable. WebGL and the local game assets are required.'; error(`Cannot load the 3D table: ${e.message}`); return; }
   }
@@ -23,39 +50,52 @@ async function syncScene() {
   table3d.update(view, {online,pending});
   document.body.classList.add('scene-ready'); $('scene-loading').hidden = true;
 }
+function warmScene() {
+  sceneLoading ||= import('./scene.mjs').then(async ({CardTable})=>{const scene=new CardTable($('scene'),{onError:error});await scene.ready;table3d=scene;return scene;});
+  return sceneLoading;
+}
 function error(message = '') { $('error').textContent = message; $('error').hidden = !message; lobbyControls?.onError(message); }
 function theme(value) { document.documentElement.dataset.theme = value; localStorage.setItem('xw-theme', value); $('theme').textContent = value === 'dark' ? 'Light theme' : 'Dark theme'; }
 theme(localStorage.getItem('xw-theme') || 'light');
 $('theme').onclick = () => theme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
-$('credits').onclick = () => $('credits-dialog').showModal();
+$('credits').onclick = () => { $('settings-panel').close(); $('credits-dialog').showModal(); };
+$('credits-dialog').addEventListener('close',()=>$('settings-toggle').focus());
+function motion(enabled){localStorage.setItem('uno-motion',enabled?'on':'off');if(table3d)table3d.reduced=!enabled;$('motion').textContent=`Motion: ${enabled?'on':'off'}`;$('motion').setAttribute('aria-pressed',String(enabled));}
+motion(localStorage.getItem('uno-motion')==='on'||(localStorage.getItem('uno-motion')!=='off'&&!matchMedia('(prefers-reduced-motion: reduce)').matches));
+$('motion').onclick=()=>motion($('motion').getAttribute('aria-pressed')!=='true');
 $('name').value = localStorage.getItem('uno-name') || '';
 $('resume').hidden = !savedInvite();
 function readIncomingInvite() {
   const incoming = new URLSearchParams(location.hash.slice(1)).get('join');
   if (!incoming) return;
-  $('invite-input').value = incoming;
+  if (room && !room.disposed) {error('An invite was opened. Leave your current room before joining it.');return;}
+  try {decodeTicket(incoming);}catch(e){error(e.message);return;}
+  incomingInvite=incoming;$('invite-input').value=incoming;
+  $('entry-title').textContent='Join your group';$('join-hint').hidden=false;
+  $('create').textContent='Join group lobby';document.querySelector('.join-block').hidden=true;$('resume').hidden=true;
   history.replaceState(null, '', location.pathname + location.search);
-  if (room && !room.disposed) error('An invite was opened. Leave your current room before joining it.');
+  $('name').focus();$('name').select();
 }
 readIncomingInvite();
 window.addEventListener('hashchange', readIncomingInvite);
 function busy(value) { for (const id of ['create','join','resume','name','invite-input']) $(id).disabled = value; }
 async function enter(invite = '') {
   if (!$('entry-form').reportValidity()) return;
-  error(); busy(true);
-  const current = new Room({onView:(...args)=>presentation.receive(...args), onLatency:updateLatency, onStatus:text => { $('connection').textContent = text; }, onError:error});
+  error(); busy(true); recentActions.reset(); renderHistory();
+  const current = new Room({onView:(...args)=>presentation.receive(...args), onLatency:updateLatency, onStatus:connectionStatus, onError:error});
   room = current;
   try {
     localStorage.setItem('uno-name', $('name').value.trim());
+    warmScene().catch(()=>{sceneLoading=null;});
     await current.open($('name').value, invite);
     if (room === current) { $('leave').hidden = false; $('leave').textContent = current.isHost ? 'End room' : 'Leave room'; }
   } catch (e) {
     error(e.message); await current.stop();
     if (room === current) room = null;
-    $('connection').textContent = 'Not connected'; busy(false);
+    connectionStatus('Not connected'); busy(false);
   }
 }
-$('entry-form').onsubmit = e => { e.preventDefault(); enter(); };
+$('entry-form').onsubmit = e => { e.preventDefault(); enter(incomingInvite); };
 $('join').onclick = () => {
   if (!$('invite-input').value.trim()) { error('Paste an invite link first.'); $('invite-input').focus(); return; }
   enter($('invite-input').value);
@@ -63,10 +103,13 @@ $('join').onclick = () => {
 $('resume').onclick = () => enter(savedInvite());
 $('leave').onclick = async () => {
   if (room?.isHost && !confirm('End this room for everyone?')) return;
-  await room?.leave(); presentation.reset(); lobbyControls?.reset(); room = null; view = null; lastForcedChoice = null; animating=false; unoArmed=false;resultRound=null;$('round-result').close();document.body.dataset.presenting='false';
+  await room?.leave(); presentation.reset(); lobbyControls?.reset(); room = null; view = null; lastForcedChoice = null; animating=false; incomingInvite='';resultRound=null;$('round-result').close();document.body.dataset.presenting='false';
   $('room').hidden = true; $('entry').hidden = false; $('leave').hidden = true; $('resume').hidden = true;
-  document.body.classList.remove('playing','scene-ready','dense-table'); table3d?.stop(); $('scene-loading').hidden = true;
-  $('connection').textContent = 'Not connected'; busy(false); error();
+  document.body.classList.remove('playing','scene-ready','dense-table','crowded-table','in-room'); table3d?.stop(); $('scene-loading').hidden = true;
+  $('history-toggle').hidden=true; $('history-panel').close(); $('settings-panel').close(); recentActions.reset(); renderHistory();
+  connectionStatus('Not connected'); busy(false); error();
+  $('entry-title').textContent="Let's play!";$('join-hint').hidden=true;$('create').textContent='Create group lobby';document.querySelector('.join-block').hidden=false;
+  readIncomingInvite();
 };
 const command = action => { if(animating&&['play','draw','pass'].includes(action.type))return; error(); room?.command(action); };
 lobbyControls = new LobbyControls({getRoom:()=>room, command});
@@ -90,15 +133,13 @@ for (const [key,label,asset] of lobbyRules) {
 }
 $('add-bot').onclick = () => command({type:'bot'});
 $('start').onclick = () => command({type:'start'});
+$('force-start').onclick=()=>{if(confirm('Start with connected players even if they are not ready?'))command({type:'start',force:true});};
 $('ready').onclick = () => command({type:'ready', ready:!view.players.find(p => p.id === view.self).ready});
 $('draw').onclick = () => command({type:'draw'});
 $('pass').onclick = () => command({type:'pass'});
 $('drawn-play').onclick = () => {if(view?.drawn)playCard(view.drawn);};
-$('call-uno').onclick=()=>{
-  if(!online||pending||animating||view?.phase!=='playing')return;
-  if(view.hand.length===1)command({type:'uno'});
-  else if(view.hand.length===2){unoArmed=!unoArmed;render(view,online,pending,animating);}
-};
+$('call-uno').onclick=()=>{if(!online||pending||animating||view?.unoWindow?.player!==view.self)return;command({type:'uno'});};
+$('catch-uno').onclick=()=>{if(view?.unoCatchable&&!animating)command({type:'catch-uno',target:view.unoWindow.player});};
 $('result-close').onclick=()=>{$('round-result').close();$('show-results').focus();};
 $('show-results').onclick=()=>$('round-result').showModal();
 $('result-rematch').onclick=()=>command({type:'start'});
@@ -133,8 +174,9 @@ function render(v, connected = true, waiting = false, presenting = false) {
   if (!v) return;
   const previousRevision = view?.revision;
   const enteringGame = view?.phase !== 'playing' && v.phase === 'playing';
-  if(!view||view.round!==v.round||view.self!==v.self||view.hand.map(c=>c.id).join(',')!==v.hand.map(c=>c.id).join(','))unoArmed=false;
   view = v; online = connected; pending = waiting; animating=presenting;
+  document.body.classList.add('in-room'); $('history-toggle').hidden=false;
+  if(recentActions.record(v,presenting))renderHistory();
   document.body.dataset.presenting=String(presenting);
   $('room').dataset.effect=v.presentation?.kind||''; $('room').dataset.effectPhase=v.presentation?.phase||''; $('room').dataset.autoDraw=String(!!v.autoDraw);
   if ($('choice').open && (previousRevision !== v.revision || !connected || waiting || v.phase !== 'playing' || !v.legal.includes(cardAction?.cardId))) $('choice').close('stale');
@@ -144,6 +186,7 @@ function render(v, connected = true, waiting = false, presenting = false) {
   $('room').classList.toggle('in-game', playing);
   document.body.classList.toggle('playing', playing);
   document.body.classList.toggle('dense-table', playing && v.players.length >= 4);
+  document.body.classList.toggle('crowded-table', playing && v.players.length >= 6);
   const playerHome = playing ? $('opponent-zone') : $('players-home');
   if ($('players').parentElement !== playerHome) playerHome.prepend($('players'));
   lobbyControls.update(v,{online,pending});
@@ -167,6 +210,8 @@ function render(v, connected = true, waiting = false, presenting = false) {
     const name = document.createElement('span'); name.className = 'seat-name'; name.textContent = p.name + (p.id === v.self ? ' (you)' : '');
     const status = document.createElement('span'); status.className = 'seat-status';
     status.textContent = `${p.id === v.host ? 'Host · ' : ''}${p.bot ? 'Bot' : !p.connected ? 'Disconnected' : v.phase === 'playing' ? 'Connected' : p.ready ? 'Ready' : 'Not ready'}${v.phase === 'playing' && p.unoCalled ? ' · UNO!' : ''}`;
+    status.dataset.ready=String(p.connected&&p.ready);
+    if(playing)name.textContent=`${v.players.indexOf(p)+1}. ${name.textContent}`;
     name.title = name.textContent;
     info.append(name,status); li.append(info);
     const fan = document.createElement('div'); fan.className = 'opponent-fan'; fan.setAttribute('aria-hidden','true');
@@ -189,6 +234,8 @@ function render(v, connected = true, waiting = false, presenting = false) {
   $('add-bot').hidden = !host || v.phase === 'playing'; $('add-bot').disabled = !online || v.players.length >= MAX_PLAYERS;
   $('start').hidden = !host || v.phase === 'playing'; $('start').textContent = v.phase === 'finished' ? 'Deal another round' : 'Start Game';
   $('start').disabled = !online || v.players.length < 2 || v.players.some(p => !p.ready || !p.connected);
+  $('force-start').hidden=!host||playing||!v.players.some(p=>!p.ready);
+  $('force-start').disabled=!online||pending||v.players.length<2||v.players.some(p=>!p.connected);
   $('ready').hidden = host || v.phase === 'playing'; $('ready').textContent = me?.ready ? 'Unready' : 'Ready'; $('ready').disabled = !online || pending;
   $('lobby-help').textContent = !online ? (room.disposed ? 'This room has closed. Leave to create or join another lobby.' : 'Connection lost. Moves are paused while reconnecting.') : v.phase === 'playing' ? 'Keep the host tab open. Disconnected players can be replaced with bots.' : 'Everyone must be ready to deal. Share the invite with your group.';
   for (const {key} of RULES) { $(key).checked = v.rules[key]; $(key).disabled = !host || !online || v.phase === 'playing'; }
@@ -197,18 +244,24 @@ function render(v, connected = true, waiting = false, presenting = false) {
   roundResult(v);
   if (v.phase === 'lobby') { syncScene(); return; }
   const jumpWindow=v.presentation?.kind==='jump-window';
-  const canPlay = online && !pending && !animating && v.phase === 'playing' && !(jumpWindow&&v.turn===v.self);
+  const canPlay = online && !pending && !animating && !v.unoWindow && v.phase === 'playing' && !(jumpWindow&&v.turn===v.self);
   const turn = canPlay && v.turn === v.self, jumping = canPlay && !turn && v.legal.length > 0;
-  $('call-uno').disabled=!online||pending||animating||!playing||![1,2].includes(v.hand.length)||me.unoCalled;
-  $('call-uno').textContent=me.unoCalled?'Called ✓':unoArmed?'Armed ✓':'UNO!';
-  $('call-uno').setAttribute('aria-pressed',String(unoArmed||me.unoCalled));
-  $('call-uno').setAttribute('aria-label',me.unoCalled?'UNO called':unoArmed?'UNO armed for your next play — press to cancel':v.hand.length===2?'Arm UNO for your next play':'Call UNO');
+  $('call-uno').hidden=!playing||animating||!online||v.unoWindow?.player!==v.self||v.turn!==v.self||v.hand.length!==1||me.unoCalled;
+  $('call-uno').disabled=pending;
+  $('catch-uno').hidden=!playing||animating||!online||!v.unoCatchable||!v.unoWindow||v.unoWindow.player===v.self;
+  $('catch-uno').disabled=pending;
+  if(v.unoWindow)$('catch-uno').textContent=`Catch ${v.players.find(p=>p.id===v.unoWindow.player)?.name} · +2`;
   $('turn-label').textContent = v.phase === 'finished' ? 'Round complete' : !online ? (room.disposed ? 'Room closed' : 'Reconnecting…') : !current?.connected ? `Waiting for ${current?.name} to reconnect` : v.turn === v.self ? 'Your turn' : jumping ? 'Jump in — exact match!' : `${current?.name}'s turn`;
-  $('direction').textContent = v.direction === 1 ? 'Clockwise →' : '← Counterclockwise';
+  $('direction').textContent = v.direction === 1 ? 'Clockwise ↻' : 'Counterclockwise ↺';
+  const at=v.players.findIndex(p=>p.id===v.turn);
+  const ordered=Array.from({length:v.players.length},(_,i)=>v.players[(at+i*v.direction+v.players.length)%v.players.length]);
+  $('turn-order').textContent=ordered.map(p=>v.players.indexOf(p)+1).join(' → ');
+  $('turn-order').setAttribute('aria-label','Turn order: '+ordered.map(p=>`${v.players.indexOf(p)+1}. ${p.name}`).join(' → '));
+  $('turn-order').title=$('turn-order').getAttribute('aria-label');
   $('direction-orbit').classList.toggle('reversed', v.direction === -1);
   $('self-name').textContent = `${me.name} · your hand`;
   const name=id=>v.players.find(p=>p.id===id)?.name||'Player',effect=v.presentation;
-  $('notice').textContent = effect?.kind==='draw'?`${name(effect.player)} draws a card (${effect.step}).`:effect?.kind==='swap'?`${name(effect.from)} → ${name(effect.to)} · ${effect.phase==='select'?'Selected for a hand swap':effect.phase==='pause'?'Returning the other hand next…':'Swapping hands…'}`:effect?.kind==='rotate'?`All hands pass ${effect.direction===1?'clockwise':'counterclockwise'}${effect.phase==='select'?' — get ready.':'…'}`:jumpWindow?'Jump-in window — match the colour and number.':v.autoDraw?`${current.name} ${v.debt?`draws ${v.debt} automatically`:'has no playable card — drawing automatically'}.`:v.notice;
+  $('notice').textContent = effect?.kind==='deal'?`Dealing card ${effect.step} of 7…`:effect?.kind==='play'?`${name(effect.player)} plays ${cardLabel(v.top)}…`:effect?.kind==='settle'?'Letting the cards settle…':!animating&&v.unoWindow?`${name(v.unoWindow.player)}: call UNO!${v.unoCatchable?' Others can now catch a missed call for +2.':''}`:effect?.kind==='draw'?`${name(effect.player)} draws a card (${effect.step}).`:effect?.kind==='swap'?`${name(effect.from)} → ${name(effect.to)} · ${effect.phase==='select'?'Selected for a hand swap':effect.phase==='pause'?'Returning the other hand next…':'Swapping hands…'}`:effect?.kind==='rotate'?`All hands pass ${effect.direction===1?'clockwise':'counterclockwise'}${effect.phase==='select'?' — get ready.':'…'}`:jumpWindow?'Jump-in window — match the colour and number.':v.autoDraw?`${current.name} ${v.debt?`draws ${v.debt} automatically`:'has no playable card — drawing automatically'}.`:v.notice;
   $('discard').replaceChildren(...(v.top ? [makeCard(v.top)] : []));
   $('current-colour').textContent = `${current?.name||'Player'}'s turn`;
   $('current-colour').setAttribute('aria-label',`${current?.name||'Player'}'s turn. Current colour: ${v.colour}.`);
@@ -219,7 +272,8 @@ function render(v, connected = true, waiting = false, presenting = false) {
   $('drawn-play').disabled = !turn;
   $('pass').hidden = !v.drawn || v.rules.forcePlay; $('pass').disabled = !turn;
   $('hand-count').textContent = `(${v.hand.length})`;
-  $('hand-help').textContent = v.autoDraw&&v.turn===v.self ? (v.debt?'Drawing the forced penalty automatically.':'No playable cards — drawing automatically.') : v.drawn ? (v.rules.forcePlay ? 'Play the drawn card — force play is on.' : 'Play or keep the drawn card.') : jumping ? 'Tap the identical card to jump in.' : turn ? (v.legal.length ? 'Tap a card to play. Tap the deck to draw.' : 'No playable cards — tap the deck to draw.') : 'Your cards are private to you and the host.';
+  $('hand-help').textContent = v.autoDraw&&v.turn===v.self ? (v.debt?'Drawing the forced penalty automatically.':'No playable cards — drawing automatically.') : v.drawn ? (v.rules.forcePlay ? 'Play the drawn card — force play is on.' : 'Play or keep the drawn card.') : jumping ? 'Tap the identical card to jump in.' : turn ? (v.legal.length ? 'Tap a card to play. Tap the deck to draw.' : 'No playable cards — tap the deck to draw.') : '';
+  $('hand-help').hidden=!$('hand-help').textContent;
   // Retain scroll position when snapshots refresh the hand.
   const scroll = $('hand').scrollLeft;
   const focused = document.activeElement?.dataset?.cardId;
@@ -253,7 +307,7 @@ async function playCard(cardId) {
   // One activation plays a card. Only wilds and 7-swap require a choice;
   // keep that attempt locked until the dialog's close event settles.
   const attempt = cardAction = {room, revision:view.revision, cardId};
-  const action = {type:'play', cardId, uno:unoArmed};
+  const action = {type:'play', cardId};
   try {
     if (card.colour === 'wild') {
       action.colour = await choose('Choose the next colour', COLOURS.map(c => [c,c[0].toUpperCase()+c.slice(1)]));

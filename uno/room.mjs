@@ -1,5 +1,5 @@
 import {Transport, token, encodeTicket, decodeTicket} from './transport.mjs';
-import {newRoom, MAX_PLAYERS, startRound, applyAction, viewFor, botAction, legalCard, callUno} from './engine.mjs';
+import {newRoom, MAX_PLAYERS, startRound, applyAction, viewFor, botAction, legalCard, callUno, catchUno, finishUnoTurn} from './engine.mjs';
 import {cleanName, validateAvatar, nextAvatar} from './profiles.mjs';
 import {validateRules} from './rules.mjs';
 import {effectDuration, TIMING} from './presentation.mjs';
@@ -28,7 +28,7 @@ export class Room {
     }, 8000);
     if (this.isHost) {
       this.self = token(); this.state = newRoom({id:this.self, name:this.name});
-      this.ticket = {v:1, ...this.transport.address(), room:token(), secret:token()};
+      this.ticket = {v:2, ...this.transport.address(), room:token(), secret:token()};
       decodeTicket(encodeTicket(this.ticket));
       this.onStatus('Hosting · iroh connected'); this.broadcast();
     } else {
@@ -62,7 +62,7 @@ export class Room {
     this.retryTimer = setTimeout(() => this.dial(), 500 * 2 ** this.retry);
   }
   send(id, message) {
-    try { this.transport.send(id, {v:1, room:this.ticket?.room, ...message}); }
+    try { this.transport.send(id, {v:2, room:this.ticket?.room, ...message}); }
     catch { this.transport.disconnect(id); }
   }
   ping(id,p) {
@@ -78,11 +78,17 @@ export class Room {
   }
   timing() {
     const t=this.actionTiming;
-    return t&&t.round===this.state.round&&t.revision===this.state.effects?.revision?{revealMs:Math.max(0,t.revealUntil-performance.now()),jumpWindowMs:Math.max(0,t.jumpUntil-performance.now())}:{revealMs:0,jumpWindowMs:0};
+    const now=performance.now(),valid=t&&t.round===this.state.round&&t.revision===this.state.effects?.revision;
+    return valid?{revealMs:Math.max(0,t.revealUntil-now),jumpWindowMs:Math.max(0,t.jumpUntil-now),unoCatchable:!!this.state.unoWindow&&now>=t.catchFrom&&now<t.unoUntil,unoMs:this.state.unoWindow?Math.max(0,t.unoUntil-now):0}:{revealMs:0,jumpWindowMs:0,unoCatchable:false,unoMs:0};
+  }
+  pace() {
+    const s=this.state,revealUntil=performance.now()+effectDuration(s.effects),played=s.effects?.events.find(e=>e.kind==='play');
+    const jump=s.phase==='playing'&&s.rules.jumpIn&&played&&/^\d$/.test(played.card.value)&&!s.debt&&!s.drawn&&!s.unoWindow;
+    this.actionTiming={round:s.round,revision:s.effects.revision,revealUntil,jumpUntil:jump?revealUntil+TIMING.jump:0,catchFrom:revealUntil+TIMING.unoCall,unoUntil:revealUntil+TIMING.unoCall+TIMING.unoCatch};
   }
   snapshotFor(id) {
     const current=this.state.players[this.state.turn];
-    return {...viewFor(this.state,id),...this.timing(),autoDraw:!!(this.state.phase==='playing'&&!this.state.drawn&&current?.connected&&!current.hand.some(c=>legalCard(this.state,current,c)))};
+    return {...viewFor(this.state,id),...this.timing(),autoDraw:!!(this.state.phase==='playing'&&!this.state.unoWindow&&!this.state.drawn&&current?.connected&&!current.hand.some(c=>legalCard(this.state,current,c)))};
   }
   event(e) {
     if (this.disposed) return;
@@ -105,7 +111,7 @@ export class Room {
       } else if (e.connection === this.connection) this.reconnect();
     } else if (e.kind === 'message') {
       let m;
-      try { m = JSON.parse(e.data); if (!m || m.v !== 1 || m.room !== this.ticket.room || typeof m.type !== 'string') throw new Error(); }
+      try { m = JSON.parse(e.data); if (!m || m.v !== 2 || m.room !== this.ticket.room || typeof m.type !== 'string') throw new Error(); }
       catch { this.transport.disconnect(e.connection); return; }
       if (this.isHost) this.hostMessage(e.connection, m);
       else if (e.connection === this.connection) this.guestMessage(m);
@@ -199,7 +205,12 @@ export class Room {
     }
     if (a.type==='uno') {
       if(a.target!==undefined||revision!==s.revision)throw new Error('The table changed. Call UNO again.');
+      if(this.timing().revealMs>0||this.timing().unoMs<=0)throw new Error('Wait for your second-last card to land');
       callUno(s,id);return;
+    }
+    if(a.type==='catch-uno') {
+      if(revision!==s.revision||!this.timing().unoCatchable)throw new Error('The missed-UNO catch window is closed');
+      catchUno(s,id,a.target);this.pace();return;
     }
     if (['play','draw','pass'].includes(a.type)) {
       if (revision !== s.revision) throw new Error('The table changed. Please choose again.');
@@ -207,12 +218,13 @@ export class Room {
       if(timing.revealMs>0)throw new Error('Wait for the cards to finish moving.');
       if(timing.jumpWindowMs>0&&s.players[s.turn].id===id)throw new Error('Jump-in window: wait before taking your normal turn.');
       applyAction(s, id, a);
-      const revealUntil=performance.now()+effectDuration(s.effects),played=s.effects.events.find(e=>e.kind==='play');
-      const jump=s.phase==='playing'&&s.rules.jumpIn&&played&&/^\d$/.test(played.card.value)&&!s.debt&&!s.drawn;
-      this.actionTiming={round:s.round,revision:s.revision,revealUntil,jumpUntil:jump?revealUntil+TIMING.jump:0};return;
+      this.pace();return;
     }
     if (id !== this.self) throw new Error('Only the host can do that');
-    if (a.type === 'start') startRound(s);
+    if (a.type === 'start') {
+      if(a.force!==undefined&&typeof a.force!=='boolean')throw new Error('Invalid force-start flag');
+      startRound(s,undefined,a.force===true);this.pace();
+    }
     else if (a.type === 'bot') {
       if (s.phase === 'playing' || s.players.length >= MAX_PLAYERS) throw new Error('Cannot add a bot now');
       s.players.push({id:token(), name:`Bot ${s.players.filter(p => p.bot).length + 1}`, avatar:nextAvatar(s.players), bot:true, ready:true, connected:true, hand:[]}); s.revision++;
@@ -244,15 +256,18 @@ export class Room {
     }
   }
   broadcast() {
+    if(this.state.unoWindow&&this.timing().unoMs<=0)finishUnoTurn(this.state);
     this.publishLatency();
     this.view = this.snapshotFor(this.self); this.onView(this.view, true);
     for (const [conn,p] of this.peers) if (p.seat) this.send(conn, {type:'snapshot', view:this.snapshotFor(p.seat)});
     clearTimeout(this.botTimer);clearTimeout(this.settleTimer);
-    const timing=this.timing(),wait=Math.max(timing.revealMs,timing.jumpWindowMs);
-    if(wait>0)this.settleTimer=setTimeout(()=>{if(!this.disposed)this.broadcast();},wait+5);
+    const timing=this.timing(),wait=Math.max(timing.revealMs,timing.jumpWindowMs,timing.unoMs);
+    const now=performance.now();
+    const milestones=[timing.revealMs,timing.jumpWindowMs,timing.unoMs,this.state.unoWindow?this.actionTiming.catchFrom-now:0].filter(ms=>ms>0);
+    if(milestones.length)this.settleTimer=setTimeout(()=>{if(!this.disposed)this.broadcast();},Math.min(...milestones)+10);
     const current = this.state.players[this.state.turn],forced=this.view.autoDraw;
     const actor=forced?current:current?.bot ? current : this.state.players.find(p=>p.bot && p.hand.some(c=>legalCard(this.state,p,c)));
-    if (this.state.phase === 'playing' && actor) this.botTimer = setTimeout(() => {
+    if (this.state.phase === 'playing' && !this.state.unoWindow && actor) this.botTimer = setTimeout(() => {
       if (this.disposed) return;
       try { this.execute(actor.id,forced?{type:'draw'}:botAction(this.state,actor.id),this.state.revision);this.broadcast(); }
       catch { this.onError('Automatic move could not finish. End the room and report this state.'); }
