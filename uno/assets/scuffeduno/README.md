@@ -6,6 +6,7 @@ These are the actual publicly served **classic** presentation assets from <https
 - `logo.webp`: unmodified ScuffedUNO logo.
 - `logo-iroh-edition.svg`: separate edition mark embedding the unchanged logo beside a new **IROH EDITION** badge. Poppins SemiBold lettering is outlined, so no external font or image requests are required. `derived-logo.json` records its hashes and the original creator; rebuild with `python3 scripts/make-uno-logo.py` (build-only dependency: fonttools).
 - `uno-button.png`: unmodified upstream in-game UNO button (`img/logo.648f8b18.png`); its URL, retrieval timestamp and digest are in `uno-button-provenance.json`.
+- `favicon-16x16.png`, `favicon-32x32.png`: unmodified upstream tab icons, used only by the UNO page. Source URLs and hashes are in `favicon-provenance.json`.
 - `avatar.webp`, `avatar-border.webp`: unmodified default orange-dot avatar and white border. No accounts, profile service, shop, or paid cosmetic unlocks are implemented.
 - `rules/`: five unmodified 512 × 512 lobby rule illustrations; exact source URLs and hashes are in `rules/provenance.json`. These replace the text-heavy checkbox cards with the original's illustrated grid.
 - The 63 `*.png` card files are lossless rectangular crops of the atlas: 165 × 256 pixels, 168-pixel column pitch, 259-pixel row pitch. No redraw, font replacement, recolouring, or compression loss is applied. Rows: red, green, yellow, blue, wild, draw-four. Number order: 1–9, 0, draw-two, skip, reverse. The last row's sixth cell is the card back.

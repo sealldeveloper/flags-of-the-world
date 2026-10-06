@@ -1,0 +1,23 @@
+{
+  "source_page": "https://scuffeduno.online/",
+  "retrieved_on": "2026-10-06",
+  "creator": "Freddie Nelson / original ScuffedUNO contributors",
+  "modifications": "None; upstream PNG bytes preserved.",
+  "licence": "Redistribution permission unverified; attribution is not a licence. Copied at operator request.",
+  "files": [
+    {
+      "file": "favicon-16x16.png",
+      "source": "https://scuffeduno.online/favicon-16x16.png",
+      "bytes": 1081,
+      "sha256": "b7e2b3c581cb9cc0d3571f4a4c617996a36557c1844cc4af11fd658a69acceec",
+      "dimensions": [16, 16]
+    },
+    {
+      "file": "favicon-32x32.png",
+      "source": "https://scuffeduno.online/favicon-32x32.png",
+      "bytes": 2312,
+      "sha256": "31ba3062ba48d80944cc60fcca470ace34e978be244abd3c078295a5c2cdd051",
+      "dimensions": [32, 32]
+    }
+  ]
+}
