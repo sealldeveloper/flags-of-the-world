@@ -1,5 +1,13 @@
 # Verification history
 
+## 3D actions, player placards and bounded turns (protocol 4)
+
+- **67 pure tests passed**, including clock stability/expiry, RTT-aware client deadlines that acknowledgements cannot restart, atomic late-jump rejection, individual draw presentation/held-card privacy, timestamp history and font glyph/provenance checks.
+- **`becb466cd` passed** the complete real-peer, animation/choice, natural-round/rematch, turn-UI and toolbar matrix. UNO, catches and exact jump-ins passed over real iroh; the final normal turn timer is 30 seconds and jump window is three seconds. The latter was increased after a real-peer failure demonstrated that 1.5 seconds was too short with relay delivery and rendering. Counter space is reserved so panels do not jump when ownership changes. Captures: `/tmp/uno-ship`; all 161 captures reviewed via `/tmp/uno-ship-review` plus full-size detail inspection. The subsequent crowded-seat fit gate **`be615d179` passed** real peers (including cross-seat HUD/hand collision assertions), all 3D actions/choices, turn UI and all 67 pure tests. All 108 final captures under `/tmp/uno-publish` were visually reviewed in `/tmp/uno-publish-review`, with full-size narrow/desktop crowded-table and spatial-choice checks.
+- **`b80af5659` passed** the corrected 3D choice suite, a natural 7–0/stacking round (64 turn updates, four choices and a seven-card rematch), and the new turn-UI suite. Four viewport widths (1920/1024/390/320) cover all action meshes, eight-seat colour/seven choices, unobstructed option centres, wheel ray picking, held/kept cards, plain-name placards, numerical counts/ping, legal-card tint, jump cues/click/expiry and timed automatic moves. Corrected action captures: `/tmp/uno-choice-corrected`; full-size and contact-sheet visual review: `/tmp/uno-choice-reviewed`.
+- Review corrected oversized/off-screen choice controls, overlapping colour hit regions, held-card/status overlap, and jump-label/avatar overlap. ScuffedUNO's subset font has no exclamation mark: the 3D call uses its original `UNO` spelling. A glyph regression test prevents its reintroduction. Earlier relay startup failures and pre-fix UNO/colour-choice failures are not claimed as passes.
+- Protocol 4 and `v=20261006d` are required. Rust/WASM, public privacy boundaries, fixed seats/camera, and physical-device/cross-network limitations are unchanged.
+
 The baseline notes below describe the original local development. UNO was subsequently published in `00fcf8e`. The current interaction/pacing changes and their new test entry points are described in `RELEASE-2026-10-06.md`; historical pre-arming/out-of-turn UNO claims below do not apply to that release.
 
 ## Original-style animation follow-up (2026-10-06 UTC)

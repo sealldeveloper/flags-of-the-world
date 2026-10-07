@@ -1,0 +1,19 @@
+{
+  "reference": "https://scuffeduno.online/js/852.fbf3c5e3.js",
+  "reference_sha256": "a934e0c236c0e9f28a84bedbfd3c24bb94c9c5cad11468916d4d279dbef76e34",
+  "attribution": "ScuffedUNO by Freddie Nelson",
+  "implementation": "Three.js geometry and animation adapters in ../../effects.mjs; original application bundle and socket handlers are not distributed",
+  "redistribution_permission": "ScuffedUNO-specific permission remains unverified",
+  "font": {
+    "file": "Rubik_Bold.json",
+    "source": "https://scuffeduno.online/fonts/Rubik_Bold.json",
+    "sha256": "0206cfc29d1659b9a1c8da8576261045bbfd6d6641399ceb1d7ee6e4eaf278a7",
+    "licence": "Rubik-OFL.txt",
+    "licence_source": "https://raw.githubusercontent.com/google/fonts/main/ofl/rubik/OFL.txt"
+  },
+  "loader": {
+    "file": "../../vendor/three/addons/loaders/FontLoader.js",
+    "source": "https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/jsm/loaders/FontLoader.js",
+    "licence": "Three.js MIT (existing vendor licence)"
+  }
+}

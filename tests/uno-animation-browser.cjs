@@ -10,7 +10,7 @@ const out=process.env.SCREENSHOT_DIR||'/tmp/uno-animations';fs.mkdirSync(out,{re
   const update=CardTable.prototype.update;CardTable.prototype.update=function(...a){window.table=this;return update.apply(this,a);};
   const next=TablePresentation.prototype.next;TablePresentation.prototype.next=function(...a){window.presenter=this;return next.apply(this,a);};
   const bc=Room.prototype.broadcast;Room.prototype.broadcast=function(...a){const result=bc.apply(this,a);clearTimeout(this.botTimer);return result;};
-  window.freeze=()=>{clearTimeout(presenter.timer);clearTimeout(r.botTimer);clearTimeout(r.settleTimer);cancelAnimationFrame(table.frameId);table.frameId=0;};
+  window.freeze=()=>{clearTimeout(presenter.timer);clearTimeout(r.botTimer);clearTimeout(r.settleTimer);clearTimeout(r.turnTimer);cancelAnimationFrame(table.frameId);table.frameId=0;};
  });
  async function shot(name){await p.screenshot({path:`${out}/${name}.png`});assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));}
  await p.locator('#name').fill('Animation host');await p.locator('#create').click();await p.locator('#room').waitFor({state:'visible'});await p.locator('#add-bot').click();await p.locator('#add-bot').click();await p.locator('#start').click();
@@ -35,6 +35,14 @@ const out=process.env.SCREENSHOT_DIR||'/tmp/uno-animations';fs.mkdirSync(out,{re
    if(value==='7'||value==='0'){await stage(value==='7'?'swap':'rotate',value==='7'?'outbound':'flight');await shot(`transfer-${value}-${w}`);}
   }
   await fixture('5',0,8);await p.evaluate(()=>{freeze();table.frame(performance.now());});const b=await p.evaluate(()=>table.pileBounds);assert(Math.abs((b.left+b.right)/2-w/2)<6);await shot(`centred-eight-seats-${w}`);
+  for(const value of ['wild','7']){
+   await fixture(value,0,8);await p.locator(value==='wild'?'#hand .wild.symbol-wild':'#hand .red.symbol-7').click();await p.locator('#choice').waitFor({state:'visible'});
+   await p.evaluate(()=>Promise.allSettled([...document.querySelectorAll('#choices button')].flatMap(b=>b.getAnimations()).map(a=>a.finished)));await shot(`spatial-choice-${value}-${w}`);
+   if(value==='wild')assert(await p.evaluate(()=>table.effects.choice.targets.every(m=>{const p=table.project(m.localToWorld(m.userData.hitPoint.clone()));return table.effects.pick(p.x,p.y)===m.userData.colour;})),'wheel ray picks the visible sector');
+   assert(await p.locator('#choices button').evaluateAll(buttons=>buttons.every(button=>{const b=button.getBoundingClientRect();return document.elementFromPoint(b.x+b.width/2,b.y+b.height/2)?.closest('button')===button;})),'each 3D option must have an unobstructed click centre');
+   const button=value==='wild'?p.locator('#choices button').first():p.locator('#choices button').last(),selected=await button.getAttribute('data-value');await button.click();await p.locator('#choice').waitFor({state:'hidden'});
+   if(value==='wild')assert.equal(await p.evaluate(()=>r.state.colour),selected);else assert.equal(await p.evaluate(()=>r.state.effects.events.find(e=>e.kind==='swap').to),selected);
+  }
  }
  // Real modal selection uses entrance + reversed exit; stale exits cannot
  // close a newly opened chooser for a different turn/revision.

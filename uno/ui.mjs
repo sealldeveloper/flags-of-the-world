@@ -3,7 +3,7 @@ import {COLOURS, cardLabel, MAX_PLAYERS} from './engine.mjs';
 import {RULES} from './rules.mjs';
 import {paintAvatar} from './profiles.mjs';
 import {LobbyControls} from './lobby.mjs';
-import {TablePresentation} from './presentation.mjs';
+import {TablePresentation, TIMING} from './presentation.mjs';
 import {decodeTicket} from './transport.mjs';
 import {RecentActions} from './history.mjs';
 const $ = id => document.getElementById(id);
@@ -17,7 +17,8 @@ function renderHistory() {
   $('action-history').replaceChildren(...recentActions.entries.map(entry=>{
     const li=document.createElement('li'), label=document.createElement('span'), text=document.createElement('p');
     label.className='history-round'; label.textContent=`Round ${entry.round}`; text.textContent=entry.text;
-    li.append(label,text); return li;
+    const time=document.createElement('time');time.dateTime=new Date(entry.timestamp).toISOString();time.textContent=new Date(entry.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});time.title=new Date(entry.timestamp).toLocaleString();
+    li.append(label,' · ',time,text); return li;
   }));
   if(scroll>0)panel.scrollTop=scroll+panel.scrollHeight-height;
 }
@@ -37,7 +38,18 @@ for(const kind of ['settings','history']) {
 }
 const presentation = new TablePresentation(render,{reduced:matchMedia('(prefers-reduced-motion: reduce)').matches});
 function pingText(ms){return Number.isInteger(ms)?`${ms} ms`:'— ms';}
-function updateLatency(values){for(const el of document.querySelectorAll('#players .seat')){const ping=el.querySelector('.seat-ping');if(ping)ping.textContent=pingText(values[el.dataset.seatId]);}}
+function paintPing(el,ms){el.textContent=pingText(ms);el.dataset.quality=!Number.isInteger(ms)?'unknown':ms<100?'good':ms<250?'fair':'poor';}
+function updateLatency(values){for(const el of document.querySelectorAll('#players .seat')){const ping=el.querySelector('.seat-ping');if(ping)paintPing(ping,values[el.dataset.seatId]);}}
+let countdownFrame=0;
+function countdowns(){
+  countdownFrame=0;if(view?.phase!=='playing')return;
+  const now=performance.now(),jump=online&&!pending&&!animating&&view.self!==view.turn&&view.legal.length>0&&view.jumpDeadline>now;
+  $('jump-prompt').hidden=!jump;
+  if(jump){const remaining=Math.min(1,(view.jumpDeadline-now)/TIMING.jump);$('jump-progress').style.transform=`scaleX(${remaining})`;$('jump-prompt').setAttribute('aria-label',`Jump in! ${Math.ceil((view.jumpDeadline-now)/1000)} seconds remaining`);}
+  for(const el of document.querySelectorAll('.turn-clock')){const running=!animating&&!view.unoWindow&&!(view.jumpDeadline>now)&&view.turnMs>0;el.style.visibility=running&&el.closest('.seat').dataset.seatId===view.turn?'visible':'hidden';const ms=Math.max(0,view.turnDeadline-now);el.querySelector('i').style.transform=`scaleX(${Math.min(1,ms/(view.turnDuration||30000))})`;el.querySelector('span').textContent=`${Math.ceil(ms/1000)}s`;}
+  if(view.self!==view.turn&&!jump)for(const el of document.querySelectorAll('#hand .card'))el.disabled=true;
+  countdownFrame=requestAnimationFrame(countdowns);
+}
 async function syncScene() {
   if (view?.phase !== 'playing') { table3d?.stop(); $('scene-loading').hidden = true; return; }
   if (!table3d) {
@@ -207,13 +219,14 @@ function render(v, connected = true, waiting = false, presenting = false) {
     li.classList.toggle('swap-source',v.presentation?.kind==='swap'&&v.presentation.from===p.id);
     li.classList.toggle('swap-target',v.presentation?.kind==='swap'&&v.presentation.to===p.id);
     const info = document.createElement('div'); info.className = 'seat-info';
-    const name = document.createElement('span'); name.className = 'seat-name'; name.textContent = p.name + (p.id === v.self ? ' (you)' : '');
+    const name = document.createElement('span'); name.className = 'seat-name'; name.textContent = p.name + (!playing && p.id === v.self ? ' (you)' : '');
+    if(p.id===v.self)name.setAttribute('aria-label',`${p.name} (you)`);
     const status = document.createElement('span'); status.className = 'seat-status';
     status.textContent = `${p.id === v.host ? 'Host · ' : ''}${p.bot ? 'Bot' : !p.connected ? 'Disconnected' : v.phase === 'playing' ? 'Connected' : p.ready ? 'Ready' : 'Not ready'}${v.phase === 'playing' && p.unoCalled ? ' · UNO!' : ''}`;
     status.dataset.ready=String(p.connected&&p.ready);
-    if(playing)name.textContent=`${v.players.indexOf(p)+1}. ${name.textContent}`;
     name.title = name.textContent;
     info.append(name,status); li.append(info);
+    if(playing){const clock=document.createElement('div');clock.className='turn-clock';clock.title='Time remaining before an automatic legal move';clock.innerHTML='<i></i><span></span>';li.append(clock);}
     const fan = document.createElement('div'); fan.className = 'opponent-fan'; fan.setAttribute('aria-hidden','true');
     const backs = Math.min(p.count,7);
     for (let i=0;i<backs;i++) {
@@ -222,8 +235,8 @@ function render(v, connected = true, waiting = false, presenting = false) {
     }
     li.append(fan);
     const meta=document.createElement('div');meta.className='seat-meta';
-    if (v.phase !== 'lobby') { const count = document.createElement('span'); count.className = 'seat-count'; count.textContent = p.unoCalled?'UNO!':`${p.count} card${p.count===1?'':'s'}`; meta.append(count); }
-    const ping=document.createElement('span');ping.className='seat-ping';ping.textContent=pingText(room?.latency?.[p.id]);ping.title=p.bot?'Local bot: no network hop':p.id===v.host?'Host: local authority, no network hop':'Measured round-trip to the host over iroh';meta.append(ping);li.append(meta);
+    if (v.phase !== 'lobby') { const count = document.createElement('span'); count.className = 'seat-count'; count.textContent = String(p.count); count.setAttribute('aria-label',`${p.count} cards${p.unoCalled?' · UNO called':''}`); meta.append(count); }
+    const ping=document.createElement('span');ping.className='seat-ping';paintPing(ping,room?.latency?.[p.id]);ping.title=p.bot?'Local bot: no network hop':p.id===v.host?'Host: local authority, no network hop':'Measured round-trip to the host over iroh';meta.append(ping);li.append(meta);
     if (host && p.id !== v.host && (v.phase !== 'playing' || !p.connected)) {
       const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = v.phase === 'playing' ? 'Use bot' : 'Remove'; remove.disabled = !online;
       remove.setAttribute('aria-label', `${remove.textContent}: ${p.name}`);
@@ -244,7 +257,7 @@ function render(v, connected = true, waiting = false, presenting = false) {
   roundResult(v);
   if (v.phase === 'lobby') { syncScene(); return; }
   const jumpWindow=v.presentation?.kind==='jump-window';
-  const canPlay = online && !pending && !animating && !v.unoWindow && v.phase === 'playing' && !(jumpWindow&&v.turn===v.self);
+  const canPlay = online && !pending && !animating && !v.unoWindow && v.phase === 'playing' && !(v.jumpDeadline>performance.now()&&v.turn===v.self) && (v.turn===v.self||v.jumpDeadline>performance.now());
   const turn = canPlay && v.turn === v.self, jumping = canPlay && !turn && v.legal.length > 0;
   $('call-uno').hidden=!playing||animating||!online||v.unoWindow?.player!==v.self||v.turn!==v.self||v.hand.length!==1||me.unoCalled;
   $('call-uno').disabled=pending;
@@ -253,17 +266,12 @@ function render(v, connected = true, waiting = false, presenting = false) {
   if(v.unoWindow)$('catch-uno').textContent=`Catch ${v.players.find(p=>p.id===v.unoWindow.player)?.name} · +2`;
   $('turn-label').textContent = v.phase === 'finished' ? 'Round complete' : !online ? (room.disposed ? 'Room closed' : 'Reconnecting…') : !current?.connected ? `Waiting for ${current?.name} to reconnect` : v.turn === v.self ? 'Your turn' : jumping ? 'Jump in — exact match!' : `${current?.name}'s turn`;
   $('direction').textContent = v.direction === 1 ? 'Clockwise ↻' : 'Counterclockwise ↺';
-  const at=v.players.findIndex(p=>p.id===v.turn);
-  const ordered=Array.from({length:v.players.length},(_,i)=>v.players[(at+i*v.direction+v.players.length)%v.players.length]);
-  $('turn-order').textContent=ordered.map(p=>v.players.indexOf(p)+1).join(' → ');
-  $('turn-order').setAttribute('aria-label','Turn order: '+ordered.map(p=>`${v.players.indexOf(p)+1}. ${p.name}`).join(' → '));
-  $('turn-order').title=$('turn-order').getAttribute('aria-label');
   $('direction-orbit').classList.toggle('reversed', v.direction === -1);
   $('self-name').textContent = `${me.name} · your hand`;
   const name=id=>v.players.find(p=>p.id===id)?.name||'Player',effect=v.presentation;
   $('notice').textContent = effect?.kind==='deal'?'Dealing seven cards — quick opening deal…':effect?.kind==='cue'?v.notice:effect?.kind==='play'?`${name(effect.player)} plays ${cardLabel(v.top)}…`:effect?.kind==='settle'?'Letting the cards settle…':!animating&&v.unoWindow?`${name(v.unoWindow.player)}: call UNO!${v.unoCatchable?' Others can now catch a missed call for +2.':''}`:effect?.kind==='draw'?`${name(effect.player)} draws a card (${effect.step}).`:effect?.kind==='swap'?`${name(effect.from)} → ${name(effect.to)} · ${effect.phase==='select'?'Selected for a hand swap':effect.phase==='pause'?'Returning the other hand next…':'Swapping hands…'}`:effect?.kind==='rotate'?`All hands pass ${effect.direction===1?'clockwise':'counterclockwise'}${effect.phase==='select'?' — get ready.':'…'}`:jumpWindow?'Jump-in window — match the colour and number.':v.autoDraw?`${current.name} ${v.debt?`draws ${v.debt} automatically`:'has no playable card — drawing automatically'}.`:v.notice;
   $('discard').replaceChildren(...(v.top ? [makeCard(v.top)] : []));
-  $('current-colour').textContent = v.players.length>=4?`Turn: ${v.players.indexOf(current)+1}`:`${current?.name||'Player'}'s turn`;
+  $('current-colour').textContent = `${current?.name||'Player'}'s turn`;
   $('current-colour').setAttribute('aria-label',`${current?.name||'Player'}'s turn. Current colour: ${v.colour}.`);
   $('debt').textContent = v.debt ? `+${v.debt} cards` : '';
   if(v.debt&&v.debt!==previousDebt&&document.body.dataset.motion==='on')$('debt').animate([{transform:'translateY(12px) scale(.4)',opacity:0},{transform:'translateY(0) scale(1.15)',opacity:1,offset:.7},{transform:'translateY(0) scale(1)',opacity:1}],{duration:400,easing:'ease-out'});
@@ -290,13 +298,19 @@ function render(v, connected = true, waiting = false, presenting = false) {
   $('hand').scrollLeft = scroll;
   if (focused) $('hand').querySelector(`[data-card-id="${CSS.escape(focused)}"]`)?.focus({preventScroll:true});
   syncScene();
+  if(!countdownFrame)countdowns();
   if (turn && !animating && v.drawn && v.rules.forcePlay) {
     const key=`${room.ticket.room}:${v.revision}:${v.drawn}`;
     if (lastForcedChoice !== key) { lastForcedChoice=key; queueMicrotask(()=>playCard(v.drawn)); }
   }
   if (enteringGame) window.scrollTo(0,0);
 }
-async function choose(title, options) {
+$('choice').addEventListener('click',event=>{
+  if(!$('choice').classList.contains('spatial-choice')||event.target.closest('button'))return;
+  const value=table3d?.effects.pick(event.clientX,event.clientY);
+  if(value)[...$('choices').children].find(button=>button.dataset.value===value&&!button.disabled)?.click();
+});
+async function choose(title, options, spatial) {
   $('choice-title').textContent = title; $('choices').replaceChildren();
   let closing=false;
   const close=async value=>{
@@ -306,12 +320,14 @@ async function choose(title, options) {
     // A stale-turn cancellation or a newer chooser must never be closed by this one.
     if($('choice').open&&$('choices').firstElementChild===first)$('choice').close(value);
   };
-  for (const [value,label] of options) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.style.setProperty('--choice-delay',`${$('choices').children.length*50}ms`); if (COLOURS.includes(value)) button.dataset.colour = value; button.onclick = () => close(value); $('choices').append(button); }
+  for (const [value,label] of options) { const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.dataset.value=value; button.style.setProperty('--choice-delay',`${$('choices').children.length*50}ms`); if (COLOURS.includes(value)) button.dataset.colour = value; button.onclick = () => close(value); $('choices').append(button); }
+  $('choice').classList.toggle('spatial-choice',!!spatial&&!!table3d);
   $('choice').returnValue = ''; $('choice').showModal();
-  return new Promise(resolve => $('choice').addEventListener('close', () => resolve($('choice').returnValue), {once:true}));
+  if(spatial&&table3d)table3d.effects.showChoice(spatial.kind,spatial.colour,options);
+  return new Promise(resolve => $('choice').addEventListener('close', () => {table3d?.effects.closeChoice();$('choice').classList.remove('spatial-choice');resolve($('choice').returnValue);}, {once:true}));
 }
 async function playCard(cardId) {
-  if (cardAction || animating || !online || pending || view?.phase !== 'playing' || !view.legal.includes(cardId)) return;
+  if (cardAction || animating || !online || pending || view?.phase !== 'playing' || !view.legal.includes(cardId) || (view.self!==view.turn&&!(view.jumpDeadline>performance.now()))) return;
   const card = view.hand.find(c => c.id === cardId); if (!card) return;
   // One activation plays a card. Only wilds and 7-swap require a choice;
   // keep that attempt locked until the dialog's close event settles.
@@ -319,11 +335,11 @@ async function playCard(cardId) {
   const action = {type:'play', cardId};
   try {
     if (card.colour === 'wild') {
-      action.colour = await choose('Choose the next colour', COLOURS.map(c => [c,c[0].toUpperCase()+c.slice(1)]));
+      action.colour = await choose('Choose the next colour', COLOURS.map(c => [c,c[0].toUpperCase()+c.slice(1)]),{kind:'colour',colour:'yellow'});
       if (!COLOURS.includes(action.colour)) return;
     }
     if (view?.rules.sevenZero && card.value === '7') {
-      action.target = await choose('Swap hands with…', view.players.filter(p => p.id !== view.self).map(p => [p.id,`${p.name} · ${p.count} cards`]));
+      action.target = await choose('Swap hands with…', view.players.filter(p => p.id !== view.self).map(p => [p.id,`${p.name}`]),{kind:'seven',colour:card.colour});
       if (!view?.players.some(p => p.id === action.target && p.id !== view.self)) return;
     }
     if (room !== attempt.room || view?.revision !== attempt.revision || !online || pending || !view.legal.includes(cardId)) {

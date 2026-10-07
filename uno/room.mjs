@@ -28,7 +28,7 @@ export class Room {
     }, 8000);
     if (this.isHost) {
       this.self = token(); this.state = newRoom({id:this.self, name:this.name});
-      this.ticket = {v:3, ...this.transport.address(), room:token(), secret:token()};
+      this.ticket = {v:4, ...this.transport.address(), room:token(), secret:token()};
       decodeTicket(encodeTicket(this.ticket));
       this.onStatus('Hosting · iroh connected'); this.broadcast();
     } else {
@@ -62,7 +62,7 @@ export class Room {
     this.retryTimer = setTimeout(() => this.dial(), 500 * 2 ** this.retry);
   }
   send(id, message) {
-    try { this.transport.send(id, {v:3, room:this.ticket?.room, ...message}); }
+    try { this.transport.send(id, {v:4, room:this.ticket?.room, ...message}); }
     catch { this.transport.disconnect(id); }
   }
   ping(id,p) {
@@ -86,9 +86,17 @@ export class Room {
     const jump=s.phase==='playing'&&s.rules.jumpIn&&played&&/^\d$/.test(played.card.value)&&!s.debt&&!s.drawn&&!s.unoWindow;
     this.actionTiming={round:s.round,revision:s.effects.revision,revealUntil,jumpUntil:jump?revealUntil+TIMING.jump:0,catchFrom:revealUntil+TIMING.unoCall,unoUntil:revealUntil+TIMING.unoCall+TIMING.unoCatch};
   }
+  updateTurnClock() {
+    const s=this.state,p=s.players[s.turn],timing=this.timing();
+    if(s.phase!=='playing'||s.unoWindow||!p?.connected){this.turnClock=null;return;}
+    const key=JSON.stringify([s.round,s.effects?.revision,s.turn,s.drawn]);
+    if(this.turnClock?.key!==key)this.turnClock={key,start:performance.now()+Math.max(timing.revealMs,timing.jumpWindowMs),duration:30000};
+  }
   snapshotFor(id) {
-    const current=this.state.players[this.state.turn];
-    return {...viewFor(this.state,id),...this.timing(),autoDraw:!!(this.state.phase==='playing'&&!this.state.unoWindow&&!this.state.drawn&&current?.connected&&!current.hand.some(c=>legalCard(this.state,current,c)))};
+    const current=this.state.players[this.state.turn],timing=this.timing(),view=viewFor(this.state,id);
+    if(id!==current?.id&&timing.jumpWindowMs<=0)view.legal=[];
+    const clock=this.turnClock,now=performance.now();
+    return {...view,...timing,turnMs:clock?Math.max(0,clock.start+clock.duration-now):0,turnDuration:clock?.duration||30000,autoDraw:!!(this.state.phase==='playing'&&!this.state.unoWindow&&!this.state.drawn&&current?.connected&&!current.hand.some(c=>legalCard(this.state,current,c)))};
   }
   event(e) {
     if (this.disposed) return;
@@ -111,7 +119,7 @@ export class Room {
       } else if (e.connection === this.connection) this.reconnect();
     } else if (e.kind === 'message') {
       let m;
-      try { m = JSON.parse(e.data); if (!m || m.v !== 3 || m.room !== this.ticket.room || typeof m.type !== 'string') throw new Error(); }
+      try { m = JSON.parse(e.data); if (!m || m.v !== 4 || m.room !== this.ticket.room || typeof m.type !== 'string') throw new Error(); }
       catch { this.transport.disconnect(e.connection); return; }
       if (this.isHost) this.hostMessage(e.connection, m);
       else if (e.connection === this.connection) this.guestMessage(m);
@@ -179,7 +187,7 @@ export class Room {
       this.onStatus('Connected · iroh');
     } else if (m.type === 'snapshot') {
       if (m.view?.self !== this.self || !Array.isArray(m.view.hand) || !Array.isArray(m.view.players)) return;
-      this.view = m.view; this.onView(this.view, true, !!this.pending);
+      this.view = {...m.view,latencyMs:this.latency[this.self]||0}; this.onView(this.view, true, !!this.pending);
     } else if (m.type === 'ack') {
       if (m.id === this.pending) { clearTimeout(this.commandTimer); this.pending = null; }
       if (m.error) this.onError(m.error);
@@ -217,6 +225,8 @@ export class Room {
       const timing=this.timing();
       if(timing.revealMs>0)throw new Error('Wait for the cards to finish moving.');
       if(timing.jumpWindowMs>0&&s.players[s.turn].id===id)throw new Error('Jump-in window: wait before taking your normal turn.');
+      if(s.players[s.turn].id!==id&&timing.jumpWindowMs<=0)throw new Error('The jump-in window is closed.');
+      if(!this.automaticMove&&id===s.players[s.turn].id&&this.turnClock&&performance.now()>=this.turnClock.start+this.turnClock.duration)throw new Error('Your turn timer expired.');
       applyAction(s, id, a);
       this.pace();return;
     }
@@ -257,27 +267,38 @@ export class Room {
   }
   broadcast() {
     if(this.state.unoWindow&&this.timing().unoMs<=0)finishUnoTurn(this.state);
+    this.updateTurnClock();
     this.publishLatency();
     this.view = this.snapshotFor(this.self); this.onView(this.view, true);
     for (const [conn,p] of this.peers) if (p.seat) this.send(conn, {type:'snapshot', view:this.snapshotFor(p.seat)});
-    clearTimeout(this.botTimer);clearTimeout(this.settleTimer);
+    clearTimeout(this.botTimer);clearTimeout(this.settleTimer);clearTimeout(this.turnTimer);
     const timing=this.timing(),wait=Math.max(timing.revealMs,timing.jumpWindowMs,timing.unoMs);
     const now=performance.now();
     const milestones=[timing.revealMs,timing.jumpWindowMs,timing.unoMs,this.state.unoWindow?this.actionTiming.catchFrom-now:0].filter(ms=>ms>0);
     if(milestones.length)this.settleTimer=setTimeout(()=>{if(!this.disposed)this.broadcast();},Math.min(...milestones)+10);
     const current = this.state.players[this.state.turn],forced=this.view.autoDraw;
-    const actor=forced?current:current?.bot ? current : this.state.players.find(p=>p.bot && p.hand.some(c=>legalCard(this.state,p,c)));
+    const jumper=timing.revealMs<=0&&timing.jumpWindowMs>0?this.state.players.find(p=>p.bot&&p.connected&&p.id!==current?.id&&p.hand.some(c=>legalCard(this.state,p,c))):null;
+    const actor=jumper||(forced?current:current?.bot ? current : null);
+    if(this.turnClock&&!actor){
+      const clock=this.turnClock;
+      this.turnTimer=setTimeout(()=>{
+        if(this.disposed||this.turnClock!==clock||!current.connected)return;
+        try {this.automaticMove=true;this.execute(current.id,botAction(this.state,current.id),this.state.revision);this.broadcast();}
+        catch {this.onError('Timed move could not finish.');}
+        finally {this.automaticMove=false;}
+      },Math.max(0,clock.start+clock.duration-performance.now())+10);
+    }
     if (this.state.phase === 'playing' && !this.state.unoWindow && actor) this.botTimer = setTimeout(() => {
       if (this.disposed) return;
-      try { this.execute(actor.id,forced?{type:'draw'}:botAction(this.state,actor.id),this.state.revision);this.broadcast(); }
+      try { this.execute(actor.id,forced&&!jumper?{type:'draw'}:botAction(this.state,actor.id),this.state.revision);this.broadcast(); }
       catch { this.onError('Automatic move could not finish. End the room and report this state.'); }
-    }, wait+(forced?450:700));
+    }, jumper?Math.min(700,timing.jumpWindowMs/2):wait+(forced?450:700));
   }
   async stop() {
     if (this.disposed) return;
     this.disposed = true;this.latency={};this.onLatency(this.latency);
     clearInterval(this.heartbeat);
-    for (const key of ['botTimer','settleTimer','joinTimer','retryTimer','commandTimer']) clearTimeout(this[key]);
+    for (const key of ['botTimer','turnTimer','settleTimer','joinTimer','retryTimer','commandTimer']) clearTimeout(this[key]);
     await this.transport?.close();
   }
   async leave() {

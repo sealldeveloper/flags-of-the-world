@@ -1,6 +1,6 @@
 // Ordered, recipient-private presentation of an already validated host action.
 // Game authority stays in the engine; animation never invents or submits moves.
-export const TIMING = Object.freeze({deal:100,dealFlight:1000,draw:1100,play:600,reflow:450,cue:1600,select:1000,outbound:1000,pause:500,inbound:1000,rotate:1500,settle:250,jump:1500,unoCall:3000,unoCatch:5000});
+export const TIMING = Object.freeze({deal:100,dealFlight:1000,draw:1100,play:600,reflow:450,cue:1600,select:1000,outbound:1000,pause:500,inbound:1000,rotate:1500,settle:250,jump:3000,unoCall:3000,unoCatch:5000});
 export const dealDuration = count => Math.max(0,count-1)*TIMING.deal+TIMING.dealFlight;
 export function playCue(event) {
   const value=event.card.value,colour=event.colour;
@@ -28,7 +28,7 @@ export function presentationFrames(previous,next,reduced=false) {
       for(let i=0;i<Math.min(108,e.count);i++) {
         if(e.player===next.self&&e.cards?.[i])hand.push({...e.cards[i]});
         counts.set(e.player,(counts.get(e.player)||0)+1);
-        stage({kind:'draw',player:e.player,step:i+1,total:e.count},TIMING.draw);
+        stage({kind:'draw',player:e.player,step:i+1,heldCard:e.player===next.self&&e.cards?.[i]?.id===next.drawn?next.drawn:null},TIMING.draw);
       }
     } else if(e.kind==='play') {
       actor=e.player;
@@ -50,15 +50,18 @@ export function presentationFrames(previous,next,reduced=false) {
       stage({kind:'rotate',direction,phase:'settle'},TIMING.settle);
     }
   }
-  stage({kind:'settle'},TIMING.settle);
+  stage({kind:'settle',heldCard:next.drawn},TIMING.settle);
   return frames;
 }
 export class TablePresentation {
   constructor(render,{reduced=false}={}) { this.render=render;this.reduced=reduced;this.reset(); }
-  reset() { clearTimeout(this.timer);this.queue=[];this.busy=false;this.window=false;this.current=null;this.frameView=null;this.latest=null;this.online=false;this.pending=false;this.serial=(this.serial||0)+1; }
+  reset() { clearTimeout(this.timer);this.receipts=new WeakMap();this.queue=[];this.busy=false;this.window=false;this.current=null;this.frameView=null;this.latest=null;this.online=false;this.pending=false;this.serial=(this.serial||0)+1; }
   receive(view,online=true,pending=false) {
     if(!view)return;
     if(this.latest&&this.latest.self!==view.self)this.reset();
+    if(!this.receipts.has(view))this.receipts.set(view,performance.now());
+    const received=this.receipts.get(view),latency=Math.max(0,view.latencyMs||0);
+    view={...view,jumpDeadline:received+(view.jumpWindowMs||0)-latency,turnDeadline:received+(view.turnMs||0)-latency};
     this.online=online;this.pending=pending;
     if(!online){this.reset();this.latest=this.current=view;this.render(view,false,false,false);return;}
     if(this.latest?.revision===view.revision) {
@@ -75,7 +78,7 @@ export class TablePresentation {
   next() {
     const next=this.queue.shift();if(!next)return;
     const frames=presentationFrames(this.current,next,this.reduced),serial=this.serial;
-    const duration=frames.reduce((ms,f)=>ms+f.duration,0),windowMs=Math.max(0,(next.jumpWindowMs||0)-duration);
+    const duration=frames.reduce((ms,f)=>ms+f.duration,0),windowMs=Math.max(0,(next.jumpDeadline||0)-performance.now()-duration);
     if(windowMs>0&&!next.unoWindow)frames.push({duration:windowMs,view:{...next,presentation:{kind:'jump-window'},legal:next.self===next.turn?[]:next.legal}});
     this.busy=frames.length>0;
     const advance=()=>{

@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {RecentActions} from '../uno/history.mjs';
 const view=(revision=1,notice='Player drew one card.')=>({phase:'playing',round:1,revision,effects:{revision},notice,hand:[{id:'private-card'}]});
 test('recent actions ignore animation frames, lobby and duplicate snapshots',()=>{
- const h=new RecentActions();assert.equal(h.record(view(),true),false);assert.equal(h.record({...view(),phase:'lobby'}),false);
+ const h=new RecentActions(50,()=>1700000000000);assert.equal(h.record(view(),true),false);assert.equal(h.record({...view(),phase:'lobby'}),false);
  assert.equal(h.record(view()),true);assert.equal(h.record(view()),false);
  assert.equal(h.record({...view(),revision:9}),false);assert.equal(h.entries.length,1);
- assert.deepEqual(h.entries[0],{round:1,text:'Player drew one card.'});
+ assert.deepEqual(h.entries[0],{round:1,text:'Player drew one card.',timestamp:1700000000000});
 });
 test('distinct actions with identical text and UNO calls are retained',()=>{
  const h=new RecentActions();h.record(view());h.record(view(2));h.record({...view(2),revision:3,notice:'Player called UNO!'});

@@ -51,8 +51,6 @@ main{max-width:1560px;margin:auto;padding:12px 20px 24px}.status-row,.room-headi
 :root[data-theme="dark"] .seat-status[data-ready="true"]{color:#80e5a6}:root[data-theme="dark"] .seat-status[data-ready="false"]{color:#ff9cac}
 #force-start{background:#ffe193;color:#421800}#force-start:hover:not(:disabled){background:#fff0ba;color:#421800}
 #avatar-colour{height:56px;padding:4px;width:100%;cursor:pointer}
-#turn-order{font-size:.65rem;color:#fff4cb;margin:4px 0;line-height:1.5;overflow-wrap:anywhere}
-.in-game .seat.current{border:2px solid #ffe193;box-shadow:0 0 0 2px #3b0600}.in-game .seat.current .seat-name::before{content:'▶ ';color:#ffe193}
 .in-game .hand-heading{right:120px}
 #round-result{width:520px}#round-result h2{font-size:clamp(1.5rem,5vw,2rem);line-height:1.25}#round-result[data-outcome="win"] h2{color:#237943}:root[data-theme="dark"] #round-result[data-outcome="win"] h2{color:#85e6a3}
 #result-players{list-style:none;padding:0;margin:20px 0;border-block:1px solid var(--border)}#result-players li{display:flex;justify-content:space-between;gap:16px;padding:10px 0}#result-players li+li{border-top:1px solid var(--border)}#result-players span{min-width:0;overflow-wrap:anywhere}#result-players strong{flex-shrink:0;font-size:.8rem}
@@ -68,7 +66,6 @@ footer{max-width:1560px;margin:auto;padding:0 20px calc(20px + env(safe-area-ins
  .in-game .seat-name{font-size:.58rem}
  .in-game .seat-count,.in-game .seat-ping{font-size:.54rem}
  .in-game .seat-meta{gap:2px 4px}
- .in-game #turn-order{font-size:.58rem}
  .in-game #table-status{width:min(520px,60vw)}
 }
 .crowded-table .in-game #table-status{width:min(320px,26vw)}
@@ -91,8 +88,36 @@ footer{max-width:1560px;margin:auto;padding:0 20px calc(20px + env(safe-area-ins
 #action-history li{padding:12px 4px;border-top:1px solid var(--border);overflow-wrap:anywhere}
 #action-history p{margin:4px 0 0}.history-round{color:var(--muted);font-size:.72rem;font-weight:600}
 body[data-motion="on"] .in-game:is([data-effect="play"],[data-effect="draw"],[data-effect="deal"]) #table-status{opacity:0}
+.in-game #table-status.status-crowded,.in-game:is([data-effect="cue"],[data-effect="swap"],[data-effect="rotate"]) #table-status,.in-game:has(#drawn-decision:not([hidden])) #table-status,body:has(#choice[open]) #table-status{opacity:0}
 @keyframes choice-pop{from{opacity:0;transform:translateY(12px) scale(.65)}70%{opacity:1;transform:translateY(0) scale(1.04)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes result-pop{from{opacity:0;transform:translateY(20px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
 body[data-motion="on"] #choice[open] .choices button{animation:choice-pop 300ms both!important;animation-delay:var(--choice-delay,0ms)!important}
 body[data-motion="on"] #round-result[open]{animation:result-pop 300ms ease-out both!important}
+#choice.spatial-choice{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;background:none;box-shadow:none;overflow:hidden;pointer-events:none}
+#choice.spatial-choice::backdrop{background:#19070025;pointer-events:auto}
+.spatial-choice #choice-title{position:fixed;top:108px;left:12px;right:12px;text-align:center;color:white;text-shadow:0 2px 3px #310000}
+.spatial-choice #choices button{position:fixed;min-height:44px;padding:2px;background:transparent;color:white;text-shadow:0 1px 3px #000,0 0 4px #000;pointer-events:auto;border-radius:4px;font-size:.8rem}
+.spatial-choice #choices button[data-colour]{font-size:.7rem;padding:0;white-space:nowrap}
+.spatial-choice #choices button:hover,.spatial-choice #choices button:focus-visible{background:#ffffff25;outline:2px solid white}
+body:has(#choice.spatial-choice[open]) .seat:not(.self),.in-game:has(#jump-prompt:not([hidden])) .seat.self{visibility:hidden}
+.spatial-choice form{pointer-events:none}.spatial-choice form>button{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);pointer-events:auto}
+/* Original-style player placards: name colour, avatar, count, numerical RTT. */
+.in-game #players .seat{grid-template-columns:52px minmax(0,1fr);grid-template-rows:auto auto auto;background:none;border:0;box-shadow:none;padding:0;gap:5px 8px;border-radius:0}
+.in-game #players .seat-info{grid-column:1/-1;grid-row:1;background:linear-gradient(90deg,#1598bd,#1598bd00);padding:4px 7px;border-radius:3px}
+.in-game #players .seat.current .seat-info{background:linear-gradient(90deg,#ee9708,#ee970800)}
+.in-game #players .seat-name{color:white;font-size:.8rem;line-height:1.3}
+.in-game #players .seat-avatar{grid-column:1;grid-row:2;width:52px;height:52px}
+.in-game #players .seat-meta{grid-column:2;grid-row:2;align-content:start;align-self:start;gap:5px}
+.in-game #players .seat-count{background:white;color:#151515;padding:0 5px;border-radius:3px;font-size:1.05rem;line-height:1.5}
+.in-game #players .seat-ping{font-size:.7rem;font-weight:600;text-shadow:0 1px 2px #300}
+.seat-ping[data-quality="good"]{color:#148b48}.seat-ping[data-quality="fair"]{color:#936500}.seat-ping[data-quality="poor"]{color:#ba2634}
+.in-game #players .seat-ping[data-quality="good"]{color:#43e58a}.in-game #players .seat-ping[data-quality="fair"]{color:#ffe079}.in-game #players .seat-ping[data-quality="poor"]{color:#ff8991}.in-game #players .seat-ping[data-quality="unknown"]{color:#ddd}
+.turn-clock{visibility:hidden;position:relative;grid-column:1/-1;grid-row:3;height:14px;background:#3d0808;overflow:hidden;border-radius:2px;font-size:10px;line-height:14px;text-align:center}
+.turn-clock i,#jump-progress{display:block;position:absolute;inset:0;background:#f6b521;transform-origin:left}
+.turn-clock span{position:relative;color:white;text-shadow:0 1px 2px #000,0 0 3px #000}
+#jump-prompt{position:fixed;z-index:6;width:130px;text-align:center;color:#ffeb82;text-shadow:0 2px 3px #310000;pointer-events:none}
+#jump-prompt strong{font-size:1rem}.countdown-track{position:relative;height:7px;background:#340c08;border:1px solid #ffe9ad;overflow:hidden;border-radius:2px;margin-top:4px}
+#action-history time{color:var(--muted);font-size:.72rem;font-variant-numeric:tabular-nums}
+@media(min-width:601px){.crowded-table .in-game #players .seat{grid-template-columns:40px minmax(0,1fr)}.crowded-table .in-game #players .seat-avatar{width:40px;height:40px}}
+@media(max-width:600px){.in-game #players .seat{grid-template-columns:28px minmax(0,1fr);gap:3px 4px}.in-game #players .seat-info{padding:3px}.in-game #players .seat-name{font-size:.62rem}.in-game #players .seat-avatar{width:28px;height:28px}.in-game #players .seat-count{font-size:.75rem;padding:0 3px}.in-game #players .seat-ping{font-size:.56rem}.in-game #players .seat-meta{gap:2px 4px}.turn-clock{height:10px;line-height:10px;font-size:8px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}

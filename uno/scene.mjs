@@ -80,7 +80,7 @@ export class CardTable {
     for(const colour of ['red','green','yellow','blue'])for(const value of [...'1234567890','draw2','skip','reverse'])faces.push(`${colour}-${value}.png`);
     for(const colour of ['wild','red','green','yellow','blue'])for(const value of ['wild','draw4'])faces.push(`${colour}-${value}.png`);
     for(const file of [...faces,'back.png'])this.texture(new URL(file,ASSETS).href);
-    this.ready=Promise.all(this.texturePromises);
+    this.ready=Promise.all([...this.texturePromises,this.effects.ready]);
   }
   texture(url) {
     if(!this.textures.has(url)) {
@@ -116,16 +116,16 @@ export class CardTable {
   }
   update(view,{online,pending}={}) {
     const previous=this.view, added=[];
-    const effectKey=JSON.stringify([view.round,view.self,view.turn,view.direction,view.legal,online,view.hand.map(c=>c.id),view.players.map(p=>[p.id,p.count]),view.top?.id,view.colour,view.presentation?.kind,view.presentation?.phase,view.presentation?.step]);
+    const effectKey=JSON.stringify([view.round,view.self,view.turn,view.direction,view.legal,online,view.hand.map(c=>c.id),view.players.map(p=>[p.id,p.count]),view.top?.id,view.colour,view.drawn,view.presentation?.heldCard,view.presentation?.kind,view.presentation?.phase,view.presentation?.step]);
     // Pending/ack/latency and UNO snapshots must not teleport an in-flight mesh
     // back to its layout target. Rebind the rebuilt DOM without rebuilding geometry.
-    if(this.active&&effectKey===this.effectKey){this.view=view;this.canAct=online&&!pending&&!view.presentation&&view.phase==='playing';this.effects.update(view);this.bindTargets();this.projectControls();return;}
+    if(this.active&&effectKey===this.effectKey){this.view=view;this.canAct=online&&!pending&&(!view.presentation||view.presentation.kind==='jump-window')&&view.phase==='playing';this.effects.update(view);this.bindTargets();this.projectControls();return;}
     if(effectKey!==this.effectKey){for(const a of this.animations){a.mesh.position.copy(a.target);a.mesh.quaternion.copy(a.targetRotation);a.mesh.scale.copy(a.targetScale);a.mesh.visible=true;a.mesh.userData.flying=false;}this.animations=[];this.effectKey=effectKey;}
     const pose=mesh=>({position:mesh.getWorldPosition(new V()),rotation:mesh.getWorldQuaternion(new THREE.Quaternion()),scale:mesh.getWorldScale(new V())});
     const oldPoses=new Map([...this.cards.values(),...[...this.players.values()].flatMap(g=>g.children)].map(mesh=>[mesh,pose(mesh)]));
     const source=this.cards.get(view.top?.id)||this.players.get(view.presentation?.player || view.lastPlayedBy || previous?.turn)?.children.at(-1);
     const playedPose=source?pose(source):null;
-    if(previous?.round!==view.round){for(const mesh of this.cards.values())this.disposeTint(mesh);this.hand.clear();this.cards.clear();for(const g of this.players.values())g.clear();this.displayDirection=view.direction;this.directionTween=null;}
+    if(previous?.round!==view.round||previous?.self!==view.self){for(const mesh of this.cards.values())this.disposeTint(mesh);this.hand.clear();this.cards.clear();for(const g of this.players.values())g.clear();this.displayDirection=view.direction;this.directionTween=null;}
     this.hand.userData.player=view.self;
     let newDiscard=null;
     if(previous?.self!==view.self)this.round=null;
@@ -153,7 +153,7 @@ export class CardTable {
     for(const c of view.hand){
       if(!this.cards.has(c.id)){const mesh=this.card(c,this.scale);mesh.userData.id=c.id;mesh.userData.privateTint=true;for(const key of ['front','back','body'])mesh.userData[key].material=mesh.userData[key].material.clone();this.hand.add(mesh);this.cards.set(c.id,mesh);added.push(mesh);}
       const mesh=this.cards.get(c.id);mesh.scale.setScalar(this.scale);
-      const dim=!online||(view.presentation?.kind!=='deal'&&view.turn!==view.self&&!view.legal.includes(c.id)),tint=dim?.52:1;
+      const dim=!online||(view.presentation?.kind!=='deal'&&!view.legal.includes(c.id)),tint=dim?.52:1;
       mesh.userData.front.material.map=this.texture(cardAsset(c));
       if(mesh.userData.targetTint!==tint){mesh.userData.tintFrom=mesh.userData.front.material.color.r;mesh.userData.tintStart=performance.now();mesh.userData.targetTint=tint;}
       mesh.userData.dim=dim;mesh.userData.outline.visible=this.hover===c.id;
@@ -166,7 +166,7 @@ export class CardTable {
       while(group.children.length>n)group.remove(group.children.at(-1));
       while(group.children.length<n){const card=this.card(null,this.scale);group.add(card);added.push(card);}
       const spacing=this.width*Math.min(4-.2*(count-2),Math.max(0,n-1))/Math.max(1,n);
-      group.children.forEach((card,i)=>{card.scale.setScalar(this.scale);card.position.set((i-(n-1)/2)*spacing,0,-i*.15);});
+      group.children.forEach((card,i)=>{const fan=i-(n-1)/2;card.scale.setScalar(this.scale);card.position.set(fan*spacing,-Math.abs(fan)*this.height*.018,-i*.28);card.rotation.set(0,fan*.025,-fan*.045);card.userData.body.scale.z=4;});
     }
     if(this.round!==view.round){this.round=view.round;this.pile.clear();this.discards=[];}
     if(view.top&&this.discards.at(-1)?.userData.id!==view.top.id){
@@ -220,19 +220,21 @@ export class CardTable {
     this.hand.translateY(-frustumHeight/2+this.height*.67+5);
     // Screen-space fit keeps every card selectable, including an unusually large hand.
     const span=Math.min(this.width*6,2*distance*Math.tan(this.camera.fov*PI/360)*this.camera.aspect/this.camera.zoom*.86);
-    const n=this.view.hand.length,spacing=Math.min(this.width,span/Math.max(1,n));
-    this.view.hand.forEach((c,i)=>{const mesh=this.cards.get(c.id);mesh.position.set(((n-1)/2-i)*spacing,0,i*.015);});
+    const held=this.view.drawn||this.view.presentation?.heldCard;
+    const regular=this.view.hand.filter(c=>c.id!==held),n=regular.length,spacing=Math.min(this.width,span/Math.max(1,n));
+    regular.forEach((c,i)=>{const mesh=this.cards.get(c.id);mesh.position.set(((n-1)/2-i)*spacing,0,i*.015);mesh.userData.baseY=0;});
+    if(held){const mesh=this.cards.get(held);mesh.scale.setScalar(this.scale);mesh.position.set(0,0,.3);mesh.userData.baseY=0;}
     // Rotate the fixed lobby order around the viewer, never around the current turn.
     const selfIndex=this.view.players.findIndex(p=>p.id===this.view.self);
     const ordered=[...this.view.players.slice(selfIndex),...this.view.players.slice(0,selfIndex)];
-    const hudWidth=Math.min(180,Math.max(74,w*(this.playerCount>5?.22:.27)));
-    const centreY=125+(h-300)/2,rx=Math.min(w*.38,w/2-hudWidth/2-8),ry=Math.max(40,Math.min((h-360)*.40,centreY-(w<600?200:240)));
+    const hudWidth=this.hudWidth=Math.min(this.playerCount>5?140:180,Math.max(74,w*(this.playerCount>5?.22:.27)));
+    const centreY=125+(h-300)/2,rx=Math.min(w*.38,w/2-hudWidth/2-8),ry=this.playerCount>5?Math.max(80,(h-300)*(w<600?.38:.35)):Math.max(40,Math.min((h-360)*.40,centreY-(w<600?200:240)));
     ordered.slice(1).forEach((p,i)=>{
       const angle=2*PI*(i+1)/this.playerCount,group=this.players.get(p.id);
       group.scale.setScalar(1);
-      group.position.copy(this.screenPoint(w/2-rx*Math.sin(angle),centreY+ry*Math.cos(angle),150));group.quaternion.copy(this.camera.quaternion);
+      group.position.copy(this.screenPoint(w/2-rx*Math.sin(angle),Math.max(w<600?210:270,centreY+ry*Math.cos(angle)),150));group.quaternion.copy(this.camera.quaternion);group.rotateX(-.55);group.rotateY(Math.sin(angle)*.4);
       this.scene.updateMatrixWorld(true);
-      const b=this.bounds(group),targetWidth=Math.min(180,w*(this.playerCount>5?.22:.28)),targetHeight=w<600?55:90;
+      const b=this.bounds(group),targetWidth=Math.min(this.playerCount>5?140:180,w*(this.playerCount>5?.22:.28)),targetHeight=this.playerCount>5?45:w<600?55:90;
       if(p.count)group.scale.setScalar(Math.min(targetWidth/(b.right-b.left),targetHeight/(b.bottom-b.top)));
     });
     const d=this.deckParameters();this.deck.position.set(-Math.sin(d.angle)*d.dist,this.floor+d.scale*.9,-Math.cos(d.angle)*d.dist);this.deck.rotation.set(-PI/2,0,-d.angle*d.rotation);
@@ -257,10 +259,11 @@ export class CardTable {
     }
     this.ring.position.copy(this.pile.position);this.ring.scale.setScalar(1);
     const angle=this.ring.rotation.y;this.ring.rotation.y=0;this.scene.updateMatrixWorld(true);
-    const ringBox=this.bounds(this.ring);this.ringScale=Math.min(180,Math.max(115,w*.32))/(ringBox.right-ringBox.left);
+    const ringBox=this.bounds(this.ring);this.ringScale=(w<600?Math.min(180,Math.max(115,w*.32)):Math.min(420,Math.max(240,w*.28)))/(ringBox.right-ringBox.left);
     this.ring.scale.setScalar(this.ringScale);this.ring.rotation.y=angle;
     this.scene.updateMatrixWorld(true);this.pileBounds=this.bounds(this.pile);
     this.seatBounds=new Map(this.view.players.map(p=>[p.id,this.bounds(p.id===this.view.self?this.hand:this.players.get(p.id))]));
+    if(held){const mesh=this.cards.get(held);mesh.scale.setScalar(this.scale*.78);const b=this.bounds(mesh),width=b.right-b.left,height=b.bottom-b.top,handTop=this.seatBounds.get(this.view.self).top;const world=this.screenPoint(Math.min(w-width/2-10,w*.76),handTop-height/2-14,distance);mesh.position.copy(this.hand.worldToLocal(world));mesh.userData.baseY=mesh.position.y;}
     this.projectControls();
   }
   screenPoint(x,y,depth) {
@@ -292,13 +295,16 @@ export class CardTable {
     for(const p of this.view.players){
       const self=p.id===this.view.self,group=self?this.hand:this.players.get(p.id),b=this.seatBounds?.get(p.id)||this.bounds(group),anchor=self?{x:Number.isFinite(b.left)?(b.left+b.right)/2:this.w/2,y:this.h-100}:this.project(group.position);
       const el=document.querySelector(`#players [data-seat-id="${CSS.escape(p.id)}"]`);
-      if(el){el.style.width=`${Math.min(180,Math.max(74,this.w*(this.playerCount>5?.22:.27)))}px`;const half=el.offsetWidth/2;el.style.left=`${Math.max(half+4,Math.min(this.w-half-4,anchor.x))}px`;el.style.bottom='auto';el.style.top=`${Math.max(110,(Number.isFinite(b.top)?b.top:anchor.y)-el.offsetHeight-8)}px`;}
+      if(el){el.style.width=`${this.hudWidth}px`;const half=el.offsetWidth/2;el.style.left=`${Math.max(half+4,Math.min(this.w-half-4,anchor.x))}px`;el.style.bottom='auto';el.style.top=`${Math.max(110,(Number.isFinite(b.top)?b.top:anchor.y)-el.offsetHeight-8)}px`;}
     }
     const status=document.getElementById('table-status');if(status){
       const pile=this.pileBounds||this.bounds(this.pile),self=document.querySelector(`#players [data-seat-id="${CSS.escape(this.view.self)}"]`).getBoundingClientRect();
       const bottom=decision&&!decision.hidden?Math.min(self.top,parseFloat(decision.style.top))-10:self.top-10;
       status.style.top=`${Math.max(pile.bottom+10,Math.min(Math.max(pile.bottom+16,this.h*.54),bottom-status.offsetHeight))}px`;
+      status.classList.toggle('status-crowded',pile.bottom+10+status.offsetHeight>bottom);
     }
+    const prompt=document.getElementById('jump-prompt');
+    if(prompt&&!prompt.hidden){const boxes=this.view.legal.map(id=>this.cards.get(id)).filter(Boolean).map(m=>this.bounds(m));if(boxes.length){const b=boxes[0];prompt.style.left=`${Math.max(8,Math.min(this.w-prompt.offsetWidth-8,(b.left+b.right-prompt.offsetWidth)/2))}px`;prompt.style.top=`${Math.max(110,b.top-prompt.offsetHeight-10)}px`;}}
     this.projectSwapArrow();
   }
   projectSwapArrow(){
@@ -398,12 +404,13 @@ export class CardTable {
     for(const [id,card] of this.cards){
       const data=card.userData,p=this.reduced?1:Math.min(1,Math.max(0,(time-data.tintStart)/800)),tint=THREE.MathUtils.lerp(data.tintFrom,data.targetTint,1-(1-p)**2);
       for(const key of ['front','back','body'])data[key].material.color.setScalar(tint);
-      data.outline.visible=id===this.hover;if(data.flying)continue;
-      const target=id===this.hover&&id!==this.view.drawn?this.height/6:0;
+      const jump=this.canAct&&!this.view.unoWindow&&this.view.turn!==this.view.self&&this.view.jumpDeadline>time&&this.view.legal.includes(id);
+      data.outline.visible=(id===this.hover||jump)&&this.view.legal.includes(id);if(data.flying)continue;
+      const target=(data.baseY||0)+((id===this.hover||jump)&&id!==this.view.drawn?this.height/6:0);
       if(data.hoverTarget!==target){data.hoverFrom=card.position.y;data.hoverTarget=target;data.hoverStart=time;}
       const hp=Math.min(1,Math.max(0,(time-data.hoverStart)/300));card.position.y=this.reduced?target:THREE.MathUtils.lerp(data.hoverFrom,target,1-(1-hp)**2);
     }
-    this.draw();
+    this.projectControls();this.draw();
   }
   draw(){
     if(!this.active)return;
