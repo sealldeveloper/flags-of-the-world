@@ -1,5 +1,14 @@
 # Verification history
 
+## Reference board and simultaneous swaps (protocol 5)
+
+- `b458a10f5` passed the full seven-card layout/hover matrix, all action/choice rendering, turn UI, real iroh peers, **67 pure tests**, and a natural **136-turn / seven-choice** 7–0/stacking game followed by a seven-card rematch. No browser errors. Syntax and whitespace checks passed.
+- The layout suite covers four players, **host plus four bots**, and eight players at 1177×725 (supplied reference), 1920×1080, 1024×900, 390×844 and 320×740. It checks full rotating-arrow envelopes against hands/placards/deck, viewport clipping, raised-card clearance, motion-on default under OS reduced-motion, and persistence of an explicit Off preference.
+- 137 captures under `/tmp/uno-board-final` were reviewed via `/tmp/uno-board-review`, with full-size four-/five-seat desktop and mobile inspections. Review caught a portrait swap fan briefly leaving the screen; the flight now translates back into view at its actual depth without shrinking cards. The animation regression asserts simultaneous, identically timed, visible swap fans.
+- `b1dc5f149` passed the focused renderer-only `uno-swap-geometry.cjs` regression and all 67 pure tests: five seat-pair swaps across four viewport sizes, 11 positions per flight, exact shared start time, card-back-only textures, and viewport containment. Its eight captures were inspected. This test uses filtered view fixtures and real WebGL without a relay; it is not a multiplayer substitute. Two subsequent real-iroh reruns failed at relay startup before gameplay, then a diagnostic connected successfully. `bef12933c` subsequently passed the complete real-iroh animation suite, including the corrected portrait swaps; its following peer rerun timed out waiting for the transient missed-UNO catch button. The earlier full peer pass above remains distinct from that failed rerun.
+- Earlier collision/focus-fixture failures are not passes. Corrections include thin separated card layers, upper-left deck placement, hover clearance, short-table arrow fitting, and placard/hand gaps. Existing card-size budgets and recipient-private boundaries are retained.
+- Protocol **5** / `v=20261006e` requires refresh and a new lobby. No WASM/backend/Cloudflare changes. Physical-device and separate-network limitations below remain.
+
 ## 3D actions, player placards and bounded turns (protocol 4)
 
 - **67 pure tests passed**, including clock stability/expiry, RTT-aware client deadlines that acknowledgements cannot restart, atomic late-jump rejection, individual draw presentation/held-card privacy, timestamp history and font glyph/provenance checks.

@@ -46,7 +46,7 @@ export class ActionEffects {
     // Draws are shown one at a time. Never reveal the eventual draw-until total.
     if(!e)for(const p of view.players){if(p.unoCalled&&!this.called.get(p.id))this.add(`${key}:uno:${p.id}`,'uno',{player:p.id});this.called.set(p.id,!!p.unoCalled);}
   }
-  anchor(player){const t=this.table;if(!player)return {x:t.w/2,y:t.tableCentreY-25};const b=t.seatBounds?.get(player);return b&&Number.isFinite(b.top)?{x:(b.left+b.right)/2,y:Math.max(155,b.top-55)}:{x:t.w/2,y:t.h*.65};}
+  anchor(player){const t=this.table;if(!player)return {x:t.tableCentreX,y:t.tableCentreY-25};const b=t.seatBounds?.get(player);return b&&Number.isFinite(b.top)?{x:(b.left+b.right)/2,y:Math.max(155,b.top-55)}:{x:t.w/2,y:t.h*.65};}
   position(mesh,x,y,pixels,factor=1){const t=this.table;mesh.position.copy(t.screenPoint(x,y,100));mesh.quaternion.copy(t.camera.quaternion);mesh.rotateX(-.5);mesh.scale.setScalar(1);mesh.updateWorldMatrix(true,true);const b=t.bounds(mesh);mesh.scale.setScalar(pixels/Math.max(1,b.right-b.left));for(let i=0;i<6;i++){const box=t.bounds(mesh);mesh.scale.multiplyScalar(pixels/Math.max(1,box.right-box.left));}mesh.scale.multiplyScalar(factor);}
   showChoice(kind,colour,options){
     this.closeChoice();const mesh=this.model(kind,colour);this.table.scene.add(mesh);const targets=[];

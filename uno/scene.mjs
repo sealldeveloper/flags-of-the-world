@@ -41,7 +41,7 @@ export class CardTable {
   constructor(canvas, {onError = ()=>{}} = {}) {
     this.canvas=canvas; this.onError=onError; this.active=false; this.cards=new Map(); this.players=new Map();
     this.textures=new Map(); this.texturePromises=[]; this.faces=new Map(); this.discards=[]; this.animations=[]; this.hover=null;
-    this.reduced=localStorage.getItem('uno-motion')==='off'||(localStorage.getItem('uno-motion')!=='on'&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+    this.reduced=localStorage.getItem('uno-motion')==='off';
     this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
     this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
     this.renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -166,7 +166,7 @@ export class CardTable {
       while(group.children.length>n)group.remove(group.children.at(-1));
       while(group.children.length<n){const card=this.card(null,this.scale);group.add(card);added.push(card);}
       const spacing=this.width*Math.min(4-.2*(count-2),Math.max(0,n-1))/Math.max(1,n);
-      group.children.forEach((card,i)=>{const fan=i-(n-1)/2;card.scale.setScalar(this.scale);card.position.set(fan*spacing,-Math.abs(fan)*this.height*.018,-i*.28);card.rotation.set(0,fan*.025,-fan*.045);card.userData.body.scale.z=4;});
+      group.children.forEach((card,i)=>{const fan=i-(n-1)/2;card.scale.setScalar(this.scale);card.position.set(fan*spacing,-Math.abs(fan)*this.height*.018,-i*.10);card.rotation.set(0,0,-fan*.015);card.userData.body.scale.z=1;});
     }
     if(this.round!==view.round){this.round=view.round;this.pile.clear();this.discards=[];}
     if(view.top&&this.discards.at(-1)?.userData.id!==view.top.id){
@@ -232,10 +232,16 @@ export class CardTable {
     ordered.slice(1).forEach((p,i)=>{
       const angle=2*PI*(i+1)/this.playerCount,group=this.players.get(p.id);
       group.scale.setScalar(1);
-      group.position.copy(this.screenPoint(w/2-rx*Math.sin(angle),Math.max(w<600?210:270,centreY+ry*Math.cos(angle)),150));group.quaternion.copy(this.camera.quaternion);group.rotateX(-.55);group.rotateY(Math.sin(angle)*.4);
+      // Reference table: side hands flank a clear centre, with the far hand above it.
+      // Five seats means the viewer plus four bots, not four seats total.
+      const slots={2:[[.5,.32]],3:[[.22,.36],[.80,.36]],4:[[.19,.46],[.55,.28],[.86,.46]],5:[[w>=900?.13:.16,.55],[.30,.28],[w>=900?.70:.76,.28],[w>=900?.92:.87,.55]]};
+      const slot=slots[this.playerCount]?.[i],x=slot?w*slot[0]:w/2-rx*Math.sin(angle),y=slot?h*slot[1]:centreY+ry*Math.cos(angle);
+      group.position.copy(this.screenPoint(x,Math.max(w<600?220:250,y),150));group.quaternion.copy(this.camera.quaternion);group.rotateX(-.55);group.rotateY(Math.sin(angle)*.25);group.rotateZ(Math.sin(angle)*.42);
       this.scene.updateMatrixWorld(true);
       const b=this.bounds(group),targetWidth=Math.min(this.playerCount>5?140:180,w*(this.playerCount>5?.22:.28)),targetHeight=this.playerCount>5?45:w<600?55:90;
       if(p.count)group.scale.setScalar(Math.min(targetWidth/(b.right-b.left),targetHeight/(b.bottom-b.top)));
+      const fitted=this.bounds(group),dx=fitted.left<12?12-fitted.left:fitted.right>w-12?w-12-fitted.right:0;
+      if(dx)group.position.add(this.screenPoint(x+dx,y,150).sub(this.screenPoint(x,y,150)));
     });
     const d=this.deckParameters();this.deck.position.set(-Math.sin(d.angle)*d.dist,this.floor+d.scale*.9,-Math.cos(d.angle)*d.dist);this.deck.rotation.set(-PI/2,0,-d.angle*d.rotation);
     this.scene.updateMatrixWorld(true);
@@ -245,15 +251,18 @@ export class CardTable {
       this.hand.scale.setScalar(factor);this.scene.updateMatrixWorld(true);
     }
     // Leave room for the play hint and optional Pass button, not a confirmation bar.
-    const handBottom=this.bounds(this.hand).bottom, desiredBottom=h-(w>1200?16:65);
+    const handBottom=this.bounds(this.hand).bottom, desiredBottom=h-(w>1200?16:w>=900?24:65);
     const pixelsPerUnit=h*this.camera.zoom/(2*distance*Math.tan(this.camera.fov*PI/360));
     if(Number.isFinite(handBottom))this.hand.position.y+=(handBottom-desiredBottom)/pixelsPerUnit;
+    if(w>=900&&this.playerCount<=5)this.hand.position.x=w*.05/pixelsPerUnit;
+    else this.hand.position.x=0;
     this.scene.updateMatrixWorld(true);
     // The discard, not the midpoint between the two piles, is the table centre.
-    this.tableCentreY=centreY-15;
-    const pileWidth=w<600?Math.max(44,w*.12):Math.min(120,w*.075),deckOffset=Math.min(150,Math.max(56,w*.18));
+    this.tableCentreX=w>=900&&this.playerCount<=5?w*.55:w/2;
+    this.tableCentreY=this.playerCount<=5?h*(w<600?.48:.53):centreY-15;
+    const pileWidth=w<600?Math.max(44,w*.12):Math.min(120,w*.075);
     this.deck.rotation.set(-PI/2,0,-.25);
-    for(const [group,x,width] of [[this.pile,w/2,pileWidth],[this.deck,w/2+deckOffset,pileWidth*.82]]){
+    for(const [group,x,width] of [[this.pile,this.tableCentreX,pileWidth],[this.deck,w*.36,pileWidth*.82]]){
       group.scale.setScalar(1);group.position.copy(this.screenPoint(x,this.tableCentreY,150));this.scene.updateMatrixWorld(true);
       const b=this.bounds(group);if(Number.isFinite(b.left))group.scale.setScalar(width/(b.right-b.left));
     }
@@ -264,7 +273,40 @@ export class CardTable {
     this.scene.updateMatrixWorld(true);this.pileBounds=this.bounds(this.pile);
     this.seatBounds=new Map(this.view.players.map(p=>[p.id,this.bounds(p.id===this.view.self?this.hand:this.players.get(p.id))]));
     if(held){const mesh=this.cards.get(held);mesh.scale.setScalar(this.scale*.78);const b=this.bounds(mesh),width=b.right-b.left,height=b.bottom-b.top,handTop=this.seatBounds.get(this.view.self).top;const world=this.screenPoint(Math.min(w-width/2-10,w*.76),handTop-height/2-14,distance);mesh.position.copy(this.hand.worldToLocal(world));mesh.userData.baseY=mesh.position.y;}
-    this.projectControls();
+    // Reserve the entire rotating arrow sweep, not just its current two visible arcs.
+    this.ringBounds=this.ringEnvelope();
+    this.projectControls();this.fitRing();this.positionDeck();this.projectControls();
+  }
+  ringEnvelope(){
+    const radius=Math.max(...this.ring.children.flatMap(m=>Array.from({length:m.geometry.attributes.position.count},(_,i)=>Math.hypot(m.geometry.attributes.position.getX(i),m.geometry.attributes.position.getZ(i)))));
+    const circle=Array.from({length:64},(_,i)=>this.project(this.ring.localToWorld(new V(Math.cos(i*PI/32)*radius,0,Math.sin(i*PI/32)*radius))));
+    return {left:Math.min(...circle.map(p=>p.x)),right:Math.max(...circle.map(p=>p.x)),top:Math.min(...circle.map(p=>p.y)),bottom:Math.max(...circle.map(p=>p.y))};
+  }
+  fitRing(){
+    const occupied=[...[...this.seatBounds].map(([id,b])=>id===this.view.self?{...b,top:b.top-(b.bottom-b.top)/6}:b),...[...document.querySelectorAll('#players .seat')].map(el=>el.getBoundingClientRect())];
+    const clashes=b=>occupied.some(a=>a.right+8>b.left&&a.left-8<b.right&&a.bottom+8>b.top&&a.top-8<b.bottom);
+    if(!clashes(this.ringBounds))return;
+    const column=occupied.filter(b=>b.left<this.tableCentreX+40&&b.right>this.tableCentreX-40);
+    const top=Math.max(120,...column.filter(b=>b.bottom<this.tableCentreY).map(b=>b.bottom+12));
+    const bottom=Math.min(this.h-100,...column.filter(b=>b.top>this.tableCentreY).map(b=>b.top-12));
+    // Only the arrows adapt to a short/crowded table. Never shrink anyone's cards.
+    const factor=Math.min(1,(bottom-top)/(this.ringBounds.bottom-this.ringBounds.top));
+    this.ringScale*=Math.max(.35,factor);this.ring.scale.setScalar(this.ringScale);this.ringBounds=this.ringEnvelope();
+    const shift=Math.max(top-this.ringBounds.top,Math.min(0,bottom-this.ringBounds.bottom)),delta=this.screenPoint(this.tableCentreX,this.tableCentreY+shift,150).sub(this.screenPoint(this.tableCentreX,this.tableCentreY,150));
+    this.pile.position.add(delta);this.ring.position.copy(this.pile.position);this.tableCentreY+=shift;
+    for(let i=0;i<20;i++){this.ringBounds=this.ringEnvelope();if(!clashes(this.ringBounds))break;this.ringScale*=.96;this.ring.scale.setScalar(this.ringScale);}
+    this.pileBounds=this.bounds(this.pile);
+  }
+  positionDeck(){
+    const w=this.w,h=this.h,box=this.bounds(this.deck),width=box.right-box.left,height=box.bottom-box.top;
+    const occupied=[this.ringBounds,...this.seatBounds.values(),...[...document.querySelectorAll('#players .seat')].map(el=>el.getBoundingClientRect())];
+    // Prefer the reference's upper-left gap between the left and far seats.
+    const preferred={x:w*(this.playerCount===5&&w<600?.5:.36),y:h*.28};
+    const candidates=[preferred];
+    for(let y=118+height/2;y<h*.62;y+=12)for(let x=10+width/2;x<w-width/2-10;x+=12)candidates.push({x,y});
+    const fits=({x,y})=>occupied.every(b=>x+width/2+10<=b.left||x-width/2-10>=b.right||y+height/2+10<=b.top||y-height/2-10>=b.bottom);
+    const best=candidates.filter(fits).sort((a,b)=>Math.hypot(a.x-preferred.x,a.y-preferred.y)-Math.hypot(b.x-preferred.x,b.y-preferred.y))[0];
+    if(best){const centre={x:(box.left+box.right)/2,y:(box.top+box.bottom)/2};this.deck.position.add(this.screenPoint(best.x,best.y,150).sub(this.screenPoint(centre.x,centre.y,150)));this.deck.updateMatrixWorld(true);}
   }
   screenPoint(x,y,depth) {
     const height=2*depth*Math.tan(this.camera.fov*PI/360)/this.camera.zoom;
@@ -295,7 +337,18 @@ export class CardTable {
     for(const p of this.view.players){
       const self=p.id===this.view.self,group=self?this.hand:this.players.get(p.id),b=this.seatBounds?.get(p.id)||this.bounds(group),anchor=self?{x:Number.isFinite(b.left)?(b.left+b.right)/2:this.w/2,y:this.h-100}:this.project(group.position);
       const el=document.querySelector(`#players [data-seat-id="${CSS.escape(p.id)}"]`);
-      if(el){el.style.width=`${this.hudWidth}px`;const half=el.offsetWidth/2;el.style.left=`${Math.max(half+4,Math.min(this.w-half-4,anchor.x))}px`;el.style.bottom='auto';el.style.top=`${Math.max(110,(Number.isFinite(b.top)?b.top:anchor.y)-el.offsetHeight-8)}px`;}
+      if(el){el.style.width=`${this.hudWidth}px`;const half=el.offsetWidth/2,side=self&&this.w>=900&&this.playerCount<=5,beside=side&&b.left>this.hudWidth+24;el.style.left=`${Math.max(half+4,Math.min(this.w-half-4,side?this.w*.13:anchor.x))}px`;el.style.bottom='auto';el.style.top=`${beside?Math.min(this.h-el.offsetHeight-24,b.top+12):Math.max(110,(Number.isFinite(b.top)?b.top:anchor.y)-(self&&Number.isFinite(b.top)?(b.bottom-b.top)/6:0)-el.offsetHeight-8)}px`;}
+    }
+    // When a full-size hand leaves no room beside it, keep its placard above
+    // the hand but slide into a clear horizontal gap, not onto a lower bot.
+    const selfEl=document.querySelector(`#players [data-seat-id="${CSS.escape(this.view.self)}"]`);
+    if(selfEl&&this.w>=900&&this.playerCount<=5){
+      const b=selfEl.getBoundingClientRect(),own=this.seatBounds.get(this.view.self);
+      const occupied=[...this.seatBounds.values(),...[...document.querySelectorAll('#players .seat')].filter(el=>el!==selfEl).map(el=>el.getBoundingClientRect()),...(this.ringBounds?[this.ringBounds]:[])];
+      occupied.push({...own,top:own.top-(own.bottom-own.top)/6});
+      const fits=x=>occupied.every(a=>x+b.width/2+8<=a.left||x-b.width/2-8>=a.right||b.bottom+8<=a.top||b.top-8>=a.bottom);
+      const origin=b.left+b.width/2,candidates=[origin];for(let x=b.width/2+12;x<this.w-b.width/2-12;x+=8)candidates.push(x);
+      const x=candidates.filter(fits).sort((a,b)=>Math.abs(a-origin)-Math.abs(b-origin))[0];if(x!==undefined)selfEl.style.left=`${x}px`;
     }
     const status=document.getElementById('table-status');if(status){
       const pile=this.pileBounds||this.bounds(this.pile),self=document.querySelector(`#players [data-seat-id="${CSS.escape(this.view.self)}"]`).getBoundingClientRect();
@@ -323,7 +376,7 @@ export class CardTable {
     svg.setAttribute('viewBox',`0 0 ${this.w} ${this.h}`);
     const swap=document.getElementById('swap-path'),rotation=document.getElementById('rotate-paths');
     swap.style.display=effect.kind==='swap'?'':'none';rotation.replaceChildren();
-    if(effect.kind==='swap')swap.setAttribute('d',effect.phase==='inbound'?path(effect.to,effect.from):path(effect.from,effect.to));
+    if(effect.kind==='swap'){swap.setAttribute('d',path(effect.from,effect.to));swap.setAttribute('marker-start',swap.getAttribute('marker-end')||'url(#arrow-head)');}
     else this.view.players.forEach((p,i,players)=>{
       const arrow=document.createElementNS('http://www.w3.org/2000/svg','path');
       arrow.setAttribute('d',path(p.id,players[(i+effect.direction+players.length)%players.length].id));
@@ -349,13 +402,20 @@ export class CardTable {
       });
       return;
     }
-    if(e?.kind!=='swap'||!['outbound','pause','inbound'].includes(e.phase))return;
+    if(e?.kind!=='swap'||e.phase!=='flight')return;
     const from=group(e.from),to=group(e.to);if(!from||!to)return;
     const a=from.getWorldPosition(new V()),b=to.getWorldPosition(new V());
-    from.visible=false;if(e.phase==='inbound')to.visible=false;
-    const ghost=(destination,source,animate,count,sourceGroup,targetGroup)=>{const fan=new THREE.Group(),n=Math.min(12,count);fan.userData.swapGhost=true;for(let i=0;i<n;i++){const card=this.card(null,this.scale);card.position.set((i-(n-1)/2)*this.width*.25,0,i*.1);fan.add(card);}fan.position.copy(destination);fan.lookAt(this.camera.position);fan.scale.copy(targetGroup.getWorldScale(new V()));this.swapGhosts.add(fan);if(animate&&!this.reduced)this.fly(fan,source,fan.quaternion.clone(),0,TIMING.outbound,{kind:'swap',sourceScale:sourceGroup.getWorldScale(new V())});};
-    ghost(b.clone().add(new V(0,3,0)),a,e.phase==='outbound',this.view.players.find(p=>p.id===e.from).count,from,to);
-    if(e.phase==='inbound')ghost(a,b,true,this.view.players.find(p=>p.id===e.to).count,to,from);
+    from.visible=false;to.visible=false;
+    const startTime=performance.now();
+    const ghost=(destination,source,animate,count,sourceGroup,targetGroup)=>{
+      const fan=new THREE.Group();fan.userData.swapGhost=true;
+      // Copy only public geometry/transforms, replacing every face with a back.
+      for(const original of sourceGroup.children.slice(0,40)){const card=this.card(null,original.scale.x);card.position.copy(original.position);card.quaternion.copy(original.quaternion);fan.add(card);}
+      fan.position.copy(destination);fan.quaternion.copy(targetGroup.getWorldQuaternion(new THREE.Quaternion()));fan.scale.copy(targetGroup.getWorldScale(new V()));this.swapGhosts.add(fan);
+      if(animate&&!this.reduced){this.fly(fan,source,sourceGroup.getWorldQuaternion(new THREE.Quaternion()),0,TIMING.swap,{kind:'swap',sourceScale:sourceGroup.getWorldScale(new V())});this.animations.at(-1).startTime=startTime;}
+    };
+    ghost(b,a,true,this.view.players.find(p=>p.id===e.from).count,from,to);
+    ghost(a,b,true,this.view.players.find(p=>p.id===e.to).count,to,from);
   }
   bindTargets(){
     const deck=document.getElementById('draw');if(deck){deck.onpointerenter=deck.onfocus=()=>{this.deckHover=!deck.disabled;};deck.onpointerleave=deck.onblur=()=>{this.deckHover=false;};}
@@ -373,7 +433,7 @@ export class CardTable {
     const start=mesh.parent.worldToLocal(from.clone());
     const parentRotation=mesh.parent.getWorldQuaternion(new THREE.Quaternion()).invert();
     const startRotation=parentRotation.multiply(rotation),startScale=sourceScale?sourceScale.clone().divide(mesh.parent.getWorldScale(new V())):targetScale.clone();
-    const up=new V(0,1,0).applyQuaternion(this.camera.quaternion),lift=Math.max(8,Math.min(45,distance*.32));
+    const up=kind==='swap'?end.clone().sub(from).cross(this.camera.getWorldDirection(new V())).normalize():new V(0,1,0).applyQuaternion(this.camera.quaternion),lift=Math.max(8,Math.min(45,distance*.32));
     const controls=kind==='reflow'?[start,target]:[start,mesh.parent.worldToLocal(from.clone().lerp(end,.22).addScaledVector(up,lift*.7)),mesh.parent.worldToLocal(from.clone().lerp(end,.65).addScaledVector(up,lift)),target];
     const curve=kind==='reflow'?null:new THREE.CatmullRomCurve3(controls,false,'catmullrom',.35);
     mesh.position.copy(start);mesh.quaternion.copy(startRotation);mesh.scale.copy(startScale);mesh.userData.flying=true;mesh.visible=delay===0;
@@ -392,6 +452,12 @@ export class CardTable {
       const progress=this.reduced?1:Math.max(0,Math.min(1,(time-a.startTime)/a.duration)),ease=a.kind==='play'?progress*progress:progress*progress*(3-2*progress);
       if(a.curve)a.mesh.position.copy(a.curve.getPoint(ease));else a.mesh.position.lerpVectors(a.start,a.target,ease);
       a.mesh.quaternion.slerpQuaternions(a.startRotation,a.targetRotation,ease);a.mesh.scale.lerpVectors(a.startScale,a.targetScale,ease);
+      if(a.kind==='swap'){
+        // Opposite lanes must remain visible even on portrait screens. Translate
+        // the travelling fan at its actual depth; never shrink it to fit.
+        const b=this.bounds(a.mesh),dx=b.left<8?8-b.left:b.right>this.w-8?this.w-8-b.right:0,dy=b.top<100?100-b.top:b.bottom>this.h-8?this.h-8-b.bottom:0;
+        if(dx||dy){const world=a.mesh.getWorldPosition(new V()),depth=-this.camera.worldToLocal(world.clone()).z;world.add(this.screenPoint(dx,dy,depth).sub(this.screenPoint(0,0,depth)));a.mesh.position.copy(a.mesh.parent.worldToLocal(world));}
+      }
       if(progress===1){a.mesh.position.copy(a.target);a.mesh.userData.flying=false;return false;}return true;
     });
     this.effects.frame(time);

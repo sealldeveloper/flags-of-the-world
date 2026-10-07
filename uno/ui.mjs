@@ -36,7 +36,7 @@ for(const kind of ['settings','history']) {
   panel.addEventListener('click',e=>{const r=panel.getBoundingClientRect();if(e.target===panel&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom))panel.close();});
   toggle.setAttribute('aria-expanded','false');
 }
-const presentation = new TablePresentation(render,{reduced:matchMedia('(prefers-reduced-motion: reduce)').matches});
+const presentation = new TablePresentation(render,{reduced:localStorage.getItem('uno-motion')==='off'});
 function pingText(ms){return Number.isInteger(ms)?`${ms} ms`:'— ms';}
 function paintPing(el,ms){el.textContent=pingText(ms);el.dataset.quality=!Number.isInteger(ms)?'unknown':ms<100?'good':ms<250?'fair':'poor';}
 function updateLatency(values){for(const el of document.querySelectorAll('#players .seat')){const ping=el.querySelector('.seat-ping');if(ping)paintPing(ping,values[el.dataset.seatId]);}}
@@ -73,7 +73,7 @@ $('theme').onclick = () => theme(document.documentElement.dataset.theme === 'dar
 $('credits').onclick = () => { $('settings-panel').close(); $('credits-dialog').showModal(); };
 $('credits-dialog').addEventListener('close',()=>$('settings-toggle').focus());
 function motion(enabled){document.body.dataset.motion=enabled?'on':'off';localStorage.setItem('uno-motion',enabled?'on':'off');if(table3d)table3d.reduced=!enabled;$('motion').textContent=`Motion: ${enabled?'on':'off'}`;$('motion').setAttribute('aria-pressed',String(enabled));}
-motion(localStorage.getItem('uno-motion')==='on'||(localStorage.getItem('uno-motion')!=='off'&&!matchMedia('(prefers-reduced-motion: reduce)').matches));
+motion(localStorage.getItem('uno-motion')!=='off');
 $('motion').onclick=()=>motion($('motion').getAttribute('aria-pressed')!=='true');
 $('name').value = localStorage.getItem('uno-name') || '';
 $('resume').hidden = !savedInvite();
@@ -269,7 +269,7 @@ function render(v, connected = true, waiting = false, presenting = false) {
   $('direction-orbit').classList.toggle('reversed', v.direction === -1);
   $('self-name').textContent = `${me.name} · your hand`;
   const name=id=>v.players.find(p=>p.id===id)?.name||'Player',effect=v.presentation;
-  $('notice').textContent = effect?.kind==='deal'?'Dealing seven cards — quick opening deal…':effect?.kind==='cue'?v.notice:effect?.kind==='play'?`${name(effect.player)} plays ${cardLabel(v.top)}…`:effect?.kind==='settle'?'Letting the cards settle…':!animating&&v.unoWindow?`${name(v.unoWindow.player)}: call UNO!${v.unoCatchable?' Others can now catch a missed call for +2.':''}`:effect?.kind==='draw'?`${name(effect.player)} draws a card (${effect.step}).`:effect?.kind==='swap'?`${name(effect.from)} → ${name(effect.to)} · ${effect.phase==='select'?'Selected for a hand swap':effect.phase==='pause'?'Returning the other hand next…':'Swapping hands…'}`:effect?.kind==='rotate'?`All hands pass ${effect.direction===1?'clockwise':'counterclockwise'}${effect.phase==='select'?' — get ready.':'…'}`:jumpWindow?'Jump-in window — match the colour and number.':v.autoDraw?`${current.name} ${v.debt?`draws ${v.debt} automatically`:'has no playable card — drawing automatically'}.`:v.notice;
+  $('notice').textContent = effect?.kind==='deal'?'Dealing seven cards — quick opening deal…':effect?.kind==='cue'?v.notice:effect?.kind==='play'?`${name(effect.player)} plays ${cardLabel(v.top)}…`:effect?.kind==='settle'?'Letting the cards settle…':!animating&&v.unoWindow?`${name(v.unoWindow.player)}: call UNO!${v.unoCatchable?' Others can now catch a missed call for +2.':''}`:effect?.kind==='draw'?`${name(effect.player)} draws a card (${effect.step}).`:effect?.kind==='swap'?`${name(effect.from)} → ${name(effect.to)} · ${effect.phase==='select'?'Selected for a hand swap':'Both hands are swapping…'}`:effect?.kind==='rotate'?`All hands pass ${effect.direction===1?'clockwise':'counterclockwise'}${effect.phase==='select'?' — get ready.':'…'}`:jumpWindow?'Jump-in window — match the colour and number.':v.autoDraw?`${current.name} ${v.debt?`draws ${v.debt} automatically`:'has no playable card — drawing automatically'}.`:v.notice;
   $('discard').replaceChildren(...(v.top ? [makeCard(v.top)] : []));
   $('current-colour').textContent = `${current?.name||'Player'}'s turn`;
   $('current-colour').setAttribute('aria-label',`${current?.name||'Player'}'s turn. Current colour: ${v.colour}.`);

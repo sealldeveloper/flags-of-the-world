@@ -8,8 +8,8 @@
   <title>Scuffed UNO · iroh port — seall.dev</title>
   <link rel="icon" href="./assets/scuffeduno/favicon-32x32.png" type="image/png" sizes="32x32">
   <link rel="icon" href="./assets/scuffeduno/favicon-16x16.png" type="image/png" sizes="16x16">
-  <link rel="stylesheet" href="./style.css?v=20261006d">
-  <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","./ui.mjs":"./ui.mjs?v=20261006d","./engine.mjs":"./engine.mjs?v=20261006d","./room.mjs":"./room.mjs?v=20261006d","./presentation.mjs":"./presentation.mjs?v=20261006d","./scene.mjs":"./scene.mjs?v=20261006d","./transport.mjs":"./transport.mjs?v=20261006d","./profiles.mjs":"./profiles.mjs?v=20261006d","./lobby.mjs":"./lobby.mjs?v=20261006d","./rules.mjs":"./rules.mjs?v=20261006d","./history.mjs":"./history.mjs?v=20261006d","./effects.mjs":"./effects.mjs?v=20261006d"}}</script>
+  <link rel="stylesheet" href="./style.css?v=20261006e">
+  <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","./ui.mjs":"./ui.mjs?v=20261006e","./engine.mjs":"./engine.mjs?v=20261006e","./room.mjs":"./room.mjs?v=20261006e","./presentation.mjs":"./presentation.mjs?v=20261006e","./scene.mjs":"./scene.mjs?v=20261006e","./transport.mjs":"./transport.mjs?v=20261006e","./profiles.mjs":"./profiles.mjs?v=20261006e","./lobby.mjs":"./lobby.mjs?v=20261006e","./rules.mjs":"./rules.mjs?v=20261006e","./history.mjs":"./history.mjs?v=20261006e","./effects.mjs":"./effects.mjs?v=20261006e"}}</script>
 </head>
 <body>
   <canvas id="scene" aria-hidden="true"></canvas>
@@ -62,7 +62,7 @@
         <div id="opponent-zone"></div>
         <div class="table-heading"><h2 id="turn-label">Your turn</h2></div>
         <div id="jump-prompt" hidden><strong>Jump in!</strong><div class="countdown-track"><i id="jump-progress"></i></div></div><div id="table-status"><span id="current-colour" class="colour-label"></span><span id="direction"></span><p id="notice" class="notice" aria-live="polite"></p></div>
-        <svg id="swap-arrow" aria-hidden="true" hidden><defs><marker id="swap-tip" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#ffdf74"/></marker></defs><path id="swap-path" fill="none" stroke="#ffdf74" stroke-width="4" marker-end="url(#swap-tip)"/><g id="rotate-paths" fill="none" stroke="#ffdf74" stroke-width="4" marker-end="url(#swap-tip)"></g></svg>
+        <svg id="swap-arrow" aria-hidden="true" hidden><defs><marker id="swap-tip" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 Z" fill="#ffdf74"/></marker></defs><path id="swap-path" fill="none" stroke="#ffdf74" stroke-width="4" marker-end="url(#swap-tip)"/><g id="rotate-paths" fill="none" stroke="#ffdf74" stroke-width="4" marker-end="url(#swap-tip)"></g></svg>
         <div class="pile-area"><div id="direction-orbit" aria-hidden="true"><span>➜</span><span>➜</span></div><div><span class="pile-label">Discard</span><div id="discard"></div></div><div class="draw-area"><span id="debt"></span><button id="draw" type="button">Draw a card</button></div></div>
         <div id="drawn-decision" role="group" aria-label="Play or keep the drawn card" hidden><button id="drawn-play" class="primary" type="button">Play</button><button id="pass" type="button">Keep</button></div>
         <div id="uno-controls"><button id="call-uno" type="button" hidden aria-label="Call UNO" title="Call UNO before your turn ends"><img src="./assets/scuffeduno/uno-button.png" alt="UNO!" draggable="false"></button><button id="catch-uno" type="button" hidden>Catch missed UNO · +2</button></div>
@@ -125,6 +125,6 @@
   </main>
   <footer>Static site · Browser-hosted · iroh only · Keep the host tab in the foreground on mobile.</footer>
   <noscript>This game needs JavaScript and WebAssembly enabled.</noscript>
-  <script type="module" src="./ui.mjs?v=20261006d"></script>
+  <script type="module" src="./ui.mjs?v=20261006e"></script>
 </body>
 </html>

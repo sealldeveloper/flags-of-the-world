@@ -1,6 +1,6 @@
 // Ordered, recipient-private presentation of an already validated host action.
 // Game authority stays in the engine; animation never invents or submits moves.
-export const TIMING = Object.freeze({deal:100,dealFlight:1000,draw:1100,play:600,reflow:450,cue:1600,select:1000,outbound:1000,pause:500,inbound:1000,rotate:1500,settle:250,jump:3000,unoCall:3000,unoCatch:5000});
+export const TIMING = Object.freeze({deal:100,dealFlight:1000,draw:1100,play:600,reflow:450,cue:1600,select:1000,swap:1000,rotate:1500,settle:250,jump:3000,unoCall:3000,unoCatch:5000});
 export const dealDuration = count => Math.max(0,count-1)*TIMING.deal+TIMING.dealFlight;
 export function playCue(event) {
   const value=event.card.value,colour=event.colour;
@@ -9,7 +9,7 @@ export function playCue(event) {
   return null;
 }
 export function effectDuration(effects) {
-  return (effects?.events || []).reduce((ms,e)=>ms+(e.kind==='deal'?dealDuration(e.count):e.kind==='draw'?e.count*TIMING.draw:e.kind==='play'?TIMING.play+(playCue(e)?TIMING.cue:0):e.kind==='swap'?TIMING.select+TIMING.outbound+TIMING.pause+TIMING.inbound+TIMING.settle:e.kind==='rotate'?TIMING.select+TIMING.rotate+TIMING.settle:0),TIMING.settle);
+  return (effects?.events || []).reduce((ms,e)=>ms+(e.kind==='deal'?dealDuration(e.count):e.kind==='draw'?e.count*TIMING.draw:e.kind==='play'?TIMING.play+(playCue(e)?TIMING.cue:0):e.kind==='swap'?TIMING.select+TIMING.swap+TIMING.settle:e.kind==='rotate'?TIMING.select+TIMING.rotate+TIMING.settle:0),TIMING.settle);
 }
 export function presentationFrames(previous,next,reduced=false) {
   const hold=()=>next.phase==='playing'&&next.revealMs>0?[{duration:next.revealMs,view:{...next,presentation:{kind:'wait'},legal:[]}}]:[];
@@ -38,7 +38,8 @@ export function presentationFrames(previous,next,reduced=false) {
       colour=e.colour;debt=next.debt;direction=next.direction;
       const cue=playCue(e);if(cue)stage({kind:'cue',cue,player:e.player},TIMING.cue);
     } else if(e.kind==='swap') {
-      for(const phase of ['select','outbound','pause','inbound'])stage({kind:'swap',from:e.from,to:e.to,phase},TIMING[phase]);
+      stage({kind:'swap',from:e.from,to:e.to,phase:'select'},TIMING.select);
+      stage({kind:'swap',from:e.from,to:e.to,phase:'flight'},TIMING.swap);
       const from=counts.get(e.from);counts.set(e.from,counts.get(e.to));counts.set(e.to,from);
       if([e.from,e.to].includes(next.self))hand=next.hand.map(c=>({...c}));
       stage({kind:'swap',from:e.from,to:e.to,phase:'settle'},TIMING.settle);
