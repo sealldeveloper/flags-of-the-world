@@ -234,7 +234,7 @@ export class CardTable {
       group.scale.setScalar(1);
       // Reference table: side hands flank a clear centre, with the far hand above it.
       // Five seats means the viewer plus four bots, not four seats total.
-      const slots={2:[[.5,.32]],3:[[.22,.36],[.80,.36]],4:[[.19,.46],[.55,.28],[.86,.46]],5:[[w>=900?.13:.16,.55],[.30,.28],[w>=900?.70:.76,.28],[w>=900?.92:.87,.55]]};
+      const slots={2:[[.5,.32]],3:[[.22,.36],[w>=900?.78:.80,.36]],4:[[.19,.46],[w>=900?.5:.55,.28],[w>=900?.81:.86,.46]],5:[[w>=900?.13:.16,.55],[.30,.28],[w>=900?.70:.76,.28],[.87,.55]]};
       const slot=slots[this.playerCount]?.[i],x=slot?w*slot[0]:w/2-rx*Math.sin(angle),y=slot?h*slot[1]:centreY+ry*Math.cos(angle);
       group.position.copy(this.screenPoint(x,Math.max(w<600?220:250,y),150));group.quaternion.copy(this.camera.quaternion);group.rotateX(-.55);group.rotateY(Math.sin(angle)*.25);group.rotateZ(Math.sin(angle)*.42);
       this.scene.updateMatrixWorld(true);
@@ -251,14 +251,13 @@ export class CardTable {
       this.hand.scale.setScalar(factor);this.scene.updateMatrixWorld(true);
     }
     // Leave room for the play hint and optional Pass button, not a confirmation bar.
-    const handBottom=this.bounds(this.hand).bottom, desiredBottom=h-(w>1200?16:w>=900?24:65);
+    const handBottom=this.bounds(this.hand).bottom, desiredBottom=h-(w>1200?16:w>=900?40:65);
     const pixelsPerUnit=h*this.camera.zoom/(2*distance*Math.tan(this.camera.fov*PI/360));
     if(Number.isFinite(handBottom))this.hand.position.y+=(handBottom-desiredBottom)/pixelsPerUnit;
-    if(w>=900&&this.playerCount<=5)this.hand.position.x=w*.05/pixelsPerUnit;
-    else this.hand.position.x=0;
+    this.hand.position.x=0;
     this.scene.updateMatrixWorld(true);
     // The discard, not the midpoint between the two piles, is the table centre.
-    this.tableCentreX=w>=900&&this.playerCount<=5?w*.55:w/2;
+    this.tableCentreX=w/2;
     this.tableCentreY=this.playerCount<=5?h*(w<600?.48:.53):centreY-15;
     const pileWidth=w<600?Math.max(44,w*.12):Math.min(120,w*.075);
     this.deck.rotation.set(-PI/2,0,-.25);
@@ -343,12 +342,14 @@ export class CardTable {
     // the hand but slide into a clear horizontal gap, not onto a lower bot.
     const selfEl=document.querySelector(`#players [data-seat-id="${CSS.escape(this.view.self)}"]`);
     if(selfEl&&this.w>=900&&this.playerCount<=5){
-      const b=selfEl.getBoundingClientRect(),own=this.seatBounds.get(this.view.self);
+      let b=selfEl.getBoundingClientRect();const own=this.seatBounds.get(this.view.self);
       const occupied=[...this.seatBounds.values(),...[...document.querySelectorAll('#players .seat')].filter(el=>el!==selfEl).map(el=>el.getBoundingClientRect()),...(this.ringBounds?[this.ringBounds]:[])];
       occupied.push({...own,top:own.top-(own.bottom-own.top)/6});
       const fits=x=>occupied.every(a=>x+b.width/2+8<=a.left||x-b.width/2-8>=a.right||b.bottom+8<=a.top||b.top-8>=a.bottom);
       const origin=b.left+b.width/2,candidates=[origin];for(let x=b.width/2+12;x<this.w-b.width/2-12;x+=8)candidates.push(x);
-      const x=candidates.filter(fits).sort((a,b)=>Math.abs(a-origin)-Math.abs(b-origin))[0];if(x!==undefined)selfEl.style.left=`${x}px`;
+      let x=candidates.filter(fits).sort((a,b)=>Math.abs(a-origin)-Math.abs(b-origin))[0];
+      if(x===undefined){selfEl.style.width=`${Math.min(140,this.hudWidth)}px`;b=selfEl.getBoundingClientRect();x=candidates.filter(fits).sort((a,b)=>Math.abs(a-origin)-Math.abs(b-origin))[0];}
+      if(x!==undefined)selfEl.style.left=`${x}px`;
     }
     const status=document.getElementById('table-status');if(status){
       const pile=this.pileBounds||this.bounds(this.pile),self=document.querySelector(`#players [data-seat-id="${CSS.escape(this.view.self)}"]`).getBoundingClientRect();

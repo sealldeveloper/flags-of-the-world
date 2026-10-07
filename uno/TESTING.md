@@ -1,5 +1,11 @@
 # Verification history
 
+## Desktop centring correction
+
+- Removed the desktop 55% hand/play-area offset: both now use the viewport midpoint. Desktop opponent slots are balanced; card sizes are unchanged. A constrained local placard can narrow to fit without moving the hand off-centre.
+- `b9b34fa06` passed the 4/5/8-seat full-hand/hover matrix at five sizes, exact midpoint assertions, collision/viewport checks, focused swap geometry and all 67 pure tests. All 28 captures in `/tmp/uno-centred` were inspected, including full-size reference, narrow-desktop and wide-desktop views.
+- Asset version `20261006f`; protocol remains 5 because only layout changed.
+
 ## Reference board and simultaneous swaps (protocol 5)
 
 - `b458a10f5` passed the full seven-card layout/hover matrix, all action/choice rendering, turn UI, real iroh peers, **67 pure tests**, and a natural **136-turn / seven-choice** 7–0/stacking game followed by a seven-card rematch. No browser errors. Syntax and whitespace checks passed.
