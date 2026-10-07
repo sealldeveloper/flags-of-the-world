@@ -83,7 +83,8 @@ export class Room {
   }
   pace() {
     const s=this.state,revealUntil=performance.now()+effectDuration(s.effects),played=s.effects?.events.find(e=>e.kind==='play');
-    const jump=s.phase==='playing'&&s.rules.jumpIn&&played&&/^\d$/.test(played.card.value)&&!s.debt&&!s.drawn&&!s.unoWindow;
+    // Inspect authoritative hands only; clients receive the deadline, never the holder/card.
+    const jump=s.phase==='playing'&&s.rules.jumpIn&&played&&/^\d$/.test(played.card.value)&&!s.debt&&!s.drawn&&!s.unoWindow&&s.players.some((p,i)=>i!==s.turn&&p.connected&&p.hand.some(c=>legalCard(s,p,c)));
     this.actionTiming={round:s.round,revision:s.effects.revision,revealUntil,jumpUntil:jump?revealUntil+TIMING.jump:0,catchFrom:revealUntil+TIMING.unoCall,unoUntil:revealUntil+TIMING.unoCall+TIMING.unoCatch};
   }
   updateTurnClock() {

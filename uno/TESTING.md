@@ -1,5 +1,14 @@
 # Verification history
 
+## Conditional jump windows and purple cumulative stacks (`20261006g`)
+
+- Host-private eligibility now opens the three-second window only for connected, out-of-turn exact-match holders, including bots. Seven new pure tests cover absent matches, normal-turn-only matches, disconnected holders, previous-actor duplicates, privacy, UNO exclusions and the immediate post-animation clock. All **74 pure tests passed**.
+- `b4f82e234` passed the real-iroh stacking suite, all action/choice/swap captures, turn UI and pure regression suite. Stacking tests exercise +2/+4/+6, +4/+8, persistent and duplicate-safe totals, payment/clear, reset, explicit Motion Off and five/eight-seat full hands. The final crowded-counter fit and label/number-to-hand/HUD collision assertions passed again in `b2eb54df5`, with all 74 pure tests and diff checks.
+- `b26679d76` passed real-peer invite, profile, force start, deal, duplicate preservation, own-turn UNO/history, missed-call catch/+2, exact jump acceptance and wrong-colour rejection, 2/4/8 seats, rotation, winner and rematch.
+- Reviewed 101 captures from `/tmp/uno-stacking-final`, `/tmp/uno-stack-actions` and `/tmp/uno-stack-turn` via six contact sheets and full-size counter images. Visual review corrected additive arrow glow over the counter and fitted the eight-seat counter below the far hand; cards were not resized.
+- Earlier runs were not counted as passes: a privacy assertion incorrectly substring-matched numeric card IDs (replaced with an unambiguous private sentinel); animation sampling raced completed flights (test-only synchronous capture freeze, disabled for real-time modal checks); one relay startup failed before gameplay. `bd8b8235a` specifically reported an unreachable iroh relay. No mocked transport or production test hooks were added.
+- Protocol stays 5; asset query is `20261006g`. Physical-device, suspension and cross-network limitations remain as below.
+
 ## Desktop centring correction
 
 - Removed the desktop 55% hand/play-area offset: both now use the viewport midpoint. Desktop opponent slots are balanced; card sizes are unchanged. A constrained local placard can narrow to fit without moving the hand off-centre.

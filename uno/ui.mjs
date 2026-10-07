@@ -184,7 +184,7 @@ function makeCard(c, interactive = false) {
 }
 function render(v, connected = true, waiting = false, presenting = false) {
   if (!v) return;
-  const previousRevision = view?.revision, previousDebt=view?.debt;
+  const previousRevision = view?.revision;
   const enteringGame = view?.phase !== 'playing' && v.phase === 'playing';
   view = v; online = connected; pending = waiting; animating=presenting;
   document.body.classList.add('in-room'); $('history-toggle').hidden=false;
@@ -274,7 +274,6 @@ function render(v, connected = true, waiting = false, presenting = false) {
   $('current-colour').textContent = `${current?.name||'Player'}'s turn`;
   $('current-colour').setAttribute('aria-label',`${current?.name||'Player'}'s turn. Current colour: ${v.colour}.`);
   $('debt').textContent = v.debt ? `+${v.debt} cards` : '';
-  if(v.debt&&v.debt!==previousDebt&&document.body.dataset.motion==='on')$('debt').animate([{transform:'translateY(12px) scale(.4)',opacity:0},{transform:'translateY(0) scale(1.15)',opacity:1,offset:.7},{transform:'translateY(0) scale(1)',opacity:1}],{duration:400,easing:'ease-out'});
   $('draw').disabled = !turn || !!v.drawn || v.autoDraw;
   $('draw').textContent = v.autoDraw?(v.debt?`Drawing ${v.debt} automatically`:'Drawing automatically'):v.debt ? `Draw ${v.debt} cards` : v.rules.drawUntilPlayable ? 'Draw until playable' : 'Draw a card';
   $('drawn-decision').hidden = !v.drawn || animating || !online;

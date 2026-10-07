@@ -7,7 +7,7 @@ const out=process.env.SCREENSHOT_DIR||'/tmp/uno-animations';fs.mkdirSync(out,{re
  await p.goto((process.env.BASE_URL||'http://127.0.0.1:18764')+'/uno/');await p.evaluate(async()=>{
   const {Room}=await import('./room.mjs'),{CardTable}=await import('./scene.mjs'),{TablePresentation}=await import('./presentation.mjs');
   const open=Room.prototype.open;Room.prototype.open=function(...a){window.r=this;return open.apply(this,a);};
-  const update=CardTable.prototype.update;CardTable.prototype.update=function(...a){window.table=this;return update.apply(this,a);};
+  const update=CardTable.prototype.update;CardTable.prototype.update=function(...a){window.table=this;const result=update.apply(this,a);if(window.freezeSamples!==false&&this.animations.some(x=>['deal','play','draw'].includes(x.kind))){window.freeze();queueMicrotask(window.freeze);}return result;};
   const next=TablePresentation.prototype.next;TablePresentation.prototype.next=function(...a){window.presenter=this;return next.apply(this,a);};
   const bc=Room.prototype.broadcast;Room.prototype.broadcast=function(...a){const result=bc.apply(this,a);clearTimeout(this.botTimer);return result;};
   window.freeze=()=>{clearTimeout(presenter.timer);clearTimeout(r.botTimer);clearTimeout(r.settleTimer);clearTimeout(r.turnTimer);cancelAnimationFrame(table.frameId);table.frameId=0;};
@@ -31,7 +31,7 @@ const out=process.env.SCREENSHOT_DIR||'/tmp/uno-animations';fs.mkdirSync(out,{re
   await fixture('5');if(w===1920){await p.locator('#draw').hover();await p.waitForFunction(()=>{const t=table.deck.children.at(-1);return t.position.z>t.userData.baseZ+.1;});await shot('deck-hover');await p.mouse.move(1,100);}await play('5');await samplePlay(`self-play-${w}`);
   await fixture('5',1);await play('5',1);await samplePlay(`opponent-play-${w}`);
   await fixture('5');await p.evaluate(()=>{r.execute(r.self,{type:'draw'},r.state.revision);r.broadcast();});await p.waitForFunction(()=>table.animations.some(a=>a.kind==='draw'));await p.evaluate(()=>{freeze();const a=table.animations.find(a=>a.kind==='draw');table.lastTime=a.startTime+a.duration*.5;table.frame(table.lastTime);});await shot(`normal-draw-${w}`);
-  for(const value of ['skip','reverse','draw2','draw4','wild','7','0']){await fixture(value);await play(value);await p.evaluate(()=>{freeze();const a=table.animations.find(a=>a.kind==='play');table.lastTime=a.startTime+a.duration;table.frame(table.lastTime);});await stage(['7','0'].includes(value)?value==='7'?'swap':'rotate':'cue',['7','0'].includes(value)?'select':undefined);assert(await p.evaluate(()=>table.effects.pulses.length>0));await shot(`cue-${value}-${w}`);
+  for(const value of ['skip','reverse','draw2','draw4','wild','7','0']){await fixture(value);await play(value);await p.evaluate(()=>{freeze();const a=table.animations.find(a=>a.kind==='play');table.lastTime=a.startTime+a.duration;table.frame(table.lastTime);});await stage(['7','0'].includes(value)?value==='7'?'swap':'rotate':'cue',['7','0'].includes(value)?'select':undefined);assert(await p.evaluate(()=>table.effects.pulses.length>0||table.effects.stack));await shot(`cue-${value}-${w}`);
    if(value==='7'||value==='0'){await stage(value==='7'?'swap':'rotate','flight');if(value==='7')assert(await p.evaluate(()=>{const a=table.animations.filter(a=>a.kind==='swap');return a.length===2&&a[0].startTime===a[1].startTime&&a.every(x=>{const b=table.bounds(x.mesh);return x.mesh.userData.flying&&b.left>=0&&b.right<=innerWidth&&b.top>=0&&b.bottom<=innerHeight;});}), 'both swap hands travel together');await shot(`transfer-${value}-${w}`);}
   }
   await fixture('5',0,8);await p.evaluate(()=>{freeze();table.frame(performance.now());});const b=await p.evaluate(()=>table.pileBounds);assert(Math.abs((b.left+b.right)/2-w/2)<6);await shot(`centred-eight-seats-${w}`);
@@ -44,6 +44,7 @@ const out=process.env.SCREENSHOT_DIR||'/tmp/uno-animations';fs.mkdirSync(out,{re
    if(value==='wild')assert.equal(await p.evaluate(()=>r.state.colour),selected);else assert.equal(await p.evaluate(()=>r.state.effects.events.find(e=>e.kind==='swap').to),selected);
   }
  }
+ await p.evaluate(()=>window.freezeSamples=false);
  // Real modal selection uses entrance + reversed exit; stale exits cannot
  // close a newly opened chooser for a different turn/revision.
  await fixture('wild');await p.locator('#hand .wild.symbol-wild').click();await p.locator('#choice').waitFor({state:'visible'});

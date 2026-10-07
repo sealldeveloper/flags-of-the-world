@@ -482,7 +482,9 @@ export class CardTable {
   draw(){
     if(!this.active)return;
     const background=this.scene.background;this.scene.background=null;
-    this.camera.layers.set(1);this.bloom.render();this.camera.layers.set(0);
+    // Keep the additive arrow glow from painting over the foreground stack text.
+    const ringVisible=this.ring.visible;if(this.effects.stack?.mesh.visible)this.ring.visible=false;
+    this.camera.layers.set(1);this.bloom.render();this.ring.visible=ringVisible;this.camera.layers.set(0);
     this.scene.background=background;this.composer.render();this.canvas.dataset.rendered='true';
   }
   stop(){this.active=false;cancelAnimationFrame(this.frameId);this.frameId=0;}

@@ -37,10 +37,49 @@ export class ActionEffects {
     if(kind==='seven'&&target){const a=this.extrude(arrow(),COLOURS[colour]||COLOURS.yellow,1);a.scale.setScalar(.5);a.position.x=8;a.userData.target=target;mesh.add(a);}
     this.pulses.push({mesh,kind,colour,player,start:performance.now(),duration});
   }
+  stackNumber(total){
+    const mesh=this.text(`+${total}`,0xffffff,1.2);mesh.material[0].opacity=1;mesh.material[1].dispose();mesh.material[1]=new THREE.MeshBasicMaterial({color:0x210038});
+    mesh.renderOrder=101;for(const m of mesh.material){m.transparent=true;m.depthTest=false;m.depthWrite=false;}
+    mesh.geometry.computeBoundingBox();mesh.userData.baseScale=Math.min(1,16/(mesh.geometry.boundingBox.max.x-mesh.geometry.boundingBox.min.x));mesh.scale.setScalar(mesh.userData.baseScale);mesh.position.y=-2;return mesh;
+  }
+  createStack(total){
+    const mesh=new THREE.Group(),shape=new THREE.Shape();shape.moveTo(-5,-9);shape.lineTo(5,-9);shape.lineTo(12,9);shape.lineTo(-12,9);shape.closePath();
+    const material=new THREE.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,side:THREE.DoubleSide,uniforms:{opacity:{value:1},bottom:{value:new THREE.Color(0x9229ef)},top:{value:new THREE.Color(0x571ba8)}},vertexShader:'varying float height;void main(){height=clamp((position.y+9.)/18.,0.,1.);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying float height;uniform float opacity;uniform vec3 bottom;uniform vec3 top;void main(){gl_FragColor=vec4(mix(bottom,top,height),(.68*(1.-height))*opacity);\n#include <colorspace_fragment>\n}'});
+    const highlight=new THREE.Mesh(new THREE.ExtrudeGeometry(shape,{depth:.5,bevelEnabled:false}),material);highlight.position.z=-1;highlight.renderOrder=100;mesh.add(highlight);
+    const label=this.text('STACKING',0xd79aff,.35);label.scale.setScalar(.23);label.position.set(0,4.8,0);label.renderOrder=101;for(const m of label.material){m.depthTest=false;m.depthWrite=false;}mesh.add(label);
+    const number=this.stackNumber(total);mesh.add(number);mesh.userData.actionCue='stack';this.table.scene.add(mesh);
+    this.stack={mesh,highlight,label,number,total,displayed:total,stage:'enter',start:performance.now()};
+  }
+  updateStack(view){
+    const total=Math.max(0,view.debt||0),s=this.stack;
+    if(total){
+      if(!s||['give','exit'].includes(s.stage)){if(s)this.dispose(s.mesh);this.createStack(total);}
+      else if(s.total!==total){s.total=total;s.stage='change';s.start=performance.now();}
+    }else if(s&&!['give','exit'].includes(s.stage)){
+      s.stage=view.presentation?.kind==='draw'?'give':'exit';s.target=view.presentation?.player;s.start=performance.now();
+    }
+  }
+  frameStack(time){
+    const s=this.stack;if(!s)return;const t=this.table,elapsed=Math.max(0,time-s.start),a=this.anchor(null),pop=x=>1+2.70158*(x-1)**3+1.70158*(x-1)**2;
+    if((t.reduced&&['give','exit'].includes(s.stage))||(s.stage==='give'&&elapsed>=1000)||(s.stage==='exit'&&elapsed>=400)){this.dispose(s.mesh);this.stack=null;return;}
+    let factor=1,numberScale=1,x=a.x,y=t.playerCount>5?t.tableCentreY-10:a.y-22;
+    if(s.stage==='enter'){const p=t.reduced?1:Math.min(1,elapsed/400);factor=Math.max(.001,pop(p));y+=35*(1-p);if(p===1)s.stage='hold';}
+    if(s.stage==='change'){
+      if((elapsed>=400||t.reduced)&&s.displayed!==s.total){s.mesh.remove(s.number);this.dispose(s.number);s.number=this.stackNumber(s.total);s.mesh.add(s.number);s.displayed=s.total;}
+      numberScale=t.reduced?1:elapsed<400?Math.max(.001,1-elapsed/400):Math.max(.001,pop(Math.min(1,(elapsed-400)/400)));if(elapsed>=800||t.reduced)s.stage='hold';
+    }
+    if(s.stage==='give'){
+      const p=elapsed/1000,end=this.anchor(s.target),ease=p*p*(3-2*p);x+=(end.x-x)*ease;y+=(end.y-y)*ease;numberScale=p<.7?1-p*.3:Math.max(.001,(1-p)/.3*.79);s.highlight.material.uniforms.opacity.value=Math.max(0,1-p*2);s.label.visible=false;
+    }
+    if(s.stage==='exit')factor=Math.max(.001,1-elapsed/400);
+    s.number.scale.setScalar(s.number.userData.baseScale*numberScale);s.mesh.visible=!this.choice;
+    this.position(s.mesh,x,y,Math.min(190,t.w*.4,t.playerCount>5?(t.ringBounds.right-t.ringBounds.left)*.9:Infinity),factor);
+  }
   update(view) {
     if(this.round!==view.round||this.self!==view.self){this.clear();this.seen.clear();this.called.clear();this.round=view.round;this.self=view.self;}
     const e=view.presentation,key=`${view.round}:${view.effects?.revision??view.revision}`;
-    if(e?.kind==='cue')this.add(key+':cue',e.cue.kind,{colour:e.cue.colour});
+    this.updateStack(view);
+    if(e?.kind==='cue'&&!['draw2','draw4'].includes(e.cue.kind))this.add(key+':cue',e.cue.kind,{colour:e.cue.colour});
     if(e?.kind==='swap'&&e.phase==='select')this.add(key+':seven','seven',{colour:view.colour,duration:TIMING.select,target:e.to});
     if(e?.kind==='rotate'&&e.phase==='select')this.add(key+':zero','zero',{colour:view.colour,duration:TIMING.select});
     // Draws are shown one at a time. Never reveal the eventual draw-until total.
@@ -58,7 +97,7 @@ export class ActionEffects {
   closeChoice(){if(this.choice){this.dispose(this.choice.mesh);this.choice=null;}}
   dispose(mesh){this.table.scene.remove(mesh);mesh.traverse(m=>{m.geometry?.dispose();for(const material of Array.isArray(m.material)?m.material:m.material?[m.material]:[])material.dispose();});}
   frame(time) {
-    const t=this.table;
+    const t=this.table;this.frameStack(time);
     this.pulses=this.pulses.filter(p=>{
       const elapsed=time-p.start,progress=Math.max(0,elapsed/p.duration);if(progress>=1){this.dispose(p.mesh);return false;}
       const edge=Math.min(300,p.duration/3),grow=Math.min(1,elapsed/edge),shrink=Math.min(1,(p.duration-elapsed)/edge),back=x=>1+2.70158*(x-1)**3+1.70158*(x-1)**2;
@@ -74,5 +113,5 @@ export class ActionEffects {
       for(const m of targets){const value=m.userData.target||m.userData.colour,point=t.project(m.localToWorld((m.userData.hitPoint||new THREE.Vector3(0,1,1)).clone())),button=[...document.querySelectorAll('#choices button')].find(el=>el.dataset.value===value);if(!button)continue;const width=t.w<600?44:64,height=44;Object.assign(button.style,{left:`${Math.max(4,Math.min(t.w-width-4,point.x-width/2))}px`,top:`${Math.max(145,Math.min(t.h-height-65,point.y-height/2))}px`,width:`${width}px`,height:`${height}px`});}
     }
   }
-  clear(){for(const p of this.pulses)this.dispose(p.mesh);this.pulses=[];this.closeChoice();}
+  clear(){for(const p of this.pulses)this.dispose(p.mesh);this.pulses=[];if(this.stack)this.dispose(this.stack.mesh);this.stack=null;this.closeChoice();}
 }
