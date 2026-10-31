@@ -4,7 +4,7 @@
 
 ## Results
 
-- `node --test tests/*.test.mjs`: **172 passed, 0 failed**. Existing puzzle/UNO regressions plus Worker origin/field/size restrictions, readable bounded JSON errors, portable data, sorting, v4 invitations, selected colours, attribution, filename sanitization/datetimes, both aggregate scoring methods, tie handling, readiness/authorship, history bounds and complete group-image layout. Export palettes are checked against `assets/theme.css`.
+- `node --test tests/*.test.mjs`: **181 passed, 0 failed**. Existing puzzle/UNO regressions plus both Workers' origin/field/size restrictions, TierMaker parsing and production routing, fresh shell-asset installation, readable bounded JSON errors, portable data, sorting, v4 invitations, selected colours, attribution, filename sanitization/datetimes, both aggregate scoring methods, tie handling, readiness/authorship, history bounds and complete group-image layout. Export palettes are checked against `assets/theme.css`.
 - `python3 tests/tiermaker-server.test.py`: **8 passed**. Cover metadata/hero paths, restricted URLs/redirects, traversal, source metadata/ordering, modern media asset paths, mismatched roots, templates over 1,000 images, saved-list extraction and variations.
 - `tests/tierlist-sort-zoom.cjs`: **passed**. Actual native and CDP touch sorting, insertion previews, cancellation, persistence, a toolbar-free overlay, continuous non-preset wheel zoom, cursor anchoring, panning, actual touch pinch, keyboard controls, image-click retention and outside-click/Escape dismissal.
 - `tests/tierlist-states.cjs`: **passed**. Hover/focus/selection, inline tier controls, disabled boundaries, deletion, keyboard/touch ranking, dense mobile content, Help, invalid imports, independent duplicate imports and byte-budget rejection.
@@ -57,13 +57,15 @@ The original Catbox failure was freshly reproduced in Firefox against that same 
 
 The current upload path paces requests, records confirmed public links by source-content hash for 24 hours, pauses remaining templates on a relay failure and explains how to retry or choose Local storage. An unreadable response can still leave an unknown anonymous upload. Recovery tests cover content reuse, clearing the cache, persisted-host validation, source ordering, original-byte preservation and retrying after a partial failure without reuploading confirmed originals. These changes improve failure handling, not the public relay's availability.
 
-## Cloudflare upload Worker preparation
+## Cloudflare services and production TierMaker fix
 
 The dedicated `tierlist/upload-worker/` config accepts uploads only from `https://puzzle.seall.dev`. Localhost, `127.0.0.1`, missing/null origins and lookalikes are deliberately refused. Ten Node policy tests passed, covering CORS/preflights, fixed path/destination, method/query/field restrictions, credential/filename stripping, exact image bytes, body/header/dimension limits, rate-limit fail-closed behavior, redirects and bounded validated upstream replies. Worker-handled production-origin failures retain readable CORS headers.
 
-`wrangler deploy --config tierlist/upload-worker/wrangler.toml --dry-run` passed with the production-only origin and 120-per-60-second rate-limit binding. This is a local bundle/configuration check, not a live Cloudflare or Catbox acceptance test. Actual deployment is blocked by the existing Wrangler OAuth grant expiring with `invalid_grant`. No unverified Worker URL has been substituted into the client. The client still uses the older public relay until deployment and a live upload are verified. Client error handling now recognizes bounded, known Worker JSON errors without trusting arbitrary proxy error text.
+The upload Worker passed Wrangler's dry-run and was deployed at `https://puzzle-tierlist-catbox.my-account-306.workers.dev`, version `8e79b63d-c43f-4e1d-9638-d8da8530155f`, after owner reauthorization. Deployment alone is not Catbox acceptance. The client retains the older public relay until a real Worker upload succeeds. Client error handling recognizes bounded, known Worker JSON errors without trusting arbitrary proxy error text.
 
-The existing crossword Worker and all account/DNS/billing settings are unchanged. This Worker does not provide TierMaker's separate read helper. The static site alone cannot enable production TierMaker URL imports.
+The reported production `URL import is not enabled on this host` error was caused by GitHub Pages not running Python. A separate read-only Worker is deployed at `https://puzzle-tierlist-tiermaker.my-account-306.workers.dev`, version `3956c1a3-2445-4bb8-9274-bd55d0a70508`. Seven policy/parser tests passed, including original bytes, saved-list positions, modern paths, more than 1,000 entries, hostile destinations/redirects, MIME/byte limits, query/method restrictions and production-only CORS. Its approximate limit is 600 reads per minute per IP/location, with a 45-second request deadline. From a real browser on `https://puzzle.seall.dev`, the exact Choose Your Weapon source returned all **18 images**. Its first source image and actual hero cover were successfully fetched and decoded through the deployed Worker. Localhost was refused. This is live helper acceptance, not yet a claim about the complete published-editor import.
+
+The production client now selects this fixed read service, while localhost and other origins keep their same-origin Python helper. Shell version 14 reloads assets during installation instead of copying stale browser-cache endpoint configuration. The 181-test suite, 8 Python tests and actual interrupted-install/update/offline browser suite passed after this change. The existing crossword Worker and all account/DNS/billing settings are unchanged. The Catbox upload Worker remains upload-only.
 
 ## Lobby-label and batch-import follow-up
 
@@ -103,7 +105,10 @@ The warning, upload selector, TierMaker import selector and upload-management st
 - `/tmp/tierlist-cover-local-accepted/`, `/tmp/tierlist-cover-sort-accepted/`, `/tmp/tierlist-cover-batch-accepted/`, `/tmp/tierlist-cover-remote-accepted/`, `/tmp/tierlist-cover-offline-accepted/`
 - `/tmp/tierlist-cover-accepted-units.txt` (earlier 161-test acceptance)
 - `/tmp/tierlist-worker-units.txt` (172-test follow-up, all passing)
-- `/tmp/tierlist-staged-release-units.txt` (172 tests passing from the scoped publishing tree, excluding unrelated local edits, plus 8 Python helper tests)
+- `/tmp/tierlist-staged-release-units.txt` (172 tests passing from the scoped editor publishing tree, excluding unrelated local edits, plus 8 Python helper tests)
+- `/tmp/tierlist-service-units.txt` (181-test production-reader integration follow-up)
+- `/tmp/tierlist-service-offline/` (successful fresh-asset install, updates and offline authoring)
+- `/tmp/tierlist-tiermaker-worker-live-receipt.json` (actual production-origin 18-image manifest and decoded first image/hero)
 - `/tmp/tierlist-loveheart-copied-cover.png` (visually inspected live imported cover)
 - `/tmp/tierlist-loveheart-local-cover-result.json` (public-source Local import evidence)
 - `/tmp/tierlist-disband-accepted/` (host/guest label, real-lobby tools and visual acceptance)
@@ -142,7 +147,7 @@ Earlier development failures are superseded by the successful acceptance runs. T
 - Public relays and TierMaker remain external dependencies. The host must keep its tab open. Guest reload can resume a seat, but host reload ends the room.
 - PNG output has explicit size/readability limits and is a locally rendered representation, not a pixel-for-pixel capture of browser chrome.
 - Saved-list extraction/variations are fixture-tested, not certified for every public TierMaker URL format.
-- GitHub Pages cannot run the optional import helper. Production imports need separately deployed same-origin endpoints and ingress rate limiting.
+- GitHub Pages cannot run Python. Production imports use the separately deployed restricted TierMaker read Worker. Other origins need the local same-origin helper. TierMaker blocking, format changes and Cloudflare platform limits remain possible.
 - Old thumbnail-only images cannot regain lost detail without re-uploading.
 - Internal IndexedDB/API identifiers remain compatible while visible wording uses Tierlists.
-- This static-editor release includes only Tier List code, its tests, the navigation card and shell-cache integration. Worker deployment and upload-target cutover remain blocked on Wrangler reauthorization and a successful live upload. Unrelated local edits and pre-existing untracked work are preserved. Remote daily-puzzle archives were fast-forwarded without changing any local feature diff.
+- Publication scope is Tier List code, its tests, the navigation card and shell-cache integration. The initial editor was pushed in `4c8b79f`. Upload-target cutover requires a successful live Catbox Worker upload, separately from the verified read-helper fix. Unrelated local edits and pre-existing untracked work are preserved. Remote daily-puzzle archives were fast-forwarded without changing any local feature diff.

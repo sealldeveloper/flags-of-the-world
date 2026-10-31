@@ -1,6 +1,6 @@
 'use strict';
 // Bump the shell version when changing app assets. Never expire puzzle data here.
-const SHELL='puzzle-app-shell-v13', DATA='puzzle-daily-data-v1';
+const SHELL='puzzle-app-shell-v14', DATA='puzzle-daily-data-v1';
 const PAGES=['/','/crossword/','/crossword-nyt/','/crossword-nytmini/','/crossword-seattle/','/connections-nyt/','/flags/','/tld/','/deadlock-guess-who/','/scattegories/','/scattegories/local/','/jeopardy/','/jeopardy/display.html','/tierlist/'];
 const ASSETS=[
   '/app.webmanifest','/favicon.svg','/assets/theme.js','/assets/theme.css','/assets/app.js','/assets/library.mjs','/assets/library.css','/assets/daily.mjs',
@@ -14,7 +14,7 @@ const ASSETS=[
   '/tierlist/style.css','/tierlist/model.mjs','/tierlist/image-policy.mjs','/tierlist/remote-images.mjs','/tierlist/catbox.mjs','/tierlist/imgur.mjs','/tierlist/codec.mjs','/tierlist/storage.mjs','/tierlist/invite.mjs','/tierlist/room.mjs','/tierlist/ui.mjs','/tierlist/sort.mjs','/tierlist/viewer.mjs','/tierlist/tiermaker.mjs','/tierlist/social.mjs','/tierlist/activity.mjs','/tierlist/ratings.mjs','/tierlist/rating-panel.mjs','/tierlist/feedback.mjs','/tierlist/files.mjs','/tierlist/group-image.mjs','/tierlist/group-export.mjs','/tierlist/icon.svg',
   '/uno/transport.mjs',
 ];
-self.addEventListener('install',event=>event.waitUntil(caches.open(SHELL).then(cache=>cache.addAll([...PAGES,...ASSETS]))));
+self.addEventListener('install',event=>event.waitUntil(caches.open(SHELL).then(cache=>cache.addAll([...PAGES,...ASSETS].map(url=>new Request(url,{cache:'reload'}))))));
 self.addEventListener('activate',event=>event.waitUntil((async()=>{
   for(const key of await caches.keys())if(key.startsWith('puzzle-app-shell-')&&key!==SHELL)await caches.delete(key);
   await self.clients.claim();

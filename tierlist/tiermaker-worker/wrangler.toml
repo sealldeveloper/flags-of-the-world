@@ -1,0 +1,17 @@
+name = "puzzle-tierlist-tiermaker"
+main = "worker.mjs"
+compatibility_date = "2025-10-01"
+account_id = "3064f4beee4be0f87ffeb180f2a3dd23"
+workers_dev = true
+preview_urls = false
+
+[[ratelimits]]
+name = "READ_RATE"
+namespace_id = "1374936202"
+
+[ratelimits.simple]
+limit = 600
+period = 60
+
+[observability]
+enabled = false

@@ -1,6 +1,6 @@
 # Tier List
 
-A browser-local, general-purpose tierlist editor at `/tierlist/`, linked beside UNO in the games library. Multiplayer uses UNO's existing iroh transport unchanged, with no game backend, accounts or short-code database. Optional TierMaker imports use a restricted public-fetch helper.
+A browser-local, general-purpose tierlist editor at `/tierlist/`, linked beside UNO in the games library. Multiplayer uses UNO's existing iroh transport unchanged, with no game backend, accounts or short-code database. Optional TierMaker imports use a restricted Cloudflare read Worker on the production site and a Python public-fetch helper for local preview.
 
 ## Use
 
@@ -70,9 +70,9 @@ Paste multiple TierMaker URLs with one per line. URLs are validated before fetch
 
 Imports preserve the title, images and source order. Saved lists exposing public ranking data also preserve tier names, colours and placements. Each import creates an independent copy and records the source URL. Nothing is saved until every image succeeds.
 
-TierMaker does not grant this browser origin cross-origin access. `server.py` serves static files plus `/tierlist-import` and `/tierlist-image`. It performs only public, unauthenticated HTTPS reads, forwards no credentials, validates every URL/redirect against exact host/path allowlists and never executes scripts. Responses, concurrency and timeouts are bounded. It is not a general CORS proxy.
+TierMaker does not grant this browser origin cross-origin access. On `https://puzzle.seall.dev`, the client uses the dedicated `https://puzzle-tierlist-tiermaker.my-account-306.workers.dev` read service. It supplies `/tierlist-import` and `/tierlist-image`, reads only public first-party template/category/list pages and approved template/hero images, and constructs the templates-v2 API request internally. It forwards no credentials, executes no page scripts and validates redirects before following. Pages/API data are bounded to 2 MiB, images to 10 MiB and requests to 45 seconds. Only the exact production origin is permitted, with an approximate 600-per-minute per-IP/location limiter. It is not an arbitrary URL proxy and stores no imports. Cloudflare sees the connection and requested public source, while TierMaker sees the upstream requests. See [the read Worker](tiermaker-worker/README.md).
 
-**GitHub Pages cannot execute the optional helper.** Production URL imports require separately deployed same-origin HTTPS endpoints with appropriate ingress rate limits. The editor, code imports/exports and iroh multiplayer work as static pages without it.
+**GitHub Pages cannot execute Python.** The separate deployed read Worker fixes production URL imports without adding a game backend. Other origins, including localhost, continue to use the same-origin `server.py` helper. The editor, code imports/exports and iroh multiplayer still work without a read service. The Catbox upload Worker is separate and never handles TierMaker reads.
 
 ## Networking
 

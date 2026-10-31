@@ -111,6 +111,14 @@ test('missing overlays are retried before claiming complete offline availability
  globalThis.fetch=async()=>new Response('image',{headers:{'Content-Type':'image/png'}});
  await loadPuzzle('mini',date);assert.equal(await offlineReady(gameFor('mini'),date),true);
 });
+test('shell installation reloads assets instead of copying stale browser-cache API configuration',async()=>{
+ const handlers={};let installed;
+ class ShellRequest{constructor(url,options){this.url=url;this.cache=options.cache;}}
+ const scope={self:{addEventListener:(name,handler)=>handlers[name]=handler},Request:ShellRequest,caches:{open:async()=>({addAll:async requests=>{installed=requests;}})}};
+ vm.createContext(scope);vm.runInContext(fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8'),scope);
+ let done;handlers.install({waitUntil:promise=>done=promise});await done;
+ assert(installed.some(request=>request.url==='/tierlist/tiermaker.mjs'));assert(installed.every(request=>request.cache==='reload'&&request.url.startsWith('/')));
+});
 test('activation removes only old shell caches, preserving puzzle data and unrelated caches',async()=>{
  const handlers={},deleted=[],scope={self:{addEventListener:(name,handler)=>handlers[name]=handler,clients:{claim:async()=>{}}},caches:{keys:async()=>['puzzle-app-shell-old','puzzle-app-shell-stale',scope.shell,DATA_CACHE,'unrelated'],delete:async key=>deleted.push(key)}};
  vm.createContext(scope);vm.runInContext(fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8')+'\nthis.shell=SHELL;',scope);

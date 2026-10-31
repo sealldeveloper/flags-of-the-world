@@ -2,6 +2,11 @@ import {emptyAlbum,id,validateAlbum,MAX_DOCUMENT} from './model.mjs';
 import {compressImage,compressCover} from './codec.mjs';
 import {ImgurUpload,imgurClientId} from './imgur.mjs';
 import {uploadCatboxImage} from './catbox.mjs';
+export const TIERMAKER_READ='https://puzzle-tierlist-tiermaker.my-account-306.workers.dev';
+export function tiermakerHelperUrl(path,url,origin=globalThis.location?.origin){
+  if(!['/tierlist-import','/tierlist-image'].includes(path))throw new Error('Invalid TierMaker helper route.');
+  return `${origin==='https://puzzle.seall.dev'?TIERMAKER_READ:''}${path}?url=${encodeURIComponent(url)}`;
+}
 export function tiermakerUrl(value) {
   if(typeof value!=='string' || value.length>2048)throw new Error('TierMaker URLs must be at most 2,048 characters.');
   let url;
@@ -29,10 +34,11 @@ async function boundedResponse(response,max,signal) {
   return new Blob(chunks,{type:response.headers.get('content-type') || ''});
 }
 async function request(path,url,signal) {
-  const response=await fetch(`${path}?url=${encodeURIComponent(url)}`,{signal,credentials:'omit'});
+  const response=await fetch(tiermakerHelperUrl(path,url),{signal,credentials:'omit',referrerPolicy:'no-referrer',redirect:'error',mode:'cors'});
+  if(response.redirected)throw new Error('The TierMaker import service unexpectedly redirected the request.');
   if(!response.ok){
     let message='TierMaker import failed.';
-    try{message=(await response.json()).error || message;}catch{if(response.status===404)message='URL import is not enabled on this host.';}
+    try{const problem=JSON.parse(await(await boundedResponse(response,2048,signal)).text());if(typeof problem.error==='string' && problem.error.length<=300)message=problem.error;}catch{if(response.status===404)message='URL import is not enabled on this host.';}
     throw new Error(message);
   }
   return response;
