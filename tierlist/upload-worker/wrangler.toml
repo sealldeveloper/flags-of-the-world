@@ -1,0 +1,20 @@
+name = "puzzle-tierlist-catbox"
+main = "worker.mjs"
+compatibility_date = "2025-10-01"
+account_id = "3064f4beee4be0f87ffeb180f2a3dd23"
+workers_dev = true
+preview_urls = false
+
+[vars]
+ALLOWED_ORIGINS = '["https://puzzle.seall.dev"]'
+
+[[ratelimits]]
+name = "UPLOAD_RATE"
+namespace_id = "1374936201"
+
+[ratelimits.simple]
+limit = 120
+period = 60
+
+[observability]
+enabled = false

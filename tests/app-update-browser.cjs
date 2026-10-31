@@ -11,10 +11,10 @@ const server=http.createServer(async(req,res)=>{
  if(failInstall&&pathname==='/assets/app-icon-512.png'){res.writeHead(503);res.end();return;}
  let relative=pathname.endsWith('/')?pathname+'index.html':pathname;
  const file=path.resolve(root,'.'+relative);
- if(!file.startsWith(root+path.sep)||/^\/(uno|uno-transport|docs|scripts)(\/|$)/.test(pathname)){res.writeHead(404);res.end();return;}
+ if(!file.startsWith(root+path.sep)||(/^\/(uno|uno-transport|docs|scripts)(\/|$)/.test(pathname)&&pathname!=='/uno/transport.mjs')){res.writeHead(404);res.end();return;}
  try{
   let body=await fs.readFile(file);
-  if(pathname==='/sw.js')body=Buffer.from(body.toString().replace("SHELL='puzzle-app-shell-v1'",`SHELL='puzzle-app-shell-${version}'`));
+  if(pathname==='/sw.js')body=Buffer.from(body.toString().replace(/SHELL='puzzle-app-shell-v\d+'/,`SHELL='puzzle-app-shell-${version}'`));
   res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','Cache-Control':'no-store'});res.end(body);
  }catch(_){res.writeHead(404);res.end();}
 });
@@ -56,6 +56,11 @@ async function update(page){return page.evaluate(async()=>{
   assert.equal(await p.evaluate(()=>fetch('/uncached-probe').then(response=>response.text())),'not an app route');
   await context.setOffline(true);assert(await p.evaluate(()=>fetch('/uncached-probe').then(()=>false).catch(()=>true)));
   await p.goto(base+'/?date=2026-10-02');await p.waitForSelector('[data-game="mini"][data-status="in-progress"]');assert.match(await p.locator('#daily-message').textContent(),/3\/3 downloaded/);
-  await context.close();console.log('PASS interrupted install, explicit waiting-update activation, native save/theme/data/unrelated cache retention, stalled-network fallback and unknown-route isolation.');
+  // Tier List authoring loads from the shell while offline, including its social modules.
+  await p.goto(base+'/tierlist/');await p.locator('#new').click();await p.locator('#workspace').waitFor({state:'visible'});
+  await p.locator('#album-name').fill('Offline album');await p.locator('#album-name').blur();await p.locator('#back').click();await p.locator('#albums h3').filter({hasText:'Offline album'}).waitFor();
+  await p.reload();await p.locator('#albums .album-card').getByRole('button',{name:'Open',exact:true}).click();assert.equal(await p.locator('#album-name').inputValue(),'Offline album');
+  assert.equal(await p.locator('#board .tier-name').count(),5);
+  await context.close();console.log('PASS interrupted install, explicit waiting-update activation, native save/theme/data/unrelated cache retention, stalled-network fallback, unknown-route isolation and offline Tier List authoring/persistence.');
  }finally{await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);server.closeAllConnections();server.close();process.exit(1);});

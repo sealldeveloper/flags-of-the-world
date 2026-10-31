@@ -1,7 +1,7 @@
 'use strict';
 // Bump the shell version when changing app assets. Never expire puzzle data here.
-const SHELL='puzzle-app-shell-v1', DATA='puzzle-daily-data-v1';
-const PAGES=['/','/crossword/','/crossword-nyt/','/crossword-nytmini/','/crossword-seattle/','/connections-nyt/','/flags/','/tld/','/deadlock-guess-who/','/scattegories/','/scattegories/local/','/jeopardy/','/jeopardy/display.html'];
+const SHELL='puzzle-app-shell-v13', DATA='puzzle-daily-data-v1';
+const PAGES=['/','/crossword/','/crossword-nyt/','/crossword-nytmini/','/crossword-seattle/','/connections-nyt/','/flags/','/tld/','/deadlock-guess-who/','/scattegories/','/scattegories/local/','/jeopardy/','/jeopardy/display.html','/tierlist/'];
 const ASSETS=[
   '/app.webmanifest','/favicon.svg','/assets/theme.js','/assets/theme.css','/assets/app.js','/assets/library.mjs','/assets/library.css','/assets/daily.mjs',
   '/assets/app-icon-192.png','/assets/app-icon-512.png','/assets/app-icon-maskable-512.png',
@@ -11,6 +11,8 @@ const ASSETS=[
   '/deadlock-guess-who/script.js','/deadlock-guess-who/style.css','/deadlock-guess-who/favicon.svg','/deadlock-guess-who/data/deadlock.json',
   '/scattegories/script.js','/scattegories/style.css','/scattegories/favicon.svg','/scattegories/local/script.js','/scattegories/local/style.css',
   '/jeopardy/favicon.svg',
+  '/tierlist/style.css','/tierlist/model.mjs','/tierlist/image-policy.mjs','/tierlist/remote-images.mjs','/tierlist/catbox.mjs','/tierlist/imgur.mjs','/tierlist/codec.mjs','/tierlist/storage.mjs','/tierlist/invite.mjs','/tierlist/room.mjs','/tierlist/ui.mjs','/tierlist/sort.mjs','/tierlist/viewer.mjs','/tierlist/tiermaker.mjs','/tierlist/social.mjs','/tierlist/activity.mjs','/tierlist/ratings.mjs','/tierlist/rating-panel.mjs','/tierlist/feedback.mjs','/tierlist/files.mjs','/tierlist/group-image.mjs','/tierlist/group-export.mjs','/tierlist/icon.svg',
+  '/uno/transport.mjs',
 ];
 self.addEventListener('install',event=>event.waitUntil(caches.open(SHELL).then(cache=>cache.addAll([...PAGES,...ASSETS]))));
 self.addEventListener('activate',event=>event.waitUntil((async()=>{

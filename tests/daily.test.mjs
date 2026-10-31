@@ -112,9 +112,9 @@ test('missing overlays are retried before claiming complete offline availability
  await loadPuzzle('mini',date);assert.equal(await offlineReady(gameFor('mini'),date),true);
 });
 test('activation removes only old shell caches, preserving puzzle data and unrelated caches',async()=>{
- const handlers={},deleted=[],scope={self:{addEventListener:(name,handler)=>handlers[name]=handler,clients:{claim:async()=>{}}},caches:{keys:async()=>['puzzle-app-shell-old','puzzle-app-shell-v1',DATA_CACHE,'unrelated'],delete:async key=>deleted.push(key)}};
- vm.createContext(scope);vm.runInContext(fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8'),scope);
- let done;handlers.activate({waitUntil:promise=>done=promise});await done;assert.deepEqual(deleted,['puzzle-app-shell-old']);
+ const handlers={},deleted=[],scope={self:{addEventListener:(name,handler)=>handlers[name]=handler,clients:{claim:async()=>{}}},caches:{keys:async()=>['puzzle-app-shell-old','puzzle-app-shell-stale',scope.shell,DATA_CACHE,'unrelated'],delete:async key=>deleted.push(key)}};
+ vm.createContext(scope);vm.runInContext(fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8')+'\nthis.shell=SHELL;',scope);
+ let done;handlers.activate({waitUntil:promise=>done=promise});await done;assert.deepEqual(deleted,['puzzle-app-shell-old','puzzle-app-shell-stale']);
 });
 test('service-worker cache denial does not block online responses',async()=>{
  const scope={self:{addEventListener(){}},caches:{open:async()=>{throw new Error('blocked');}},fetch:async()=>new Response('online'),AbortController,setTimeout,clearTimeout};
@@ -129,6 +129,8 @@ test('service-worker stalled requests fall back to a saved response',async()=>{
 test('shell precache is complete and excludes all unpublished work',()=>{
  const scope={self:{addEventListener(){}},Set};vm.createContext(scope);
  vm.runInContext(fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8')+'\nthis.files=[...PAGES,...ASSETS];',scope);
- for(const path of scope.files){assert(!/uno|\/docs\/|\/scripts\//.test(path),path);assert(fs.existsSync(new URL('..'+(path.endsWith('/')?path+'index.html':path),import.meta.url)),path);}
+ const sharedTransport=new Set(['/uno/transport.mjs']);
+ for(const path of scope.files){assert(!/\/docs\/|\/scripts\//.test(path),path);if(path.startsWith('/uno/'))assert(sharedTransport.has(path),path);assert(fs.existsSync(new URL('..'+(path.endsWith('/')?path+'index.html':path),import.meta.url)),path);}
+ assert(scope.files.includes('/tierlist/'));for(const path of sharedTransport)assert(scope.files.includes(path));
  const manifest=fixture('../app.webmanifest');assert.equal(manifest.display,'standalone');assert.equal(manifest.scope,'/');assert(manifest.icons.some(icon=>icon.sizes==='192x192'));assert(manifest.icons.some(icon=>icon.sizes==='512x512'));
 });
