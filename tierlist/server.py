@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static preview plus a public-only TierMaker importer. No accounts or stored imports."""
+"""Static preview plus restricted public metadata/image imports. No accounts or stored imports."""
 import argparse
 import ast
 from html.parser import HTMLParser
@@ -7,6 +7,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
 import re
+import subprocess
 import threading
 import urllib.error
 import urllib.parse
@@ -204,13 +205,30 @@ def load_manifest(value):
         raise ValueError('TierMaker did not return an image list') from None
 
 
+def fetch_media(route, values):
+    if route not in ('/media-import', '/media-image'):
+        raise ValueError('Invalid public import route')
+    if any(key not in ('url', 'cursor', 'version') or len(value) != 1 for key, value in values.items()) or 'url' not in values:
+        raise ValueError('Supply one approved public collection URL')
+    if route == '/media-image' and set(values) != {'url'}:
+        raise ValueError('Invalid artwork request')
+    payload = {'route': route, **{key: value[0] for key, value in values.items()}}
+    result = subprocess.run(['node', str(ROOT / 'tierlist' / 'media-cli.mjs')], input=json.dumps(payload).encode(), capture_output=True, timeout=50, check=False)
+    if result.returncode:
+        raise ValueError(result.stderr.decode('utf-8', errors='replace')[:300] or 'Public collection import failed')
+    content_type, separator, data = result.stdout.partition(b'\n')
+    if not separator or content_type not in (b'application/json', b'image/png', b'image/jpeg', b'image/webp') or len(data) > MAX_IMAGE:
+        raise ValueError('Invalid public import response')
+    return data, content_type.decode('ascii')
+
+
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
     def do_GET(self):
         route = urllib.parse.urlsplit(self.path)
-        if route.path not in ('/tierlist-import', '/tierlist-image'):
+        if route.path not in ('/tierlist-import', '/tierlist-image', '/media-import', '/media-image'):
             if any(part.startswith('.') for part in urllib.parse.unquote(route.path).split('/') if part):
                 self.send_error(404)
                 return
@@ -219,15 +237,20 @@ class Handler(SimpleHTTPRequestHandler):
             self.respond(429, b'{"error":"Import service is busy. Try again."}', 'application/json')
             return
         try:
-            values = urllib.parse.parse_qs(route.query, max_num_fields=2)
+            values = urllib.parse.parse_qs(route.query, max_num_fields=4, keep_blank_values=True)
             value = values.get('url', [''])[0]
-            if route.path == '/tierlist-import':
+            if route.path in ('/media-import', '/media-image'):
+                if len(route.query) > 8192:
+                    raise ValueError('Import request is too large')
+                data, content_type = fetch_media(route.path, values)
+                self.respond(200, data, content_type)
+            elif route.path == '/tierlist-import':
                 result = load_manifest(value)
                 self.respond(200, json.dumps(result).encode(), 'application/json')
             else:
                 data, content_type = fetch_public(value, 'image')
                 self.respond(200, data, content_type)
-        except (ValueError, urllib.error.URLError, TimeoutError, OSError) as error:
+        except (ValueError, urllib.error.URLError, TimeoutError, OSError, subprocess.TimeoutExpired) as error:
             message = str(error) if isinstance(error, ValueError) else 'TierMaker could not be reached. Try again.'
             self.respond(400, json.dumps({'error': message}).encode(), 'application/json')
         finally:

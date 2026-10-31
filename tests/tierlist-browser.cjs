@@ -25,7 +25,7 @@ fs.mkdirSync(out,{recursive:true});
   }
   const host=await page('Host'),guest=await page('Guest'),late=await page('Late arrival');
   await capture(host,'library-empty',true);
-  await host.locator('#new').click();await host.locator('#workspace').waitFor({state:'visible'});
+  await host.locator('#new').click();await host.locator('#confirm-new').click();await host.locator('#workspace').waitFor({state:'visible'});
   await capture(host,'empty-editor');
   await host.locator('#album-name').fill('A deliberately long album title for a very opinionated group of reviewers');await host.locator('#album-name').blur();
   const fixtures=await host.evaluate(()=>{

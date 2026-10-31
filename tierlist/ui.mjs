@@ -5,6 +5,7 @@ import {TierRoom, savedInvite} from './room.mjs';
 import {insertionBefore} from './sort.mjs';
 import {openImage,refreshImage} from './viewer.mjs';
 import {importTiermaker,tiermakerUrls} from './tiermaker.mjs';
+import{createMediaTierlist}from'./media.mjs';
 import {Activity} from './activity.mjs';
 import {contrastInk,randomColour,cleanColour} from './social.mjs';
 import {RatingPanel} from './rating-panel.mjs';
@@ -380,7 +381,24 @@ $('#album-name').addEventListener('change',()=>{
   album.name=$('#album-name').value.trim() || 'Untitled tierlist';queueSave();syncWorkspace();
 });
 for(const tab of ['rank','images','everyone'])$(`[data-tab="${tab}"]`).addEventListener('click',()=>setTab(tab));
-$('#new').addEventListener('click',attempt(async()=>{const next=await saveAlbum(emptyAlbum());await openAlbum(next);}));
+let newController=null;
+function newSourceMode(){
+ const kind=$('#new-source').value,blank=kind==='blank';$('#new-url-fields').hidden=blank;$('#new-url').required=!blank;$('#new-url').disabled=blank;$('#new-local-help').hidden=blank;$('#new-url-label').textContent=kind==='spotify'?'Album URL':'Playlist URL';$('#new-url').placeholder=kind==='spotify'?'https://open.spotify.com/album/…':'https://www.youtube.com/playlist?list=…';$('#new-name').placeholder=blank?'Untitled tierlist':'Uses the collection name';$('#new-source-help').textContent=blank?'Start empty and add your own images.':kind==='spotify'?'Each track gets its own name and number, using the album artwork.':'Keeps playlist order and video names. Hidden or unavailable videos are reported, not fetched privately.';$('#confirm-new').textContent=blank?'Create blank tierlist':'Create from '+(kind==='spotify'?'album':'playlist');
+}
+function newControls(pending){$('#new-source').disabled=pending;$('#new-url').readOnly=pending;$('#new-name').readOnly=pending;$('#confirm-new').disabled=pending;if(pending)$('#confirm-new').textContent='Creating…';else newSourceMode();}
+$('#new').addEventListener('click',()=>{if(busy)return;$('#new-source').value='blank';$('#new-url').value='';$('#new-name').value='';$('#new-progress').textContent='';$('#new-error').textContent='';newControls(false);$('#new-dialog').showModal();$('#new-source').focus();});
+$('#new-source').addEventListener('change',()=>{newSourceMode();$('#new-error').textContent='';$('#new-progress').textContent='';});
+$('#new-dialog').addEventListener('close',()=>{if($('#new-dialog').open||!newController)return;newController.abort();newController=null;busy=false;newControls(false);lockLibrary();if(album)syncWorkspace();});
+$('#new-form').addEventListener('submit',async event=>{
+ event.preventDefault();if(newController||busy)return;const controller=new AbortController();newController=controller;busy=true;newControls(true);lockLibrary();$('#new-error').textContent='';$('#new-progress').textContent='';
+ try{
+  const kind=$('#new-source').value,name=$('#new-name').value.trim();let next,warnings=[];
+  if(kind==='blank'){next=emptyAlbum();if(name)next.name=name;}else{const result=await createMediaTierlist($('#new-url').value,{kind,name,signal:controller.signal,onProgress:text=>{if(newController===controller)$('#new-progress').textContent=text;}});next=result.album;warnings=result.warnings;}
+  controller.signal.throwIfAborted();const saved=await saveAlbum(next);if(controller.signal.aborted){await refreshLibrary();return;}
+  newController=null;busy=false;newControls(false);lockLibrary();$('#new-dialog').close();await openAlbum(saved);status(`Created ${saved.images.length?saved.images.length+' named images.':'blank tierlist.'}${warnings.length?' '+warnings.join(' '):''}`);
+ }catch(problem){if(!controller.signal.aborted&&newController===controller){$('#new-progress').textContent='';$('#new-error').textContent=problem.message;}}
+ finally{if(newController===controller){newController=null;busy=false;newControls(false);lockLibrary();if(album)syncWorkspace();}}
+});
 async function showLibrary() {
   if(busy)return;await persist();rememberLobby();await refreshLibrary();generation++;album=null;state=null;selected=null;$('#workspace').hidden=true;$('#library').hidden=false;status('');lockLibrary();
 }

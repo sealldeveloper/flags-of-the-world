@@ -188,6 +188,15 @@ dialog .section-heading>button { flex: none }
 #tiermaker-progress { font-size: 13px }
 #tiermaker-progress:empty,#tiermaker-error:empty { display: none }
 #tier-dialog,#host-dialog,#join-dialog,#copy-dialog,#creating-dialog { max-width: 420px }
+#new-dialog { max-width: 520px }
+#new-form { display: flex; flex-direction: column; gap: 8px }
+#new-form>label,#new-form>p { margin: 0 }
+#new-url-fields { min-width: 0 }
+#new-url-fields label { display: block; margin-bottom: 8px }
+#new-progress:empty,#new-error:empty { display: none }
+#new-progress,#new-error { overflow-wrap: anywhere }
+#new-error { color: var(--site-danger) }
+#new-form>.actions { margin-top: 8px }
 #creating-dialog { border-left: 5px solid var(--site-accent) }
 #creating-title { font-size: 24px }
 #creating-status { font-size: 15px; color: var(--site-text); margin-block: 16px 24px }

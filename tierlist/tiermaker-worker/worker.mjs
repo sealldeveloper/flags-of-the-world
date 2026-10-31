@@ -1,4 +1,6 @@
 import {tiermakerPublicUrl,parseTiermakerPage,tiermakerManifest} from './parse.mjs';
+import{mediaSource,mediaImageUrl}from'../media-source.mjs';
+import{loadMediaManifest,loadMediaImage,mediaCursor,MediaReadError}from'../media-reader.mjs';
 const ORIGIN='https://puzzle.seall.dev',MAX_PAGE=2*1024*1024,MAX_IMAGE=25*1024*1024;
 class ReadError extends Error{constructor(status,message){super(message);this.status=status;}}
 function reply(origin,status,body,type='application/json; charset=utf-8'){
@@ -43,23 +45,26 @@ export async function loadTiermakerManifest(value,signal){
 export default{async fetch(request,env){
  const origin=request.headers.get('Origin')===ORIGIN?ORIGIN:null;if(!origin)return reply(null,403,{error:'This website is not allowed to import.',code:'origin_not_allowed'});
  const url=new URL(request.url);
- if(!['/tierlist-import','/tierlist-image'].includes(url.pathname))return reply(origin,404,{error:'Not found.',code:'not_found'});
+ if(!['/tierlist-import','/tierlist-image','/media-import','/media-image'].includes(url.pathname))return reply(origin,404,{error:'Not found.',code:'not_found'});
  if(request.method==='OPTIONS'){
   const headers=(request.headers.get('Access-Control-Request-Headers')||'').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
   if(request.headers.get('Access-Control-Request-Method')!=='GET'||headers.some(x=>x!=='content-type'))return reply(origin,403,{error:'This import request is not allowed.',code:'preflight_not_allowed'});
   return new Response(null,{status:204,headers:{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'GET','Access-Control-Allow-Headers':'Content-Type','Access-Control-Max-Age':'600','Vary':'Origin, Access-Control-Request-Method, Access-Control-Request-Headers','Cache-Control':'no-store'}});
  }
- if(request.method!=='GET'){const result=reply(origin,405,{error:'Use GET for public TierMaker imports.',code:'method_not_allowed'});result.headers.set('Allow','GET, OPTIONS');return result;}
- if(url.search.length>8192||[...url.searchParams.keys()].length!==1||url.searchParams.getAll('url').length!==1)return reply(origin,400,{error:'Supply exactly one TierMaker URL.',code:'invalid_request'});
- const value=url.searchParams.get('url'),kind=url.pathname==='/tierlist-image'?'image':'page';
- try{tiermakerPublicUrl(value,kind);}catch{return reply(origin,400,{error:'Use an approved HTTPS TierMaker template or image URL.',code:'invalid_request'});}
+ if(request.method!=='GET'){const result=reply(origin,405,{error:'Use GET for public imports.',code:'method_not_allowed'});result.headers.set('Allow','GET, OPTIONS');return result;}
+ const media=url.pathname.startsWith('/media-'),value=url.searchParams.get('url'),kind=url.pathname.endsWith('-image')?'image':'page',keys=[...url.searchParams.keys()];let options={};
+ try{
+  if(url.search.length>8192||url.searchParams.getAll('url').length!==1||keys.some(key=>!((media&&kind==='page'?['url','cursor','version']:['url']).includes(key)))||new Set(keys).size!==keys.length)throw new Error('Supply one approved public source URL.');
+  if(media){if(kind==='image')mediaImageUrl(value);else{const source=mediaSource(value);options={cursor:url.searchParams.get('cursor')??undefined,version:url.searchParams.get('version')??undefined};mediaCursor(source,options.cursor,options.version);}}else tiermakerPublicUrl(value,kind);
+ }catch(error){return reply(origin,400,{error:media?error.message:'Use an approved HTTPS TierMaker template or image URL.',code:'invalid_request'});}
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),45000);
  try{
   if(!env.READ_RATE?.limit)throw new ReadError(503,'Import protection is not configured.');let rate;
   try{rate=await env.READ_RATE.limit({key:request.headers.get('CF-Connecting-IP')||'unknown'});}catch{throw new ReadError(503,'Import protection is unavailable. Try again.');}
   if(!rate.success)return reply(origin,429,{error:'Too many import requests. Wait before retrying.',code:'rate_limited'});
+  if(media){if(kind==='page')return reply(origin,200,await loadMediaManifest(value,controller.signal,options));const image=await loadMediaImage(value,controller.signal);return reply(origin,200,image,image.type);}
   if(kind==='page')return reply(origin,200,await loadTiermakerManifest(value,controller.signal));
   const image=await fetchTiermaker(value,'image',controller.signal);return reply(origin,200,image.data,image.type);
- }catch(error){const message=controller.signal.aborted?'TierMaker import timed out. Try again.':error instanceof ReadError?error.message:error?.constructor===Error?error.message.slice(0,200):'TierMaker returned invalid template data.';return reply(origin,error instanceof ReadError?error.status:400,{error:message,code:'tiermaker_failed'});}
+ }catch(error){const known=error instanceof ReadError||error instanceof MediaReadError,message=controller.signal.aborted?'Public import timed out. Try again.':known?error.message:error?.constructor===Error?error.message.slice(0,200):'The source returned invalid collection metadata.';return reply(origin,known?error.status:400,{error:message,code:media?'media_failed':'tiermaker_failed'});}
  finally{clearTimeout(timer);}
 }};

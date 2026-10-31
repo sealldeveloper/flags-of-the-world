@@ -57,7 +57,7 @@ async function update(page){return page.evaluate(async()=>{
   await context.setOffline(true);assert(await p.evaluate(()=>fetch('/uncached-probe').then(()=>false).catch(()=>true)));
   await p.goto(base+'/?date=2026-10-02');await p.waitForSelector('[data-game="mini"][data-status="in-progress"]');assert.match(await p.locator('#daily-message').textContent(),/3\/3 downloaded/);
   // Tier List authoring loads from the shell while offline, including its social modules.
-  await p.goto(base+'/tierlist/');await p.locator('#new').click();await p.locator('#workspace').waitFor({state:'visible'});
+  await p.goto(base+'/tierlist/');await p.locator('#new').click();await p.locator('#confirm-new').click();await p.locator('#workspace').waitFor({state:'visible'});
   await p.locator('#album-name').fill('Offline album');await p.locator('#album-name').blur();await p.locator('#back').click();await p.locator('#albums h3').filter({hasText:'Offline album'}).waitFor();
   await p.reload();await p.locator('#albums .album-card').getByRole('button',{name:'Open',exact:true}).click();assert.equal(await p.locator('#album-name').inputValue(),'Offline album');
   assert.equal(await p.locator('#board .tier-name').count(),5);

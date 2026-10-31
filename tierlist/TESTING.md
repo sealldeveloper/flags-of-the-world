@@ -1,5 +1,18 @@
 # Tier List verification
 
+## Blank, YouTube and Spotify creation
+
+The collection feature passes **170 JavaScript tests and 13 Python helper/bridge tests** from the scoped indexed runtime/test snapshot `d01cae04217555b65960e93567ddc0f622e7a157`, excluding unrelated working-tree edits. Its metadata/policy tests cover provider URL canonicalization, private/mix/track rejection, fixed artwork hosts/paths, modern/legacy YouTube rows, recommendation-versus-playlist continuation scoping, ordered duplicate entries, bounded/incomplete/repeated pagination, Spotify region-restricted track names, largest artwork, and rejection of audio, redirects, arbitrary targets, writes and invalid cursors. Only the fixed YouTube browse endpoint may receive an internal metadata-read POST. Public page scripts, cookies, account access tokens and visitor identifiers are not executed or forwarded.
+
+Real Chromium and Firefox checks on the local preview created **18 Spotify tracks** from Global Warming and **11 YouTube entries** from Big History through the actual New tierlist UI. Every name/order matched the public metadata. All generated data/previews/covers were embedded, and portable files retained every Unranked item. Spotify artwork was downloaded once. Source artwork remained **640×640** and **1280×720** respectively, with exact decoded RGBA pixel equality in the artwork region after captions were appended and the normal lossless codec ran. Network assertions saw no audio/video requests or image-hosting writes. Actual named-card zooms and both-theme 1920/1024/390/320 images were visually inspected.
+
+Separate deterministic Chromium/Firefox fixtures exercise blank creation, source selection, custom names, focus/hover, long content, loading, cancellation, wrong-provider and provider errors, duplicate playlist items, missing-artwork text cards, shared album artwork and persistence. These are UI/error fixtures, not a substitute for the actual-provider tests above. Existing editor/file/real-iroh/late-join/resume, local editing during a lobby, group PNG and install/update/offline regressions passed after adapting blank creation to its new dialog. Offline tests execute the actual cached lossless WASM encoder.
+
+The existing read Worker was updated without changing DNS, billing, account plans or the crossword Worker. Live version `e26976b2-8b9e-4169-9a34-c6d0c9db5f0b` read both actual collections/artwork plus a larger YouTube playlist across two pages: **198 public entries from 200 reported**, with the provider's unavailable-video notice. The first implementation incorrectly followed a separate recommendation continuation. That was fixed and regression-tested before publication. Spotify's two explicit artwork CDN variants are allowlisted, without opening arbitrary hosts.
+
+The final scoped candidate also passed both-browser UI/pixel tests, including cancellation after a first image had already been generated, plus the complete install/update/offline suite. Every captured source-choice, loading, error and generated-image state was visually reviewed in both themes at desktop/tablet/mobile widths. Production UI acceptance is checked after Pages publication, not inferred from these local or read-Worker checks. Local Python bridge tests are in `tests/tierlist-media-server.test.py`, and the actual provider test is `tests/tierlist-media-live.cjs`. Physical mobile devices and future provider markup/access remain uncertified.
+
+
 ## Local-only release
 
 This release removes hosted-image controls, remote-image rendering, upload clients and the upload Worker. The TierMaker Worker remains read-only. Image originals retain their source resolution, with no new lossy compression. Independent compressed previews are used for ranking and preview-first lobby readiness.
@@ -37,15 +50,20 @@ The half-height viewer change was separately published in `4860c70`. Pages build
 
 The production TierMaker service is `https://puzzle-tierlist-tiermaker.my-account-306.workers.dev`, restricted to `https://puzzle.seall.dev`, fixed first-party destinations and GET/OPTIONS. It has no upload or storage API. Version `448d9694-394e-4c4a-b4dc-84831232b44f` deploys the tested 25 MiB read limit, with all seven Worker policy/parser tests passing before deployment. The exact Choose Your Weapon source supplies 18 images. Sample source PNGs are actually 300×300, not higher-resolution images that the app can reconstruct. The alternate raw `/media/template_images/` paths did not supply usable images through the read service. Imports preserve the actual provided resolution instead of inventing detail.
 
-The former Catbox upload Worker was successfully deleted. No Imgur or R2 service was enabled. Historical upload/proxy tests are not evidence for this local-only release and their obsolete source/tests have been removed.
+The former Catbox upload Worker was successfully deleted. A subsequent Cloudflare deployment lookup for `puzzle-tierlist-catbox` confirmed error `10007`, meaning the Worker does not exist on the account. No Imgur or R2 service was enabled. Historical upload/proxy tests are not evidence for this local-only release and their obsolete source/tests have been removed.
 
 ## Reproduction commands
 
 ```sh
 node --test tests/*.test.mjs
 python3 tests/tiermaker-server.test.py
+python3 tests/tierlist-media-server.test.py
 export PLAYWRIGHT_MODULE=/path/to/playwright
 export CHROMIUM_PATH=/path/to/chromium
+node tests/tierlist-media.cjs
+BROWSER=firefox node tests/tierlist-media.cjs
+node tests/tierlist-media-live.cjs
+BROWSER=firefox node tests/tierlist-media-live.cjs
 node tests/tierlist-browser.cjs
 node tests/tierlist-sort-zoom.cjs
 node tests/tierlist-states.cjs

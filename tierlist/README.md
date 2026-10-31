@@ -21,6 +21,20 @@ Portable `TIER1.` files use lossless gzip compression and contain image bytes, p
 
 Only embedded static PNG/JPEG/WebP image data is accepted in files or peer documents. SVG, external URLs, arbitrary blob URLs and remote thumbnails are rejected before fetching or rendering. Existing local saves remain compatible. Older saves containing hosted-only images are not deleted or silently downgraded to their previews, but cannot be opened as local-only tierlists. The library reports unsupported records without hiding valid local saves. Removing the old upload feature does not delete files previously hosted elsewhere.
 
+## New blank, playlist and album tierlists
+
+New tierlist offers Blank tierlist, YouTube playlist and Spotify album. Give it an optional custom name, or use the public collection name.
+
+- YouTube accepts public playlist URLs, including a watch/share URL with a playlist ID. Source ordering and repeated videos are retained. Modern/legacy list layouts and continuation pages are supported. Unavailable or hidden videos are reported rather than fetched privately. Mixes, watch-later lists and private sources are not supported.
+- Spotify accepts `https://open.spotify.com/album/…` URLs. Every exposed track gets its own number and name, even if the public metadata marks its audio unavailable in a region. Audio is never requested. Album artwork is read once and reused locally across track cards.
+- Each item becomes an embedded image with the full artwork at its supplied pixel dimensions, followed by a separate numbered title/artist caption. Artwork is not resized or covered by the caption. The normal lossless image pipeline creates independent ranking previews. Item labels remain editable in Images. Captions inside generated images retain the source name from creation. The source URL stays in the description.
+- YouTube tries its public maximum-resolution thumbnail, then smaller published variants only if a variant is missing. Spotify chooses the largest supplied artwork. Missing artwork produces a named text card with a notice, not a missing ranking item.
+- Collections are bounded to 500 entries and the existing 128 MiB expanded tierlist limit. Incomplete or repeated pagination and oversized sources fail clearly. Nothing is saved until the complete generated tierlist is ready. Cancel or Escape stops creation without saving a partial album.
+
+This reads public page/embed metadata, not signed-in accounts or supported streaming APIs. Provider markup can change and access may be blocked. No audio/video files or song previews are downloaded. Account tokens and browser cookies are never used or forwarded. Page scripts are treated as text and never executed. Sign-in requirements, consent pages and browser checks are not bypassed. The source websites and the read-service operator can see their network requests.
+
+Production uses the existing restricted read Worker for `/media-import` and `/media-image`. Browser requests are GETs. The Worker may make a fixed anonymous YouTube browse request with POST to read another public metadata page, but never calls account-changing or upload APIs. Local preview uses the same parsers/read policy through a bounded Node CLI bridge, requiring Node 22+ alongside Python. Blank creation, existing generated tierlists and portable files work offline. Starting a new URL-based creation requires network access.
+
 ## Covers
 
 Choose cover imports a file, Use an existing image selects an image from the tierlist, and Use first image resets the automatic library cover. Covers do not add ranking items or change placements. They are embedded PNG/WebP previews, limited to 256 pixels per edge and 64 KiB, and survive files, independent copies and lobby transfers.
@@ -61,7 +75,7 @@ Paste one or more public HTTPS TierMaker create/category/list URLs, one per line
 
 Completed templates are saved independently. Cancellation preserves completed saves and retains unfinished URLs for retry. Missing covers warn without losing a successful image import. Foreign image/cover metadata is never fetched.
 
-On `https://puzzle.seall.dev`, public reads use the separate restricted `https://puzzle-tierlist-tiermaker.my-account-306.workers.dev` Worker. It accepts only that production origin, exact first-party public page/image paths and internally constructed templates-v2 API requests. It forwards no credentials, executes no page scripts, validates every redirect and has byte/deadline/rate limits. It does not store imports or accept uploads. Cloudflare and TierMaker can see their respective network requests. See `tiermaker-worker/README.md`.
+On `https://puzzle.seall.dev`, public reads use the separate restricted `https://puzzle-tierlist-tiermaker.my-account-306.workers.dev` Worker. The TierMaker routes accept only that production origin, exact first-party public page/image paths and internally constructed templates-v2 API requests. The separate media routes also have fixed public YouTube/Spotify metadata and artwork policies. It forwards no credentials, executes no page scripts, validates every redirect and has byte/deadline/rate limits. It does not store imports or accept uploads. Cloudflare and TierMaker can see their respective network requests. See `tiermaker-worker/README.md`.
 
 GitHub Pages cannot execute Python. Local preview instead uses `server.py` for the same restricted read endpoints. Local file editing, portable imports/exports and iroh play do not depend on a TierMaker service. Provider availability and future page-format changes cannot be guaranteed.
 
@@ -71,8 +85,12 @@ GitHub Pages cannot execute Python. Local preview instead uses `server.py` for t
 python3 tierlist/server.py --port 18764
 node --test tests/*.test.mjs
 python3 tests/tiermaker-server.test.py
+python3 tests/tierlist-media-server.test.py
 export PLAYWRIGHT_MODULE=/path/to/playwright
 export CHROMIUM_PATH=/path/to/chromium
+node tests/tierlist-media.cjs
+BROWSER=firefox node tests/tierlist-media.cjs
+node tests/tierlist-media-live.cjs
 node tests/tierlist-browser.cjs
 node tests/tierlist-sort-zoom.cjs
 node tests/tierlist-states.cjs
