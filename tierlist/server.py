@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PALETTE = ['#ff7f7f', '#ffbf7f', '#ffdf7f', '#ffff7f', '#bfff7f', '#7fff7f', '#7fffff', '#7fbfff', '#7f7fff', '#ff7fff', '#bf7fbf', '#3b3b3b', '#858585', '#cfcfcf', '#f7f7f7']
 SLUG = r'[A-Za-z0-9][A-Za-z0-9_-]{0,250}'
 MAX_PAGE = 2 * 1024 * 1024
-MAX_IMAGE = 10 * 1024 * 1024
+MAX_IMAGE = 25 * 1024 * 1024
 UPSTREAM = threading.BoundedSemaphore(4)
 
 

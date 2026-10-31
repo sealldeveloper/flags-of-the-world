@@ -1,16 +1,17 @@
 import {tiermakerPublicUrl,parseTiermakerPage,tiermakerManifest} from './parse.mjs';
-const ORIGIN='https://puzzle.seall.dev',MAX_PAGE=2*1024*1024,MAX_IMAGE=10*1024*1024;
+const ORIGIN='https://puzzle.seall.dev',MAX_PAGE=2*1024*1024,MAX_IMAGE=25*1024*1024;
 class ReadError extends Error{constructor(status,message){super(message);this.status=status;}}
 function reply(origin,status,body,type='application/json; charset=utf-8'){
  const headers=new Headers({'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Vary':'Origin'});
  if(origin)headers.set('Access-Control-Allow-Origin',origin);if(status===429){headers.set('Retry-After','60');headers.set('Access-Control-Expose-Headers','Retry-After');}
  return new Response(type.startsWith('application/json')?JSON.stringify(body):body,{status,headers});
 }
-async function bytes(response,limit,signal){
+async function bytes(response,limit,signal,asBlob=false){
  if(Number(response.headers.get('content-length'))>limit){await response.body?.cancel().catch(()=>{});throw new ReadError(502,'TierMaker response exceeds the import size limit.');}
  const reader=response.body?.getReader();if(!reader)throw new ReadError(502,'TierMaker returned an empty response.');
  const chunks=[];let size=0;try{while(true){signal.throwIfAborted();const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>limit)throw new ReadError(502,'TierMaker response exceeds the import size limit.');chunks.push(value);}}
  catch(error){await reader.cancel().catch(()=>{});throw error;}
+ if(asBlob)return new Blob(chunks);
  const data=new Uint8Array(size);let offset=0;for(const chunk of chunks){data.set(chunk,offset);offset+=chunk.byteLength;}return data;
 }
 export async function fetchTiermaker(value,kind,signal){
@@ -27,7 +28,7 @@ export async function fetchTiermaker(value,kind,signal){
   const type=(upstream.headers.get('content-type')||'').split(';')[0].trim().toLowerCase();
   const supported=kind==='image'?['image/png','image/jpeg','image/webp','image/gif','image/avif','image/bmp']:kind==='page'?['text/html']:['application/json','text/plain','text/html'];
   if(!supported.includes(type)){await upstream.body?.cancel().catch(()=>{});throw new ReadError(502,'TierMaker returned an unsupported response type.');}
-  return {data:await bytes(upstream,kind==='image'?MAX_IMAGE:MAX_PAGE,signal),type};
+  return {data:await bytes(upstream,kind==='image'?MAX_IMAGE:MAX_PAGE,signal,kind==='image'),type};
  }
  throw new ReadError(502,'Too many TierMaker redirects.');
 }

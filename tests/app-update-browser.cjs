@@ -2,7 +2,7 @@
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const assert=require('node:assert/strict'),http=require('node:http'),fs=require('node:fs/promises'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),out=process.env.SCREENSHOT_DIR||'/tmp/puzzle-app-updates';
-const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.json':'application/json','.webmanifest':'application/manifest+json','.css':'text/css','.svg':'image/svg+xml','.png':'image/png'};
+const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.json':'application/json','.webmanifest':'application/manifest+json','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.wasm':'application/wasm'};
 let version='v1',failInstall=false,stall=false;
 const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost'),pathname=decodeURIComponent(url.pathname);
@@ -61,6 +61,7 @@ async function update(page){return page.evaluate(async()=>{
   await p.locator('#album-name').fill('Offline album');await p.locator('#album-name').blur();await p.locator('#back').click();await p.locator('#albums h3').filter({hasText:'Offline album'}).waitFor();
   await p.reload();await p.locator('#albums .album-card').getByRole('button',{name:'Open',exact:true}).click();assert.equal(await p.locator('#album-name').inputValue(),'Offline album');
   assert.equal(await p.locator('#board .tier-name').count(),5);
-  await context.close();console.log('PASS interrupted install, explicit waiting-update activation, native save/theme/data/unrelated cache retention, stalled-network fallback, unknown-route isolation and offline Tier List authoring/persistence.');
+  const optimized=await p.evaluate(async()=>{const canvas=document.createElement('canvas');canvas.width=canvas.height=16;canvas.getContext('2d').fillRect(0,0,16,16);const bitmap=await createImageBitmap(canvas),blob=await(await import('./lossless.mjs')).encodeLossless(bitmap);bitmap.close();return{type:blob.type,size:blob.size};});assert.equal(optimized.type,'image/webp');assert(optimized.size>0);
+  await context.close();console.log('PASS interrupted install, explicit waiting-update activation, native save/theme/data/unrelated cache retention, stalled-network fallback, unknown-route isolation, offline Tier List authoring/persistence and an actual offline lossless WASM encode.');
  }finally{await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);server.closeAllConnections();server.close();process.exit(1);});

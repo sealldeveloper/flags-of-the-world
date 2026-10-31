@@ -1,11 +1,11 @@
 // Portable data model. All imports and peer edits cross these validators.
-import {remoteImageUrl,isRemoteImage,remoteDimensions} from './image-policy.mjs';
+import {rasterHeaderAt,MAX_RASTER_EDGE,MAX_IMAGE_BYTES} from './raster.mjs';
 export const VERSION = 1;
-export const MAX_DOCUMENT = 16 * 1024 * 1024;
+export const MAX_DOCUMENT = 128 * 1024 * 1024;
 export const MAX_BOARD = 48 * 1024; // Fits the shared iroh transport's 64 KiB frame.
-export const MAX_IMAGE_EDGE = 1920; // Zoom viewer: up to 960 CSS pixels at 2×.
+export const MAX_IMAGE_EDGE = MAX_RASTER_EDGE;
 export const MAX_THUMB_EDGE = 256;
-export const MAX_IMAGE_DATA = 2 * 1024 * 1024;
+export const MAX_IMAGE_DATA = 35 * 1024 * 1024;
 export const MAX_COVER_DATA = 64 * 1024;
 export const id = () => crypto.randomUUID();
 const fail = message => { throw new Error(message); };
@@ -42,24 +42,14 @@ export function validateBoard(value, imageIds) {
   if (new TextEncoder().encode(JSON.stringify(result)).length > MAX_BOARD) fail('This board is too large to sync (48 KiB limit)');
   return result;
 }
-// Embedded raster headers are inspected before decoding. Remote URLs have a separate exact-provider allowlist.
+// File imports and peer assets must be self-contained rasters, never network URLs.
 export function imageDimensions(data, maxEdge = MAX_IMAGE_EDGE) {
-  if (typeof data !== 'string' || data.length > MAX_IMAGE_DATA || !/^data:image\/(webp|png);base64,[A-Za-z0-9+/]+={0,2}$/.test(data)) fail('Expected a small embedded WebP or PNG image');
-  let bytes;
-  try { bytes = Uint8Array.from(atob(data.split(',')[1]), c => c.charCodeAt(0)); } catch { fail('Invalid image encoding'); }
-  const s = (at, n) => String.fromCharCode(...bytes.slice(at, at+n));
-  const v = new DataView(bytes.buffer);
-  let width, height;
-  if (data.startsWith('data:image/png;') && bytes.length >= 33 && s(0,8) === '\x89PNG\r\n\x1a\n' && s(12,4) === 'IHDR') {
-    width = v.getUint32(16); height = v.getUint32(20);
-  } else if (data.startsWith('data:image/webp;') && bytes.length >= 30 && s(0,4) === 'RIFF' && s(8,4) === 'WEBP') {
-    const type = s(12,4);
-    if (type === 'VP8 ' && s(23,3) === '\x9d\x01\x2a') { width = v.getUint16(26,true) & 0x3fff; height = v.getUint16(28,true) & 0x3fff; }
-    else if (type === 'VP8L' && bytes[20] === 0x2f) { const bits = v.getUint32(21,true); width = (bits & 0x3fff)+1; height = ((bits >>> 14) & 0x3fff)+1; }
-    else if (type === 'VP8X') { width = 1+bytes[24]+(bytes[25]<<8)+(bytes[26]<<16); height = 1+bytes[27]+(bytes[28]<<8)+(bytes[29]<<16); }
-  }
-  if (!width || !height || Math.max(width,height) > maxEdge) fail(`Images must be at most ${maxEdge} pixels on either edge`);
-  return {width,height};
+  if(typeof data!=='string'||data.length>MAX_IMAGE_DATA||!/^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/.test(data))fail('Expected an embedded PNG, JPEG or WebP image. External image URLs are not supported.');
+  if(maxEdge<=MAX_THUMB_EDGE&&(!/^data:image\/(webp|png);/.test(data)||data.length>64*1024))fail('Expected a small embedded PNG or WebP preview.');
+  const start=data.indexOf(',')+1,encoded=data.length-start;if(encoded%4)fail('Invalid image encoding');
+  const length=encoded/4*3-(data.endsWith('==')?2:data.endsWith('=')?1:0);if(length>MAX_IMAGE_BYTES)fail('Embedded image exceeds 25 MiB.');
+  const read=(at,count)=>{const first=Math.floor(at/3)*4,last=Math.ceil((at+count)/3)*4,offset=at%3;let bytes;try{bytes=Uint8Array.from(atob(data.slice(start+first,start+last)),c=>c.charCodeAt(0));}catch{fail('Invalid image encoding');}return bytes.subarray(offset,offset+count);};
+  return rasterHeaderAt(read,length,data.slice(5,data.indexOf(';')),maxEdge);
 }
 export function coverDimensions(data) {
   if(typeof data!=='string' || data.length>MAX_COVER_DATA)fail('Cover image exceeds the 64 KiB limit');
@@ -67,19 +57,19 @@ export function coverDimensions(data) {
 }
 export function validateAlbum(value) {
   if (!value || value.v !== VERSION || !Array.isArray(value.images)) fail('Unsupported tierlist version');
-  if (JSON.stringify(value).length > MAX_DOCUMENT) fail('Tierlist exceeds the 16 MiB limit');
+  if (JSON.stringify(value).length > MAX_DOCUMENT) fail('Tierlist exceeds the 128 MiB limit');
   const ids = new Set();
   const images = value.images.map(image => {
     if (!image || ids.has(image.id)) fail('Duplicate image');
     ids.add(key(image.id));
-    const dimensions = isRemoteImage(image)?(remoteImageUrl(image.data),remoteDimensions(image)):imageDimensions(image.data);
+    const dimensions = imageDimensions(image.data);
     if (image.thumb !== undefined) imageDimensions(image.thumb, MAX_THUMB_EDGE);
     return {id:image.id, label:text(image.label, 160, 'image label'), data:image.data, ...dimensions, ...(image.thumb === undefined ? {} : {thumb:image.thumb})};
   });
   const album = {v:VERSION, id:key(value.id), name:text(value.name, 120, 'tierlist name'), description:text(value.description, 1000, 'description', true), images, board:validateBoard(value.board, ids)};
   if(value.cover!==undefined){coverDimensions(value.cover);album.cover=value.cover;}
   if(value.copiedFrom!==undefined)album.copiedFrom=cleanName(value.copiedFrom);
-  if (new TextEncoder().encode(JSON.stringify(album)).length > MAX_DOCUMENT) fail('Tierlist exceeds the 16 MiB limit');
+  if (new TextEncoder().encode(JSON.stringify(album)).length > MAX_DOCUMENT) fail('Tierlist exceeds the 128 MiB limit');
   return album;
 }
 export function moveImage(board, image, target, before = null) {

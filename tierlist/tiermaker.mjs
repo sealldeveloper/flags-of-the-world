@@ -1,7 +1,5 @@
 import {emptyAlbum,id,validateAlbum,MAX_DOCUMENT} from './model.mjs';
 import {compressImage,compressCover} from './codec.mjs';
-import {ImgurUpload,imgurClientId} from './imgur.mjs';
-import {uploadCatboxImage} from './catbox.mjs';
 export const TIERMAKER_READ='https://puzzle-tierlist-tiermaker.my-account-306.workers.dev';
 export function tiermakerHelperUrl(path,url,origin=globalThis.location?.origin){
   if(!['/tierlist-import','/tierlist-image'].includes(path))throw new Error('Invalid TierMaker helper route.');
@@ -43,11 +41,10 @@ async function request(path,url,signal) {
   }
   return response;
 }
-export async function importTiermaker(value,{signal,onProgress=()=>{},storage='local',clientId='',onUpload=()=>{},onWarning=()=>{}}={}) {
-  if(!['local','catbox','imgur'].includes(storage))throw new Error('Invalid image storage option.');if(storage==='imgur')imgurClientId(clientId);
+export async function importTiermaker(value,{signal,onProgress=()=>{},onWarning=()=>{}}={}) {
   const source=tiermakerUrl(value),controller=new AbortController(),abort=()=>controller.abort(signal.reason);
   if(signal?.aborted)signal.throwIfAborted();signal?.addEventListener('abort',abort,{once:true});
-  const active=controller.signal;let upload,firstError,finished=0,total=0,uploadAttempted=false;
+  const active=controller.signal;let firstError,finished=0,total=0;
   try {
     onProgress('Loading template…');
     const response=await request('/tierlist-import',source,active),blob=await boundedResponse(response,2*1024*1024,active),manifest=JSON.parse(await blob.text());
@@ -59,27 +56,26 @@ export async function importTiermaker(value,{signal,onProgress=()=>{},storage='l
       try{const response=await request('/tierlist-image',coverUrl,active),blob=await boundedResponse(response,10*1024*1024,active);album.cover=await compressCover(new File([blob],'cover',{type:blob.type.split(';')[0]}));}
       catch(error){active.throwIfAborted();onWarning('The TierMaker cover could not be copied. Choose a cover in Images.');}
     }
-    if(storage==='imgur'){onProgress('Creating unlisted Imgur album…');upload=await ImgurUpload.create(clientId,album.name,{signal:active});}
-    const available=MAX_DOCUMENT-65536-(album.cover?.length || 0),images=new Array(total),mapping=new Map(),imageBudget=Math.max(512,Math.floor(available/total)-512);let cursor=0,bytes=0;
-    const workers=await Promise.allSettled(Array.from({length:Math.min(storage==='catbox'?1:3,images.length)},async()=>{try{
+    const available=MAX_DOCUMENT-65536-(album.cover?.length || 0),images=new Array(total),mapping=new Map();let cursor=0,bytes=0;
+    onProgress(`Importing originals… 0/${images.length}`);
+    const workers=await Promise.allSettled(Array.from({length:Math.min(1,images.length)},async()=>{try{
       while(cursor<images.length){
         active.throwIfAborted();const index=cursor++,entry=manifest.images[index];
-        const response=await request('/tierlist-image',sources[index],active),blob=await boundedResponse(response,10*1024*1024,active);
+        const response=await request('/tierlist-image',sources[index],active),blob=await boundedResponse(response,25*1024*1024,active);
         const type=blob.type.split(';')[0],file=new File([blob],`image-${index+1}.${type.split('/')[1]}`,{type}),label=typeof entry.label==='string' && entry.label.trim()?entry.label.trim().slice(0,160):`Image ${index+1}`;
-        if(storage==='catbox')uploadAttempted=true;
-        const image=upload?await upload.add(file,label,{signal:active}):storage==='catbox'?await uploadCatboxImage(file,label,{signal:active,maxThumbData:imageBudget}):await compressImage(file,{maxData:imageBudget});active.throwIfAborted();
+        const image=await compressImage(file);active.throwIfAborted();
         image.id=`i${index.toString(36)}`;
         image.label=typeof entry.label==='string' && entry.label.trim()?entry.label.trim().slice(0,160):`Image ${index+1}`;
-        bytes+=new TextEncoder().encode(JSON.stringify(image)).length;if(bytes>available)throw new Error('Tierlist exceeds the 16 MiB limit.');
+        bytes+=new TextEncoder().encode(JSON.stringify(image)).length;if(bytes>available)throw new Error('Tierlist exceeds the 128 MiB limit.');
         images[index]=image;const key=String(entry.id);if(mapping.has(key))throw new Error('Duplicate TierMaker image.');mapping.set(key,image.id);
-        onProgress(`${upload || storage==='catbox'?'Uploading images…':'Importing images…'} ${++finished}/${images.length}`);
+        onProgress(`Importing originals… ${++finished}/${images.length}`);
       }
     }catch(error){firstError ||= error;controller.abort();throw error;}}));
     const failed=workers.find(result=>result.status==='rejected');if(failed)throw firstError || failed.reason;
     album.images=images;
     if(manifest.tiers.length)album.board.tiers=manifest.tiers.map(row=>({id:id(),name:row.name,color:row.color,items:row.items.map(item=>mapping.get(String(item)))}));
     const ranked=new Set(album.board.tiers.flatMap(row=>row.items));album.board.unranked=images.map(image=>image.id).filter(key=>!ranked.has(key));
-    active.throwIfAborted();const result=validateAlbum(album);if(upload){await upload.commit(active);active.throwIfAborted();onUpload(upload);}return result;
-  } catch(error){controller.abort();if(upload){onProgress('Removing incomplete Imgur uploads…');try{await upload.rollback();}catch(cleanup){throw new Error(`${error.message} ${cleanup.message}`);}}if(storage==='catbox' && uploadAttempted && !signal?.aborted)throw Object.assign(new Error(`${error.message} ${finished} of ${total} images completed. Retry reuses completed uploads. An interrupted anonymous upload may still remain on Catbox.`),{pauseBatch:error.pauseBatch});throw error;}
+    active.throwIfAborted();return validateAlbum(album);
+  } catch(error){controller.abort();throw error;}
   finally{signal?.removeEventListener('abort',abort);}
 }

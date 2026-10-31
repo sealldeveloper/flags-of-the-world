@@ -1,7 +1,6 @@
 import {contrastInk} from './social.mjs';
 import {groupRatings} from './ratings.mjs';
-import {isRemoteImage} from './image-policy.mjs';
-import {authorizeRemote,fetchRemoteBlob} from './remote-images.mjs';
+import {imageDimensions,MAX_THUMB_EDGE} from './model.mjs';
 const FONT='system-ui, sans-serif',PAD=32,GAP=24,BOARD=640,LABEL=130,TILE=52;
 export const IMAGE_PALETTES={
   light:{bg:'#f5f7fb',surface:'#ffffff',inset:'#e6ebf2',text:'#182133',muted:'#556173',border:'#bcc8d8'},
@@ -57,7 +56,7 @@ async function thumbnails(images,signal){
   const map=new Map();
   try{
     for(const image of images){
-      signal?.throwIfAborted();const blob=isRemoteImage(image)?await fetchRemoteBlob(image,{preview:true,signal}):await (await fetch(image.thumb || image.data,{signal})).blob(),ratio=Math.min(1,56/Math.max(image.width,image.height));
+      signal?.throwIfAborted();const data=image.thumb || image.data;imageDimensions(data,image.thumb?MAX_THUMB_EDGE:undefined);const blob=await(await fetch(data,{signal})).blob(),ratio=Math.min(1,56/Math.max(image.width,image.height));
       const bitmap=await createImageBitmap(blob,{resizeWidth:Math.max(1,Math.round(image.width*ratio)),resizeHeight:Math.max(1,Math.round(image.height*ratio)),resizeQuality:'high'});map.set(image.id,bitmap);
     }
     return map;
@@ -106,7 +105,6 @@ async function paint(snapshot,layout,palette,art,icon,signal){
 }
 export async function renderGroupImages(snapshot,{signal,onProgress=()=>{},first='light'}={}){
   if(!snapshot.players.length)throw new Error('There are no player boards to export.');
-  await authorizeRemote(snapshot.images,{signal});
   const metrics=document.createElement('canvas').getContext('2d'),layout=layoutGroupImage(metrics,snapshot);let art;
   try{
     onProgress('Preparing images…');art=await thumbnails(snapshot.images,signal);const icon=new Image();icon.src=new URL('./icon.svg',import.meta.url).href;await icon.decode();signal?.throwIfAborted();

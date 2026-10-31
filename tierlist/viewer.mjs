@@ -1,6 +1,4 @@
-import {isRemoteImage} from './image-policy.mjs';
-import {authorizeRemote,fetchRemoteBlob,PLACEHOLDER} from './remote-images.mjs';
-let remoteLoad,remoteUrl,loadVersion=0;
+import {imageDimensions} from './model.mjs';
 const dialog=document.querySelector('#image-dialog'),stage=document.querySelector('#image-stage'),picture=document.querySelector('#zoom-image'),pointers=new Map();
 let image=null,scale=1,fitScale=1,panX=0,panY=0,fitted=true,dragged=false,suppressClickUntil=0,previousFocus=null;
 const fitValue=()=>Math.min(2,(stage.clientWidth-48)/image.width,stage.clientHeight*.5/image.height);
@@ -20,25 +18,21 @@ function zoom(next,x=stage.clientWidth/2,y=stage.clientHeight/2){
 }
 function fit(){if(!image)return;fitScale=fitValue();scale=fitScale;panX=panY=0;fitted=true;render();}
 export function openImage(value){
-  const version=++loadVersion;remoteLoad?.abort();if(remoteUrl){URL.revokeObjectURL(remoteUrl);remoteUrl=null;}
-  const remote=isRemoteImage(value) && !value.data.startsWith('blob:');
-  if(remote){
-    const controller=remoteLoad=new AbortController();
-    (async()=>{
-      await authorizeRemote([value],{signal:controller.signal});if(version!==loadVersion)return;
-      showImage(value,value.thumb || PLACEHOLDER);document.querySelector('#image-load-status').textContent='Loading image…';
-      const blob=await fetchRemoteBlob(value,{signal:controller.signal});if(version!==loadVersion || !dialog.open)return;
-      remoteUrl=URL.createObjectURL(blob);picture.src=remoteUrl;document.querySelector('#image-load-status').textContent='';
-    })().catch(()=>{if(!controller.signal.aborted && version===loadVersion && dialog.open)document.querySelector('#image-load-status').textContent='The remote image could not be loaded.';});return;
-  }
+  if(!value.data.startsWith('blob:'))imageDimensions(value.data);
+  else if(new URL(value.data).origin!==location.origin)throw new Error('Invalid local image.');
   showImage(value,value.data);
 }
+export function refreshImage(images){
+  if(!dialog.open||!image)return;const next=images.find(value=>value.id===image.id);if(!next)return;
+  if(next.data===image.data){image=next;document.querySelector('#image-load-status').textContent=next.originalPending?'Preview shown. Full-resolution image is loading…':'';return;}
+  imageDimensions(next.data);const factor=image.width/next.width;scale*=factor;image=next;picture.src=next.data;picture.style.width=`${next.width}px`;picture.style.height=`${next.height}px`;fitScale=fitValue();fitted=Math.abs(scale-fitScale)<1e-9;document.querySelector('#image-load-status').textContent='';render();
+}
 function showImage(value,source){
-  document.querySelector('#image-load-status').textContent='';
+  document.querySelector('#image-load-status').textContent=value.originalPending?'Preview shown. Full-resolution image is loading…':'';
   previousFocus=document.activeElement;image=value;picture.src=source;picture.alt=value.label;picture.style.width=`${value.width}px`;picture.style.height=`${value.height}px`;document.querySelector('#image-title').textContent=value.label;
   pointers.clear();dragged=false;suppressClickUntil=0;if(!dialog.open)dialog.showModal();fit();stage.focus({preventScroll:true});
 }
-dialog.addEventListener('close',()=>{if(dialog.open)return;++loadVersion;remoteLoad?.abort();if(remoteUrl){URL.revokeObjectURL(remoteUrl);remoteUrl=null;}document.querySelector('#image-load-status').textContent='';pointers.clear();image=null;picture.removeAttribute('src');stage.classList.remove('panning');if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});});
+dialog.addEventListener('close',()=>{if(dialog.open)return;document.querySelector('#image-load-status').textContent='';pointers.clear();image=null;picture.removeAttribute('src');stage.classList.remove('panning');if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});});
 stage.addEventListener('wheel',event=>{
   event.preventDefault();const delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?stage.clientHeight:1),rect=stage.getBoundingClientRect();
   zoom(scale*Math.exp(-delta*.002),event.clientX-rect.left,event.clientY-rect.top);

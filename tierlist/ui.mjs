@@ -3,7 +3,7 @@ import {compressImage, compressCover, encodeAlbum, decodeAlbum, verifyImages, MA
 import {listAlbums, saveAlbum, deleteAlbum} from './storage.mjs';
 import {TierRoom, savedInvite} from './room.mjs';
 import {insertionBefore} from './sort.mjs';
-import {openImage} from './viewer.mjs';
+import {openImage,refreshImage} from './viewer.mjs';
 import {importTiermaker,tiermakerUrls} from './tiermaker.mjs';
 import {Activity} from './activity.mjs';
 import {contrastInk,randomColour,cleanColour} from './social.mjs';
@@ -11,10 +11,7 @@ import {RatingPanel} from './rating-panel.mjs';
 import {flashButton,resetFeedback} from './feedback.mjs';
 import {tierlistFilename} from './files.mjs';
 import {GroupExport} from './group-export.mjs';
-import {isRemoteImage} from './image-policy.mjs';
-import {authorizeRemote,setImageSource,setRemoteConsentPrompt,mayLoadRemote,resetRemoteConsent,fetchRemoteBlob} from './remote-images.mjs';
-import {listImgurUploads,deleteImgurUpload} from './imgur.mjs';
-import {uploadCatboxImage,clearCatboxUploadCache} from './catbox.mjs';
+import {setImageSource} from './images.mjs';
 const $ = selector => document.querySelector(selector);
 const el = (tag, className='', text='') => {const node=document.createElement(tag);node.className=className;node.textContent=text;return node;};
 const button = (text, action, className='') => {const node=el('button',className,text);node.type='button';node.addEventListener('click',action);return node;};
@@ -31,34 +28,9 @@ const clearError = () => {$('#error').hidden=true;$('#error').textContent='';$('
 const attempt = action => async(...args) => {try {await action(...args);} catch(e){error(e);}};
 function currentBoard() {return state ? state.players.find(p=>p.id===state.self)?.board : album?.board;}
 const canEdit = () => !!album && !busy && (!state || (state.connected && !room?.disposed));
-let remoteRequest;
-function finishRemote(allow){
-  const request=remoteRequest;if(!request)return;remoteRequest=null;request.signal?.removeEventListener('abort',request.abort);
-  const remember=allow && $('#remote-remember').checked;if($('#remote-dialog').open)$('#remote-dialog').close();request.resolve({allow,remember});
-}
-setRemoteConsentPrompt(({count,hosts,signal})=>new Promise(resolve=>{
-  $('#remote-remember').checked=false;const abort=()=>finishRemote(false);remoteRequest={resolve,signal,abort};signal?.addEventListener('abort',abort,{once:true});
-  $('#remote-title').textContent=`Download ${count} remote image${count===1?'':'s'}?`;$('#remote-hosts').textContent=`Images download directly from ${hosts.join(' and ')}. These hosts receive your IP address when an image downloads.`;$('#remote-dialog').showModal();$('#remote-cancel').focus();
-}));
-$('#remote-allow').addEventListener('click',()=>finishRemote(true));$('#remote-cancel').addEventListener('click',()=>finishRemote(false));
-$('#remote-dialog').addEventListener('cancel',event=>{event.preventDefault();finishRemote(false);});$('#remote-dialog').addEventListener('close',()=>{if(!$('#remote-dialog').open)finishRemote(false);});
-$('#reset-remote-warning').addEventListener('click',()=>{resetRemoteConsent();flashButton($('#reset-remote-warning'),'Warning reset');});
-$('#clear-upload-cache').addEventListener('click',()=>{clearCatboxUploadCache();flashButton($('#clear-upload-cache'),'Cache cleared');});
-for(const prefix of ['images','tiermaker']){
-  $('#'+prefix+'-storage').addEventListener('change',()=>{const remote=$('#'+prefix+'-storage').value==='catbox';$('#'+prefix+'-remote-settings').hidden=!remote;$('#'+prefix+'-storage-help').textContent=remote?'Originals stay on Catbox. Tierlists share links and small previews instead of full images.':'Stored in the tierlist and sent by the host. Images are compressed.';});
-}
-try{$('#manage-imgur').hidden=!listImgurUploads().length;}catch{}
-function renderImgurUploads(){
-  const list=$('#imgur-uploads-list');list.replaceChildren();const records=listImgurUploads();if(!records.length)list.append(el('p','empty','No Imgur uploads from this browser.'));
-  for(const record of records){const row=el('section','imgur-upload-record'),link=el('a','','Open album');link.href='https://imgur.com/a/'+encodeURIComponent(record.albumId);link.target='_blank';link.rel='noopener noreferrer';row.append(el('h3','',record.title),el('p','hint',`${record.images.length} image${record.images.length===1?'':'s'}${record.complete?'':' · Incomplete upload'}`),link,button('Delete images and album',async event=>{
-    if(!confirm('Delete this Imgur album and its images? Shared tierlists will lose these images.'))return;const control=event.currentTarget;control.disabled=true;
-    try{await deleteImgurUpload(record);renderImgurUploads();}catch(problem){$('#imgur-uploads-error').textContent=problem.message;control.disabled=false;}
-  },'danger'));list.append(row);}
-}
-$('#manage-imgur').addEventListener('click',attempt(()=>{$('#imgur-uploads-error').textContent='';renderImgurUploads();$('#imgur-uploads-dialog').showModal();}));
 function presentAlbum() {return validateAlbum({...album,board:currentBoard()});}
 async function refreshLibrary() {
-  try {libraryRecords=(await listAlbums()).map(validateAlbum);renderLibrary();}
+  try {let unsupported=0;libraryRecords=[];for(const saved of await listAlbums())try{libraryRecords.push(validateAlbum(saved));}catch{unsupported++;}renderLibrary();if(unsupported)error(`${unsupported} older tierlist${unsupported===1?' uses':'s use'} unsupported image data. Stored records have not been deleted.`);}
   catch(e) {error(e);libraryRecords=[];renderLibrary();}
 }
 function renderLibrary() {
@@ -79,7 +51,7 @@ function renderLibrary() {
 }
 function rememberLobby() {if(viewingLobby && lobbyState){lobbyTab=activeTab;lobbyScroll=scrollY;lobbySelected=selected;}viewingLobby=false;clearTouch();clearSort();}
 async function openAlbum(value) {
-  if(busy)return;const next=validateAlbum(value);await authorizeRemote(next.images);await persist();rememberLobby();
+  if(busy)return;const next=validateAlbum(value);await persist();rememberLobby();
   generation++;album=next;state=null;selected=null;dirty=false;activeTab='rank';clearError();$('#cover-status').textContent='';
   $('#library').hidden=true;$('#workspace').hidden=false;syncWorkspace();renderBoard();renderImages();setTab('rank');
   status('');
@@ -93,8 +65,9 @@ function syncWorkspace() {
   $('#album-fields').hidden=!!state;$('#host').hidden=!!room;$('#back').hidden=false;
   $('#lobby-details').hidden=!state;$('#tab-images').hidden=!!state;$('#tab-everyone').hidden=!state;$('#save-copy').hidden=!state;$('#group-export').hidden=!state;
   $('#activity-panel').hidden=!state;renderLobbyBar();renderCover();
-  $('#load-remote-images').hidden=!album.images.some(image=>isRemoteImage(image) && !mayLoadRemote(image.data));$('#album-name').readOnly=busy;$('#images-storage').disabled=busy;for(const input of $('#image-grid').querySelectorAll('textarea'))input.readOnly=busy;
-  $('#host').disabled=busy || !album.images.length;$('#export').disabled=busy;$('#add-tier').disabled=!canEdit();$('#reset').disabled=!canEdit();
+  $('#album-name').readOnly=busy;for(const input of $('#image-grid').querySelectorAll('textarea'))input.readOnly=busy;
+  const originals=state?.assets;$('#originals-status').hidden=!originals||originals.complete;$('#originals-status').textContent=originals?.error?`Originals paused. ${originals.error} Rejoin to retry.`:originals&&!originals.complete?`Full-resolution images ${originals.loaded}/${originals.total}${originals.percent?` · Current image ${originals.percent}%`:''}. Ranking is ready. Export is available when originals finish.`:'';
+  $('#save-copy').disabled=busy||!!(originals&&!originals.complete);$('#host').disabled=busy || !album.images.length;$('#export').disabled=busy||!!(originals&&!originals.complete);$('#add-tier').disabled=!canEdit();$('#reset').disabled=!canEdit();
   const self=state?.players.find(player=>player.id===state.self);$('#board-title').classList.toggle('player-heading',!!self);
   if(self){$('#board-title').style.setProperty('--player-color',self.color);$('#board-title').replaceChildren(el('span','player-dot'),el('span','','Your tier list'));}
   else $('#board-title').textContent='Your tier list';
@@ -117,7 +90,7 @@ async function updateCover(read) {
 $('#cover-upload').addEventListener('change',()=>{const file=$('#cover-upload').files[0];if(file)updateCover(()=>compressCover(file));});
 $('#cover-source').addEventListener('change',()=>{
   const image=album?.images.find(image=>image.id===$('#cover-source').value);if(!image)return;
-  updateCover(async()=>{let blob;if(isRemoteImage(image) && !image.thumb){await authorizeRemote([image]);blob=await fetchRemoteBlob(image,{preview:true});}else blob=await (await fetch(image.thumb || image.data)).blob();return compressCover(new File([blob],'cover',{type:blob.type}));});
+  updateCover(async()=>{const blob=await(await fetch(image.thumb || image.data)).blob();return compressCover(new File([blob],'cover',{type:blob.type}));});
 });
 $('#reset-cover').addEventListener('click',()=>{if(!album || state || busy)return;delete album.cover;queueSave();renderCover();$('#cover-status').textContent=album.images.length?'Using the first image.':'No cover image.';});
 function queueSave() {
@@ -244,11 +217,11 @@ function commitSort() {
   const {image,before,zone}=sort;clearSort();changeBoard(moveImage(currentBoard(),image,zone.dataset.dropTier,before));
 }
 document.addEventListener('dragover',event=>{if(sort && !event.target.closest('#board [data-drop-tier]'))clearSlot();});
-function playerStatus(player) {return !player.online?'Offline':player.phase==='loading'?`Loading assets · ${player.progress}%`:player.phase==='checking'?'Checking assets':'Ready';}
+function playerStatus(player) {return !player.online?'Offline':player.phase==='loading'?`Loading previews · ${player.progress}%`:player.phase==='checking'?'Checking previews':(player.originals??0)<album.images.length?`Ready · Originals ${player.originals??0}/${album.images.length}`:'Ready';}
 function renderComparison() {
   if(!state)return;ratings.render(album.images,state.players);const container=$('#comparison'),previous=new Map([...container.children].map(node=>[node.dataset.player,node]));
   const cards=state.players.map(player=>{
-    const signature=JSON.stringify([player.seq,player.online,player.phase,player.progress,player.name,player.color]),old=previous.get(player.id);
+    const signature=JSON.stringify([player.seq,player.online,player.phase,player.progress,player.originals,player.name,player.color]),old=previous.get(player.id);
     if(old?.dataset.signature===signature)return old;
     const card=el('article','comparison-card'),heading=el('h3','player-heading'),name=el('span','comparison-name',player.name+(player.id===state.self?' (you)':''));
     card.dataset.player=player.id;card.dataset.signature=signature;card.style.setProperty('--player-color',player.color);
@@ -390,26 +363,6 @@ $('#upload').addEventListener('change',attempt(async()=>{
   const files=[...$('#upload').files];if(!files.length)return;
   busy=true;clearError();syncWorkspace();$('#upload').disabled=true;
   const version=generation,errors=[];
-  if($('#images-storage').value==='catbox'){
-    const controller=uploadController=new AbortController();let savedRemote=false;
-    $('#cancel-upload').hidden=false;
-    try{
-      const plannedIds=files.map(()=>id()),maxThumbData=Math.floor((MAX_DOCUMENT-new TextEncoder().encode(JSON.stringify(album)).length-65536)/files.length)-1024;
-      if(maxThumbData<256)throw new Error('This tierlist is too large to add these images.');
-      validateBoard({...album.board,unranked:[...album.board.unranked,...plannedIds]},[...album.images.map(image=>image.id),...plannedIds]);await persist();
-      const added=[];
-      for(const [index,file] of files.entries()){controller.signal.throwIfAborted();$('#upload-status').textContent=`Uploading ${index+1} of ${files.length}: ${file.name}`;const image=await uploadCatboxImage(file,(file.name.replace(/\.[^.]+$/,'').trim() || 'Image').slice(0,160),{signal:controller.signal,maxThumbData});image.id=plannedIds[index];added.push(image);}
-      controller.signal.throwIfAborted();
-      const next=copy(album);next.images.push(...added);next.board.unranked.push(...added.map(image=>image.id));const saved=await saveAlbum(validateAlbum(next));album=saved;dirty=false;savedRemote=true;
-      $('#upload-status').textContent=`Added ${added.length} Catbox images.`;
-      await authorizeRemote(added,{signal:controller.signal});
-    }catch(problem){
-      if(!savedRemote)$('#upload-status').textContent=(controller.signal.aborted?'Upload cancelled.':'Upload failed. No images were added.')+' Anonymous uploads already sent cannot be deleted.';
-      if(!controller.signal.aborted)error(problem);
-    }
-    finally{busy=false;uploadController=null;$('#cancel-upload').hidden=true;$('#upload').disabled=false;$('#upload').value='';syncWorkspace();renderImages();renderBoard();}
-    return;
-  }
   try {
     for(const [index,file] of files.entries()) {
       $('#upload-status').textContent=`Compressing ${index+1} of ${files.length}: ${file.name}`;
@@ -437,9 +390,7 @@ async function returnToLobby() {
   requestAnimationFrame(()=>scrollTo(0,lobbyScroll));
 }
 $('#back').addEventListener('click',attempt(showLibrary));$('#return-lobby').addEventListener('click',attempt(returnToLobby));
-let importController,uploadController,codeController;
-$('#cancel-upload').addEventListener('click',()=>{uploadController?.abort();$('#upload-status').textContent='Cancelling upload…';});
-$('#load-remote-images').addEventListener('click',attempt(async()=>{await authorizeRemote(album.images);syncWorkspace();renderBoard();renderImages();if(activeTab==='everyone'){ratings.reset();renderComparison();}}));
+let importController,codeController;
 function setImportMethod(method) {
   importController?.abort();codeController?.abort();codeController=null;$('#import-code').disabled=false;$('#code-fields').hidden=method!=='code';$('#tiermaker-fields').hidden=method!=='tiermaker';
   $('#method-code').setAttribute('aria-pressed',String(method==='code'));$('#method-tiermaker').setAttribute('aria-pressed',String(method==='tiermaker'));
@@ -450,28 +401,27 @@ $('#code-dialog').addEventListener('close',()=>{if(!$('#code-dialog').open){impo
 $('#import-tiermaker').addEventListener('click',async()=>{
   importController?.abort();const controller=new AbortController();importController=controller;
   const imported=[],failures=[],warnings=[];let sources=null,pending=null,finished=false,singleResult=null;
-  const storage=$('#tiermaker-storage').value;
-  $('#import-tiermaker').disabled=true;$('#import-tiermaker').textContent='Importing…';$('#tiermaker-url').readOnly=true;$('#tiermaker-storage').disabled=true;$('#tiermaker-error').textContent='';$('#tiermaker-progress').textContent='';
+  $('#import-tiermaker').disabled=true;$('#import-tiermaker').textContent='Importing…';$('#tiermaker-url').readOnly=true;$('#tiermaker-error').textContent='';$('#tiermaker-progress').textContent='';
   try {
     sources=tiermakerUrls($('#tiermaker-url').value);pending=new Set(sources);
     for(const [index,source] of sources.entries()){
       controller.signal.throwIfAborted();
       try {
-        const next=await importTiermaker(source,{storage,signal:controller.signal,onWarning:text=>warnings.push(text),onProgress:text=>{if(importController===controller)$('#tiermaker-progress').textContent=sources.length===1?text:`Tierlist ${index+1} of ${sources.length} · ${text}`;}});
+        const next=await importTiermaker(source,{signal:controller.signal,onWarning:text=>warnings.push(text),onProgress:text=>{if(importController===controller)$('#tiermaker-progress').textContent=sources.length===1?text:`Tierlist ${index+1} of ${sources.length} · ${text}`;}});
         controller.signal.throwIfAborted();
         try{const saved=await saveAlbum(next,true);imported.push({id:saved.id,name:saved.name});if(sources.length===1)singleResult=saved;pending.delete(source);}
-        catch(problem){failures.push(`Could not save locally: ${problem.message}${storage==='catbox'?' Anonymous uploads already sent cannot be deleted.':''}`);break;}
+        catch(problem){failures.push(`Could not save locally: ${problem.message}`);break;}
       }catch(problem){if(controller.signal.aborted)throw problem;failures.push(`${source}: ${problem.message}`);if(problem.pauseBatch)break;}
     }
     controller.signal.throwIfAborted();finished=true;
     if(pending.size){$('#tiermaker-error').textContent=failures.join('\n');$('#tiermaker-progress').textContent=`${imported.length} imported · ${pending.size} remaining. Retry the remaining URLs.`;}
   }catch(problem){if(!controller.signal.aborted)$('#tiermaker-error').textContent=problem.message;}
   finally{
-    if(importController===controller){$('#import-tiermaker').disabled=false;$('#import-tiermaker').textContent='Import';$('#tiermaker-url').readOnly=false;$('#tiermaker-storage').disabled=false;if(pending)$('#tiermaker-url').value=[...pending].join('\n');if(controller.signal.aborted || (finished && !pending.size))$('#tiermaker-progress').textContent='';}
+    if(importController===controller){$('#import-tiermaker').disabled=false;$('#import-tiermaker').textContent='Import';$('#tiermaker-url').readOnly=false;if(pending)$('#tiermaker-url').value=[...pending].join('\n');if(controller.signal.aborted || (finished && !pending.size))$('#tiermaker-progress').textContent='';}
     if(imported.length){await refreshLibrary();if(controller.signal.aborted && !$('#library').hidden)status(`Imported ${imported.length} tierlist${imported.length===1?'':'s'}.`);}
   }
   if(finished && !pending.size && imported.length && importController===controller && $('#code-dialog').open){
-    $('#code-dialog').close();if(sources.length===1)try{await openAlbum(singleResult);}catch(problem){error(problem);status('Tierlist saved. Remote images were not loaded.');return;}status((sources.length===1?'Imported.':`Imported ${imported.length} tierlists.`)+(warnings.length?` ${warnings.length} cover${warnings.length===1?' could':'s could'} not be copied. Choose a cover in Images.`:''));
+    $('#code-dialog').close();if(sources.length===1)try{await openAlbum(singleResult);}catch(problem){error(problem);status('Tierlist saved. It could not be opened.');return;}status((sources.length===1?'Imported.':`Imported ${imported.length} tierlists.`)+(warnings.length?` ${warnings.length} cover${warnings.length===1?' could':'s could'} not be copied. Choose a cover in Images.`:''));
   }
 });
 function codeMode(importing) {
@@ -486,7 +436,7 @@ async function showExport(value) {
   codeMode(false);exportFilename=tierlistFilename(value.name);$('#code-filename').textContent=exportFilename;$('#code-help').textContent='Preparing code…';$('#copy-code').disabled=true;$('#download-code').disabled=true;
   try {
     const code=await encodeAlbum(value);$('#code').value=code;$('#code-size').textContent=`${code.length.toLocaleString()} characters`;
-    $('#code-help').textContent=value.images.some(isRemoteImage)?'Includes remote image links, small previews, tiers and ordering. Originals need an internet connection.':'Includes images, tiers and ordering.';
+    $('#code-help').textContent='Includes embedded images, tiers and ordering.';
   } catch(e){$('#code-error').textContent=e.message;}
   finally {$('#copy-code').disabled=false;$('#download-code').disabled=false;}
 }
@@ -539,7 +489,7 @@ async function beginRoom(invite='') {
     if(room!==current)return;
     const newSelf=next.players.find(player=>player.id===next.self),first=!lobbyState;
     lobbyState=next;renderLobbyBar();if(!viewingLobby)return;
-    state=next;album=next.album;selected=first?null:selected;
+    state=next;album=next.album;refreshImage(album.images);selected=first?null:selected;
     if(first)rosterSignature='';
     $('#library').hidden=true;$('#workspace').hidden=false;syncWorkspace();renderPlayers();
     if(first)setTab('rank');
@@ -563,7 +513,7 @@ async function beginRoom(invite='') {
 }
 function renderPlayers() {
   if(!state)return;
-  const signature=JSON.stringify([state.host,state.players.map(player=>[player.id,player.name,player.color,player.online,player.phase,player.progress])]);
+  const signature=JSON.stringify([state.host,state.players.map(player=>[player.id,player.name,player.color,player.online,player.phase,player.progress,player.originals])]);
   if(signature===rosterSignature)return;rosterSignature=signature;
   const container=$('#players');container.replaceChildren();
   for(const player of state.players) {
@@ -612,6 +562,7 @@ async function shareInvite(code=false) {
 $('#copy-invite').addEventListener('click',()=>shareInvite());$('#copy-invite-code').addEventListener('click',()=>shareInvite(true));
 function openCopy() {
   if(!state || !lobbyState || copySaving)return;
+  if(lobbyState.assets&&!lobbyState.assets.complete)throw new Error('Wait for full-resolution images to finish before saving a copy.');
   const host=lobbyState.players.find(player=>player.id===lobbyState.hostId);if(!host)throw new Error('The lobby author is unavailable.');
   copyDraft=validateAlbum({...lobbyState.album,copiedFrom:host.name});copyOrigin=$('#save-copy');$('#copy-name').value=copyDraft.name;$('#copy-source').textContent=`Copied from ${copyDraft.copiedFrom}`;$('#copy-error').textContent='';$('#confirm-copy').disabled=false;$('#copy-dialog').showModal();$('#copy-name').focus();$('#copy-name').select();
 }
@@ -637,7 +588,7 @@ async function leaveLobby() {
   if(location.hash)history.replaceState(null,'',location.pathname+location.search);status('');
 }
 $('#leave').addEventListener('click',attempt(leaveLobby));
-addEventListener('beforeunload',event=>{if((room && !room.disposed) || dirty || uploadController || $('#import-tiermaker').disabled || $('#import-code').disabled){event.preventDefault();event.returnValue='';}});
+addEventListener('beforeunload',event=>{if((room && !room.disposed) || dirty || busy || $('#import-tiermaker').disabled || $('#import-code').disabled){event.preventDefault();event.returnValue='';}});
 addEventListener('pagehide',()=>{if(dirty)persist().catch(()=>{});});
 try {if(!$('#player-name').value)$('#player-name').value=localStorage.getItem('tierlist-name') || '';} catch {}
 let preferredColour=randomColour();try{preferredColour=cleanColour(localStorage.getItem('tierlist-color'));}catch{}

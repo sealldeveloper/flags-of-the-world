@@ -23,7 +23,7 @@ export function encodeInvite(input) {
   else if(/^[a-z2-7]{52}$/.test(ticket.host) && base32(unbase32(ticket.host))===ticket.host){kind=1;host=unbase32(ticket.host);}
   else {kind=2;host=new TextEncoder().encode(ticket.host);}
   const bytes=Uint8Array.from([(relay<<2)|kind,...(kind===2?[host.length]:[]),...host,...unhex(ticket.room),...unhex(ticket.secret)]);
-  return 'TL4.'+btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
+  return 'TL5.'+btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
 }
 export function decodeInvite(input) {
   if(typeof input!=='string' || input.length>5000)throw new Error('Invalid lobby invite');
@@ -34,7 +34,7 @@ export function decodeInvite(input) {
     if(original.app!=='tierlist')throw new Error('Wrong lobby application');
     return {...ticket,app:'tierlist',protocol:1};
   }
-  if(!/^TL[234]\./.test(code) || !/^[A-Za-z0-9_-]+$/.test(code.slice(4)))throw new Error('Paste a Tier List invite link or code');
+  if(!/^TL[2345]\./.test(code) || !/^[A-Za-z0-9_-]+$/.test(code.slice(4)))throw new Error('Paste a Tier List invite link or code');
   let bytes;
   try {bytes=Uint8Array.from(atob(code.slice(4).replaceAll('-','+').replaceAll('_','/')),char=>char.charCodeAt(0));}
   catch {throw new Error('Invalid lobby code');}

@@ -60,7 +60,7 @@ test('validators reject missing, duplicate, unknown images and hostile image/CSS
   const duplicateTier=copy(album);duplicateTier.board.tiers[1].id=duplicateTier.board.tiers[0].id;assert.throws(()=>validateAlbum(duplicateTier));
   const reservedTier=copy(album);reservedTier.board.tiers[0].id='unranked';assert.throws(()=>validateAlbum(reservedTier));
   const tooBig=copy(album),bytes=Uint8Array.from(atob(png.split(',')[1]),c=>c.charCodeAt(0));new DataView(bytes.buffer).setUint32(16,10000);
-  tooBig.images[0].data='data:image/png;base64,'+btoa(String.fromCharCode(...bytes));assert.throws(()=>validateAlbum(tooBig),/1920/);
+  tooBig.images[0].data='data:image/png;base64,'+btoa(String.fromCharCode(...bytes));assert.throws(()=>validateAlbum(tooBig),/8192/);
 });
 test('bad codes and decompression bombs are bounded',async()=>{
   for(const code of ['TIER1.bad','not a code','TLOBBY1.something','TIER2.abc'])await assert.rejects(decodeAlbum(code));

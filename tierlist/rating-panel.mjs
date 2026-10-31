@@ -1,5 +1,5 @@
 import {groupRatings} from './ratings.mjs';
-import {setImageSource} from './remote-images.mjs';
+import {setImageSource} from './images.mjs';
 const el=(tag,className='',text='')=>{const node=document.createElement(tag);node.className=className;node.textContent=text;return node;};
 export class RatingPanel {
   constructor(container,onPreview){this.container=container;this.onPreview=onPreview;this.signature='';}

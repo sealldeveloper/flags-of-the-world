@@ -22,14 +22,14 @@ test('16 seat colours remain distinct and category text contrasts against its ba
 test('compact v4 invites roundtrip every relay, identify older protocols and reject malformed data',async()=>{
  for(const region of ['use1-1','usw1-1','euc1-1','aps1-1']){
   const ticket={host:'0123456789abcdef'.repeat(4),relay:`https://${region}.relay.n0.iroh.link./`,room:a,secret:b};
-  const code=encodeInvite(ticket),decoded=decodeInvite(code);assert.equal(code.length,91);assert.equal(decoded.protocol,4);
+  const code=encodeInvite(ticket),decoded=decodeInvite(code);assert.equal(code.length,91);assert.equal(decoded.protocol,5);
   for(const key of ['host','relay','room','secret'])assert.equal(decoded[key],ticket[key]);
   assert.equal(decodeInvite('https://example.test/tierlist/#join='+code).secret,b);
-  const old=code.replace('TL4.','TL2.');assert.equal(decodeInvite(old).protocol,2);
+  const old=code.replace('TL5.','TL2.');assert.equal(decodeInvite(old).protocol,2);
   await assert.rejects(new TierRoom({onState:()=>{},onStatus:()=>{},onError:()=>{}}).open('Name',null,old),/older version/);
   const legacy='TLOBBY1.'+encodeTicket({...ticket,v:5,app:'tierlist'});assert.equal(decodeInvite(legacy).protocol,1);
  }
- for(const code of ['TL4.','TL4.AAAA','TL4.!!!'])assert.throws(()=>decodeInvite(code));
+ for(const code of ['TL5.','TL5.AAAA','TL5.!!!'])assert.throws(()=>decodeInvite(code));
 });
 test('structured activity includes full maximum-length item/tier names and safe identifiers',()=>{
  const {room}=host(),old=copy(room.album.board);old.tiers[0].name='中'.repeat(100);room.album.images[0].label='界'.repeat(160);
