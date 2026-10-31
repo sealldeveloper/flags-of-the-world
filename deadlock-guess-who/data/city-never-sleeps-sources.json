@@ -1,0 +1,642 @@
+{
+  "source": "Deadlock Wiki",
+  "license": "CC BY-NC-SA 4.0",
+  "syncedAt": "2026-10-31T20:08:07.386116+00:00",
+  "textNormalization": "Markup and reference markers removed, whitespace collapsed. No prose paraphrased or synthesized.",
+  "heroes": [
+    {
+      "id": "hero_baba",
+      "name": "Baba",
+      "page": "Baba",
+      "revision": 215550,
+      "sourceUrl": "https://deadlock.wiki/index.php?title=Baba&oldid=215550",
+      "sourceHtmlSha256": "430bd2fa8bc087cdab9c842676fb6d6e96cc91ae2b14540e974cbece27568fb3",
+      "descriptionHtml": [
+        "<p><b>Baba</b> is a <a href=\"/Heroes\" title=\"Heroes\">Hero</a> in <i><a href=\"/Deadlock\" title=\"Deadlock\">Deadlock</a></i>. She is a hexing, <a href=\"/Spirit\" title=\"Spirit\">spirit</a>-draining witch who uses her long-legged bench to brawl in the front lines of the <a class=\"mw-redirect\" href=\"/Ritual\" title=\"Ritual\">Ritual</a>. Flinging scalding tea, cursed yarn, and breadcrumbs in equal measure, Baba is a cackling force to be reckoned with. \n</p>",
+        "<p>In the heat of battle, Baba throws out her <b><a class=\"mw-selflink-fragment\" href=\"#Threadsap\">Threadsap</a></b>, a chaotic spool of yarn that steals the very spirit of her enemies, granting her greater power. While her legs might not be what they used to, <b><a class=\"mw-selflink-fragment\" href=\"#Granny_Long_Legs\">her trusty bench comes to life</a></b> with a creak of metal, allowing her to run, jump, and kick with impressive vigor. Parkgoers know it's best to stay on Baba's good side, as at tea time you might find yourself splashed with one of <b><a class=\"mw-selflink-fragment\" href=\"#Baba's_Brews\">Baba's Brews</a></b> (some of them much sweeter than others), and when tea time is over - <b><a class=\"mw-selflink-fragment\" href=\"#Feed_The_Birds\">The Birds</a></b> come out to play...\n</p>"
+      ],
+      "tagHtml": [
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(-2deg)\">Cackling</div>",
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(1deg)\">Beady</div>",
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(-2deg)\">Hexing</div>"
+      ],
+      "abilities": [
+        {
+          "nameHtml": "<span class=\"ac-name\">Threadsap</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Weave a scraggly thread that follows your crosshair before bursting along its path, dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> and stealing enemy <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Power\" title=\"Spirit Power\"><img class=\"mw-file-element\" data-file-height=\"46\" data-file-width=\"48\" decoding=\"async\" height=\"19\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_Icon.png/20px-Spirit_Icon.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_Icon.png/40px-Spirit_Icon.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Spirit_Power\" title=\"Spirit Power\">Spirit</a></span>, increased in effectiveness for Baba.<br/><br/>While holding stolen <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Power\" title=\"Spirit Power\"><img class=\"mw-file-element\" data-file-height=\"46\" data-file-width=\"48\" decoding=\"async\" height=\"19\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_Icon.png/20px-Spirit_Icon.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_Icon.png/40px-Spirit_Icon.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Spirit_Power\" title=\"Spirit Power\">Spirit</a></span>, Baba deals <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">bonus spirit damage</a></span> with every bullet.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Baba&oldid=215550#Threadsap",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Threadsap.png",
+          "icon": "./assets/deadlock/hero-hero_baba-ability-1.png",
+          "sourceSha256": "92527f3884907c09dde4a1ec6114eab261df495d8a0279bd63d3552901f90df7",
+          "localSha256": "92527f3884907c09dde4a1ec6114eab261df495d8a0279bd63d3552901f90df7",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Granny Long Legs</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Your bench's legs extend, granting <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0)saturate(100%)invert(66%)sepia(32%)saturate(1046%)hue-rotate(95deg)brightness(103%)contrast(102%);\"><span typeof=\"mw:File\"><a href=\"/Move_speed\" title=\"Move speed\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Move_speed.png/20px-Move_speed.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Move_speed.png/40px-Move_speed.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Move_speed\" title=\"Move speed\">bonus move speed</a></span>, higher jumps, <span style=\"font-weight:bold\">Debuff Resistance</span> and <span style=\"font-weight:bold\">Melee Resistance</span>.<br/><br/><span style=\"font-style: italic;color:#C0C0C0\">Light Melee:</span> Perform a <span style=\"font-weight:bold\">kick</span> that knocks enemies back.<br/><span style=\"font-style: italic;color:#C0C0C0\">Heavy Melee:</span> Perform a <span style=\"font-weight:bold\">ground pound</span> that applies <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><span><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Status_Displacement.png/20px-Status_Displacement.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Status_Displacement.png/40px-Status_Displacement.png 2x\" width=\"20\"/></span></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Status_Effects\" title=\"Status Effects\">knockup</a></span>, <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Movement_Slow\" title=\"Movement Slow\"><img class=\"mw-file-element\" data-file-height=\"64\" data-file-width=\"64\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/20px-MoveSlow.png\" srcset=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/40px-MoveSlow.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Movement_Slow\" title=\"Movement Slow\">slow</a></span>, and deals <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span>.<br/><br/><span style=\"font-style: italic;color:#C0C0C0\">Hold <b> Crouch / slide</b> to charge a high jump, release to jump.</span></div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Baba&oldid=215550#Granny_Long_Legs",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Granny_Long_Legs.png",
+          "icon": "./assets/deadlock/hero-hero_baba-ability-2.png",
+          "sourceSha256": "2b00afa79b8d48e4bc909c2886b312248e665bf409740971a7cd42594a30fd4b",
+          "localSha256": "2b00afa79b8d48e4bc909c2886b312248e665bf409740971a7cd42594a30fd4b",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Baba's Brew</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Brew a pot of tea that applies a magical effect in an area when thrown, cycling over time in a random order between a soothing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Damage_Resistance\" title=\"Damage Resistance\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Bullet_Armor_%28item%29.png/20px-Bullet_Armor_%28item%29.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Bullet_Armor_%28item%29.png/40px-Bullet_Armor_%28item%29.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Barrier\" title=\"Barrier\">barrier</a></span>, <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0)saturate(100%)invert(78%)sepia(43%)saturate(4738%)hue-rotate(215deg)brightness(100%)contrast(102%);\"><span typeof=\"mw:File\"><a href=\"/Silence\" title=\"Silence\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Silence.png/20px-Silence.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Silence.png/40px-Silence.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Silence\" title=\"Silence\">Silence</a></span>, or scalding burn that deals <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage over time</a></span> and reduces <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0)saturate(100%)invert(78%)sepia(43%)saturate(4738%)hue-rotate(215deg)brightness(100%)contrast(102%);\"><span typeof=\"mw:File\"><a href=\"/Damage_Resistance\" title=\"Damage Resistance\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_Armor.png/20px-Spirit_Armor.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_Armor.png/40px-Spirit_Armor.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Damage_Resistance\" title=\"Damage Resistance\">spirit resist</a></span>. <br/><br/>Press <b> Zoom / alt-fire</b> to pause or resume brewing.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Baba&oldid=215550#Baba%27s_Brew",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Baba%27s_Brew.png",
+          "icon": "./assets/deadlock/hero-hero_baba-ability-3.png",
+          "sourceSha256": "5fe5cd6e0ac55f95458827d7d4745a3965347068212b8a6053c472c4d002aff8",
+          "localSha256": "5fe5cd6e0ac55f95458827d7d4745a3965347068212b8a6053c472c4d002aff8",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Feed The Birds</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Cover targets in front of you with <span style=\"font-weight:bold\">bread</span>, adding a stacking <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Movement_Slow\" title=\"Movement Slow\"><img class=\"mw-file-element\" data-file-height=\"64\" data-file-width=\"64\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/20px-MoveSlow.png\" srcset=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/40px-MoveSlow.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Movement_Slow\" title=\"Movement Slow\">slow</a></span> .<br/><br/>When the channel ends a flock of pigeons bombard the targets, dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> and hexing each target into a <span style=\"font-weight:bold\">pigeon</span>, increasing in both damage and duration based on bread count.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Baba&oldid=215550#Feed_The_Birds",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Feed_The_Birds.png",
+          "icon": "./assets/deadlock/hero-hero_baba-ability-4.png",
+          "sourceSha256": "31aa87b964ca0747a370ebad8fa460fb74003c5d546d75d965ae08ec26ba8b3a",
+          "localSha256": "31aa87b964ca0747a370ebad8fa460fb74003c5d546d75d965ae08ec26ba8b3a",
+          "width": 137,
+          "height": 137
+        }
+      ],
+      "artwork": {
+        "body": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Baba_vertical.png",
+          "path": "./assets/deadlock/hero-hero_baba-card.webp",
+          "sourceSha256": "bd860eb0765f714b3c0d482973a2af03a71953a2444500c15a047e5537ab73eb",
+          "localSha256": "0cf69b71ed4efa7932244352f71b61ef5ef773307817aad9d59633bf681fa24c",
+          "width": 120,
+          "height": 200
+        },
+        "headshot": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Baba.png",
+          "path": "./assets/deadlock/hero-hero_baba-headshot.webp",
+          "sourceSha256": "3980e369fad74a27f5f7c5e154100d39d53a578c023ae2b11cb7f79803ecfa0a",
+          "localSha256": "11bb330734126244dd4dd396b7c9d93714e45ef4066d3751687f597c5c3eb054",
+          "width": 128,
+          "height": 128
+        },
+        "showcase": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Baba_Render.png",
+          "path": "./assets/deadlock/hero-hero_baba-showcase.webp",
+          "sourceSha256": "3fe0ed367784574cead70eeea439f0420657607d54ce7a90cee68489fb0758a5",
+          "localSha256": "eefb8320f1f5d46a29f07cc72a95bfe22cb86b57dcc6bc40de760369c7f6c405",
+          "width": 1668,
+          "height": 1440
+        },
+        "background": {
+          "sourceUrl": "https://cdn.deadlock.wiki/thumb/Baba_bg_psd.png/1241px-Baba_bg_psd.png",
+          "path": "./assets/deadlock/hero-hero_baba-background.webp",
+          "sourceSha256": "0a415f5bf6821e71c8062082aa727837bd95443ab7c22719b5543cb4043a3dae",
+          "localSha256": "26aee8b76fc027d3459a276bd934fe77ebebeb3e7891deb72c0fb5732871292c",
+          "width": 1241,
+          "height": 700
+        }
+      }
+    },
+    {
+      "id": "hero_deadpack",
+      "name": "Deadman Danny",
+      "page": "Deadman_Danny",
+      "revision": 215598,
+      "sourceUrl": "https://deadlock.wiki/index.php?title=Deadman_Danny&oldid=215598",
+      "sourceHtmlSha256": "18b416215f90853a24b028ebf7bc511e842283763f075ad93190f582944e0a73",
+      "descriptionHtml": [
+        "<p><b>Deadman Danny</b> is a daring and explosive <a href=\"/Heroes\" title=\"Heroes\">Hero</a> with a rocket launcher, a rocket jetpack, and a series of additional rocket skills to blow his opponents away. With only the most powerful of permanently-attached rocket packs, Danny is excited to surprise and amaze all potential Fairfax Industries customers.\n</p>",
+        "<p>Today, Fairfax Industries is proud to introduce their most valuable salesman: Deadman Danny. Wielding a rocket launcher and flying high above the streets of New York (courtesy of the <b><a class=\"mw-selflink-fragment\" href=\"#Chimera_Mk1\">Chimera Mk1</a></b> - the latest and greatest in self-adhered aviation technology), Danny rains his <a class=\"mw-selflink-fragment\" href=\"#Strix_Salvo\"><b>Strix Salvo</b></a> missiles down upon foes, marking them for future attacks. <a class=\"mw-selflink-fragment\" href=\"#Jettison_Fuel\"><b>Jettison Fuel</b></a> is a handy trick that both expels heat from the Chimera System, while also dousing nearby enemies in the warm embrace of a firey inferno. Yet his most impressive tactic has always been his ability to <a class=\"mw-selflink-fragment\" href=\"#Close_The_Deal\"><b>Close the Deal</b></a>, wowing prospective customers with an explosive hands-on demonstration of all that Fairfax has to offer.\n</p>"
+      ],
+      "tagHtml": [
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(-2deg)\">Reckless</div>",
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(1deg)\">High-flying</div>",
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(-2deg)\">Explosive</div>"
+      ],
+      "abilities": [
+        {
+          "nameHtml": "<span class=\"ac-name\">Strix Salvo</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Launch a <span style=\"font-weight:bold\">salvo of spirit missiles that lodge into the ground along a line.</span> The missiles explode after a delay or upon detecting an enemy, dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> and <span style=\"font-weight:bold\">marking</span> the target.<br/><br/>Shooting a marked enemy with a charged shot consumes a mark to deal <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">bonus spirit damage</a></span> and apply a fading <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Movement_Slow\" title=\"Movement Slow\"><img class=\"mw-file-element\" data-file-height=\"64\" data-file-width=\"64\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/20px-MoveSlow.png\" srcset=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/40px-MoveSlow.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Movement_Slow\" title=\"Movement Slow\">slow</a></span>.<br/><br/><span style=\"font-style: italic;color:#C0C0C0\">Hold and drag to select the angle.</span></div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Deadman_Danny&oldid=215598#Strix_Salvo",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Strix_Salvo.png",
+          "icon": "./assets/deadlock/hero-hero_deadpack-ability-1.png",
+          "sourceSha256": "2a845bb510809f0f5a47c00b79dabc3009d0c78972bfdc33f454d4faa6914b8d",
+          "localSha256": "2a845bb510809f0f5a47c00b79dabc3009d0c78972bfdc33f454d4faa6914b8d",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Chimera Mk1</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Hold <b> Jump / mantle</b> to fly, building up heat. When max heat is reached, your jetpack will begin to overheat.<br/><br/><span style=\"font-style: italic;color:#C0C0C0\">Overheating:</span> After a short delay, <span style=\"font-weight:bold\">dive to the ground.</span> Upon impact, create an explosion that <span style=\"font-weight:bold\">deals damage</span> and launches you and nearby enemies. If no hero is hit, you stun yourself. Press <b> Ability 2</b> to dive early.<br/><br/><span style=\"font-style: italic;color:#C0C0C0\">Cooling Down:</span> After overheating, the jetpack cannot be used until it fully cools down.<br/><br/>Slows affect you while airborne. You always explode on death.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Deadman_Danny&oldid=215598#Chimera_Mk1",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Chimera_Mk1.png",
+          "icon": "./assets/deadlock/hero-hero_deadpack-ability-2.png",
+          "sourceSha256": "b6e6951940879d9c97bb4c198554ae20d8c2527c0ad93b2f213cc2872c3fd3f7",
+          "localSha256": "b6e6951940879d9c97bb4c198554ae20d8c2527c0ad93b2f213cc2872c3fd3f7",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Jettison Fuel</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Spray fuel dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ec981a;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Weapon_Damage\" title=\"Weapon Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Bullet_damage.png/20px-Bullet_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Bullet_damage.png/40px-Bullet_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Weapon_Damage\" title=\"Weapon Damage\">weapon damage over time</a></span> and shredding <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ec981a;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0)saturate(100%)invert(80%)sepia(42%)saturate(6295%)hue-rotate(355deg)brightness(104%)contrast(85%);\"><span typeof=\"mw:File\"><a href=\"/Damage_Resistance\" title=\"Damage Resistance\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Bullet_Armor.png/20px-Bullet_Armor.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Bullet_Armor.png/40px-Bullet_Armor.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Damage_Resistance\" title=\"Damage Resistance\">bullet resist</a></span>, building up to a <span style=\"font-weight:bold\">huge backblast</span> that deals <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> and knocks you backwards.<br/><br/>Vents the jetpack when dealing damage.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Deadman_Danny&oldid=215598#Jettison_Fuel",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Jettison_Fuel.png",
+          "icon": "./assets/deadlock/hero-hero_deadpack-ability-3.png",
+          "sourceSha256": "838633c24297adcfaa31222353202855fe9e11c0b660ab5f1d24a29e4251860b",
+          "localSha256": "838633c24297adcfaa31222353202855fe9e11c0b660ab5f1d24a29e4251860b",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Close The Deal</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\"><span style=\"font-weight:bold\">Grab an enemy</span> and give them a hands-on demonstration, flying high into the air before crashing back to the ground.<br/><br/>You and the participant take <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage over time</a></span> while falling and <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> upon impact. Damage is increased to enemies <span style=\"font-weight:bold\">under 50% health.</span></div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Deadman_Danny&oldid=215598#Close_The_Deal",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Close_The_Deal.png",
+          "icon": "./assets/deadlock/hero-hero_deadpack-ability-4.png",
+          "sourceSha256": "6d78781bfa75af9cbf5eeb37f8c6184f4686ec3c8f8b5601ecd9f96aea33a0b3",
+          "localSha256": "6d78781bfa75af9cbf5eeb37f8c6184f4686ec3c8f8b5601ecd9f96aea33a0b3",
+          "width": 137,
+          "height": 137
+        }
+      ],
+      "artwork": {
+        "body": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Deadman_Danny_vertical.png",
+          "path": "./assets/deadlock/hero-hero_deadpack-card.webp",
+          "sourceSha256": "d301bcf268edf7720686e0b9f24f4eec79f8b79170373d25036aad5383bd5125",
+          "localSha256": "32065161ffecc35326a3aa9bb367300a2412bf4be8d59aaace23f1058e258f39",
+          "width": 120,
+          "height": 200
+        },
+        "headshot": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Deadman_Danny.png",
+          "path": "./assets/deadlock/hero-hero_deadpack-headshot.webp",
+          "sourceSha256": "f75dcd51649b797f220510fb67062c987e8ca44a7a6c3e9ffcf918f90721a03c",
+          "localSha256": "69194ab71f8af0a6b762827241053b95ad2edb225bf18ebdbd4f3382ebb90d83",
+          "width": 128,
+          "height": 128
+        },
+        "showcase": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Deadman_Danny_Render.png",
+          "path": "./assets/deadlock/hero-hero_deadpack-showcase.webp",
+          "sourceSha256": "48c46781a6fe9b5ab1d7a5a2bc0a64425413a94d5fb24f6268846db60e7d9142",
+          "localSha256": "c34873ea13eb26694ae4ed9bd5c63467d463e5cd65eb3262bdf10af20a8b940d",
+          "width": 1464,
+          "height": 1440
+        },
+        "background": {
+          "sourceUrl": "https://cdn.deadlock.wiki/thumb/Deadpack_bg_psd.png/1241px-Deadpack_bg_psd.png",
+          "path": "./assets/deadlock/hero-hero_deadpack-background.webp",
+          "sourceSha256": "afaaffb90a9d5bfe2daba534eea02d6ab04e2a2ce080221fcbeedca7fdd6b5b1",
+          "localSha256": "0cdcff702c2c05e0a5e66555fe7e01de93cebf86f5cf20fd4fff2f2df96d97b5",
+          "width": 1241,
+          "height": 700
+        }
+      }
+    },
+    {
+      "id": "hero_nurse",
+      "name": "Nurse Harrow",
+      "page": "Nurse_Harrow",
+      "revision": 215641,
+      "sourceUrl": "https://deadlock.wiki/index.php?title=Nurse_Harrow&oldid=215641",
+      "sourceHtmlSha256": "70a0e25b3ba655acdeffb40a21f547c7a4333a8b03bc0b4ca79ac51ebe3d4273",
+      "descriptionHtml": [
+        "<p><a class=\"mw-selflink selflink\">Nurse Harrow</a> is a draining, healing <a class=\"mw-redirect\" href=\"/Hero\" title=\"Hero\">Hero</a> with dangerous tools and a terrible bedside manner. To some, her practices may seem unorthodox, her patients at the Marble Hill Possession Ward cannot say that the results aren't effective. \n</p>",
+        "<p>With <a class=\"mw-selflink-fragment\" href=\"#Leech_Therapy\"><b>Leech Therapy</b></a>, she throws a jar full of leeches that attach to oncoming enemies, draining their health and energy, before crawling back to deliver their haul. Cracking open one of her vials, she releases her <a class=\"mw-selflink-fragment\" href=\"#Wretched_Vapors\"><b>Wretched Vapors</b></a>, possessing her allies with a powerful boost of effectiveness - though subjects should be warned of the side effects when the vapors wear off. To efficiently keep her teammates fighting their best, she loads her syringe full of <a class=\"mw-selflink-fragment\" href=\"#Healing_Needles\"><b>Healing Needles</b></a> to inject medicine directly into their veins. And when her patience runs out, she opens her bag to release all the <a class=\"mw-selflink-fragment\" href=\"#Lurking_Terrors\"><b>Lurking Terrors</b></a> captured inside, making her adversaries run for cover. \n</p>"
+      ],
+      "tagHtml": [
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(-2deg)\">Strict</div>",
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(1deg)\">Terrifying</div>",
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(-2deg)\">Savior</div>"
+      ],
+      "abilities": [
+        {
+          "nameHtml": "<span class=\"ac-name\">Leech Therapy</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Throw a jar of leeches that attach to enemies, dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage over time</a></span> and <span style=\"font-weight:bold\">eating away at the duration of enemy buffs</span>.</div>",
+            "<div class=\"ac-info-desc\">Harrow can pick up leeches after they finish feeding, <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#13f278;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0)saturate(100%)invert(66%)sepia(32%)saturate(1046%)hue-rotate(95deg)brightness(103%)contrast(102%);\"><span typeof=\"mw:File\"><a href=\"/Healing\" title=\"Healing\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Healing.png/20px-Healing.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Healing.png/40px-Healing.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Healing\" title=\"Healing\">healing</a></span> her for the health drained and permanently granting <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#13f278;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0)saturate(100%)invert(66%)sepia(32%)saturate(1046%)hue-rotate(95deg)brightness(103%)contrast(102%);\"><span typeof=\"mw:File\"><a href=\"/Health_Regen\" title=\"Health Regen\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Healing.png/20px-Healing.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Healing.png/40px-Healing.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Health_Regen\" title=\"Health Regen\">regeneration</a></span> and <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Fire_Rate\" title=\"Fire Rate\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Fire_Rate.png/20px-Fire_Rate.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Fire_Rate.png/40px-Fire_Rate.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Fire_Rate\" title=\"Fire Rate\">fire rate</a></span>. <br/><br/>25% of your leech stacks are lost on death.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Nurse_Harrow&oldid=215641#Leech_Therapy",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Leech_Therapy.png",
+          "icon": "./assets/deadlock/hero-hero_nurse-ability-1.png",
+          "sourceSha256": "5e4e771eef7bd4ae1701566faae9fed87eec4ae863061963d8303b253242d299",
+          "localSha256": "5e4e771eef7bd4ae1701566faae9fed87eec4ae863061963d8303b253242d299",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Wretched Vapors</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Crack open a vial to release an ethereal vapor onto yourself or an ally that causes a rush, then a crash.<br/><br/><span style=\"font-style: italic;color:#C0C0C0\">Specter Rush:</span> While it lasts, increases the speed of all actions and temporarily <span style=\"font-weight:bold\">numbs all incoming damage</span> creating looming specters.<br/><br/><span style=\"font-style: italic;color:#C0C0C0\">Specter Crash:</span> When the vapors wear off, all actions are slower and any remaining specters <span style=\"font-weight:bold\">deal their delayed damage plus extra damage</span>.<br/><br/>Incoming healing will prioritize removing specters first, preventing them from dealing damage.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Nurse_Harrow&oldid=215641#Wretched_Vapors",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Wretched_Vapors.png",
+          "icon": "./assets/deadlock/hero-hero_nurse-ability-2.png",
+          "sourceSha256": "5ebf60c7c1abf740e0d47f2b14de39c34e26e9db8f520ff391157f9f394b95f4",
+          "localSha256": "5ebf60c7c1abf740e0d47f2b14de39c34e26e9db8f520ff391157f9f394b95f4",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Healing Needles</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Load your weapon with a full clip of syringes that <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#13f278;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0)saturate(100%)invert(66%)sepia(32%)saturate(1046%)hue-rotate(95deg)brightness(103%)contrast(102%);\"><span typeof=\"mw:File\"><a href=\"/Healing\" title=\"Healing\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Healing.png/20px-Healing.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Healing.png/40px-Healing.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Healing\" title=\"Healing\">heal</a></span> allies. <span style=\"font-weight:bold\">Dealing damage</span> recovers charges, and each leech you have collected slowly restores them.<br/><br/>Reloading spends a charge for a fresh clip.<br/><br/>Unused syringes are refunded as a partial charge. Recast to put them away.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Nurse_Harrow&oldid=215641#Healing_Needles",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Healing_Needles.png",
+          "icon": "./assets/deadlock/hero-hero_nurse-ability-3.png",
+          "sourceSha256": "db535bfeebc627e2d1aae3462bc9eae850bcda2bbfc881ee38524aeecae3639d",
+          "localSha256": "db535bfeebc627e2d1aae3462bc9eae850bcda2bbfc881ee38524aeecae3639d",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Lurking Terrors</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Open your bag and reveal the horrors you carry inside, dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage over time</a></span> to enemies in front of you. Enemies <span style=\"font-weight:bold\">looking at you</span> build up terror and <span style=\"font-weight:bold\">cannot use stamina or movement abilities</span>. At max terror, they <span style=\"font-weight:bold\">flee in fear away from you</span>.<br/><br/>Each leech you have collected adds <span style=\"font-weight:bold\">fear duration</span>.<br/><span style=\"font-style: italic;color:#C0C0C0\"><br/>Enemies facing away from you take 50% damage unless feared.</span></div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Nurse_Harrow&oldid=215641#Lurking_Terrors",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Lurking_Terrors.png",
+          "icon": "./assets/deadlock/hero-hero_nurse-ability-4.png",
+          "sourceSha256": "7516248452927b8be97b8fca29f89cc5be30c75dea0c3af50fe165f4daed05a6",
+          "localSha256": "7516248452927b8be97b8fca29f89cc5be30c75dea0c3af50fe165f4daed05a6",
+          "width": 137,
+          "height": 137
+        }
+      ],
+      "artwork": {
+        "body": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Nurse_Harrow_vertical.png",
+          "path": "./assets/deadlock/hero-hero_nurse-card.webp",
+          "sourceSha256": "6fd1c90d8baaa1696c37340f015cd6a8aee42e1589b5e289d9c5fb927d316703",
+          "localSha256": "6e44a50ba16757285df1d0a6fd62812b739c269dfbf51b23d070c8e9a4443370",
+          "width": 120,
+          "height": 200
+        },
+        "headshot": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Nurse_Harrow.png",
+          "path": "./assets/deadlock/hero-hero_nurse-headshot.webp",
+          "sourceSha256": "52e6f43e0180861b48b35cdf7b28f3f561dbe98fa8ded2577dd6aaa1e73186ad",
+          "localSha256": "c3069d3fdddc5ecf39035a7f54217bdcd6a53f026b1d4dcfcdd708a910d8ecc7",
+          "width": 128,
+          "height": 128
+        },
+        "showcase": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Nurse_Harrow_Render.png",
+          "path": "./assets/deadlock/hero-hero_nurse-showcase.webp",
+          "sourceSha256": "8861a734acaf9de0aa73e9749b80a3f56ae28d8efc056c26c87a63aaffa3378f",
+          "localSha256": "8f99d42a25dc3aa854861c22d10359bc1eb7ddd0ed5054a5437fabb0e46c7b13",
+          "width": 1400,
+          "height": 1125
+        },
+        "background": {
+          "sourceUrl": "https://cdn.deadlock.wiki/thumb/Nurse_bg_psd.png/1241px-Nurse_bg_psd.png",
+          "path": "./assets/deadlock/hero-hero_nurse-background.webp",
+          "sourceSha256": "b165ff93d1c02611cd0f4831bc9db77bc0e1c264334a34f84f552cd37c866a07",
+          "localSha256": "a9aa697b9e2e468242d819b1752b90f1c50485dc834bf1cb908f7dd025eb0860",
+          "width": 1241,
+          "height": 700
+        }
+      }
+    },
+    {
+      "id": "hero_ratking",
+      "name": "Rat King",
+      "page": "Rat_King",
+      "revision": 215646,
+      "sourceUrl": "https://deadlock.wiki/index.php?title=Rat_King&oldid=215646",
+      "sourceHtmlSha256": "eefd25d87330034d777684ff25b8904eabce52528a69b7b18edda407bfaa4964",
+      "descriptionHtml": [
+        "<p><b>Rat King</b> is a scrappy, tanky <a href=\"/Heroes\" title=\"Heroes\">Hero</a> fighting out of the sewers and into the streets of the <a href=\"/Cursed_Apple\" title=\"Cursed Apple\">Cursed Apple</a>. Summoning swarms of rats to his whims, he leads the charge into battle with heavy armor and a <a class=\"mw-redirect\" href=\"/Patrons\" title=\"Patrons\">plan</a> to turn Long Island into a rat utopia. \n</p>",
+        "<p>Rodent-hating citizens of Manhattan won't be prepared to see his <b><a class=\"mw-selflink-fragment\" href=\"##Scrap_Grenade\">Scrap Grenade</a></b> bouncing down Broadway, nor for his <b><a class=\"mw-selflink-fragment\" href=\"#Rat_Swarm\">Swarm of Rats</a></b> biting at their heels. By donning his <b><a class=\"mw-selflink-fragment\" href=\"#Royal_Pestments\">Royal Pestments</a></b>, the Rat King shakes off incoming damage, allowing him to bravely lead the charge into battle. His loyal subjects will feel awed and inspired when they see the great <b><a class=\"mw-selflink-fragment\" href=\"#Rule,_Ratannia!\">Banner of Ratannia</a></b> waving in the middle of combat, and those who oppose him will rue the day they ever thought they could overthrow the king. \n</p>"
+      ],
+      "tagHtml": [
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(-2deg)\">Scrappy</div>",
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(1deg)\">Regal</div>",
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(-2deg)\">Tenacious</div>"
+      ],
+      "abilities": [
+        {
+          "nameHtml": "<span class=\"ac-name\">Scrap Grenade</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Throw a grenade of scrap that detonates multiple times, dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ec981a;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Weapon_Damage\" title=\"Weapon Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Bullet_damage.png/20px-Bullet_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Bullet_damage.png/40px-Bullet_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Weapon_Damage\" title=\"Weapon Damage\">bullet damage</a></span> and applying <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Movement_Slow\" title=\"Movement Slow\"><img class=\"mw-file-element\" data-file-height=\"64\" data-file-width=\"64\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/20px-MoveSlow.png\" srcset=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/40px-MoveSlow.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Movement_Slow\" title=\"Movement Slow\">slow</a></span>.<br/><br/><span style=\"font-style: italic;color:#C0C0C0\">The grenade can be meleed to knock it away.</span></div>",
+            "<div class=\"ac-info-desc\">The final detonation has a longer fuse but increased detonation radius, deals increased <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ec981a;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Weapon_Damage\" title=\"Weapon Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Bullet_damage.png/20px-Bullet_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Bullet_damage.png/40px-Bullet_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Weapon_Damage\" title=\"Weapon Damage\">bullet damage</a></span> and applies a stronger <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Movement_Slow\" title=\"Movement Slow\"><img class=\"mw-file-element\" data-file-height=\"64\" data-file-width=\"64\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/20px-MoveSlow.png\" srcset=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/40px-MoveSlow.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Movement_Slow\" title=\"Movement Slow\">slow</a></span>.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Rat_King&oldid=215646#Scrap_Grenade",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Scrap_Grenade.png",
+          "icon": "./assets/deadlock/hero-hero_ratking-ability-1.png",
+          "sourceSha256": "0988a548670823632552c2e193866bd41dea6474c8a3e8057aed578d796d17f7",
+          "localSha256": "0988a548670823632552c2e193866bd41dea6474c8a3e8057aed578d796d17f7",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Rat Swarm</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Call forth a swarm of <span style=\"font-weight:bold\">rats</span> that leap onto enemies, dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage over time</a></span> and reducing their <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ec981a;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0)saturate(100%)invert(80%)sepia(42%)saturate(6295%)hue-rotate(355deg)brightness(104%)contrast(85%);\"><span typeof=\"mw:File\"><a href=\"/Damage_Resistance\" title=\"Damage Resistance\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Bullet_Armor.png/20px-Bullet_Armor.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Bullet_Armor.png/40px-Bullet_Armor.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Damage_Resistance\" title=\"Damage Resistance\">bullet resist</a></span> with every bite. The more rats are attached, the faster they will bite the target.<br/><br/>Enemies can have multiple rats attached, but can shake off a <span style=\"font-weight:bold\">rat</span> early by performing a <span style=\"font-weight:bold\">ground or air dash</span>.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Rat_King&oldid=215646#Rat_Swarm",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Rat_Swarm.png",
+          "icon": "./assets/deadlock/hero-hero_ratking-ability-2.png",
+          "sourceSha256": "967e3d552bcf17e1ed1674549f8e31b036f1ee3b9950db942dffb823e4dee783",
+          "localSha256": "967e3d552bcf17e1ed1674549f8e31b036f1ee3b9950db942dffb823e4dee783",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Royal Pestments</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Adorn scrappy armor, gaining <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Damage_Resistance\" title=\"Damage Resistance\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Bullet_Armor_%28item%29.png/20px-Bullet_Armor_%28item%29.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Bullet_Armor_%28item%29.png/40px-Bullet_Armor_%28item%29.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Barrier\" title=\"Barrier\">barrier</a></span> based on your <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#13f278;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0)saturate(100%)invert(66%)sepia(32%)saturate(1046%)hue-rotate(95deg)brightness(103%)contrast(102%);\"><span typeof=\"mw:File\"><a href=\"/Health\" title=\"Health\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Healing.png/20px-Healing.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Healing.png/40px-Healing.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Health\" title=\"Health\">max health</a></span>. As long as the armor holds, bullets have a chance to be <span style=\"font-weight:bold\">deflected</span> back towards the attacker.<br/><br/><span style=\"font-style: italic;color:#C0C0C0\">The barrier does not benefit from resists.</span></div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Rat_King&oldid=215646#Royal_Pestments",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Royal_Pestments.png",
+          "icon": "./assets/deadlock/hero-hero_ratking-ability-3.png",
+          "sourceSha256": "5660f8f0c1046fc7fa0755270c94b96fb4f549e8ea65c867f67c0f34e5c8acb3",
+          "localSha256": "5660f8f0c1046fc7fa0755270c94b96fb4f549e8ea65c867f67c0f34e5c8acb3",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Rule, Ratannia!</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Charge up and summon the banner of Ratannia, granting all nearby allies increased <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0)saturate(100%)invert(66%)sepia(32%)saturate(1046%)hue-rotate(95deg)brightness(103%)contrast(102%);\"><span typeof=\"mw:File\"><a href=\"/Move_speed\" title=\"Move speed\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Move_speed.png/20px-Move_speed.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Move_speed.png/40px-Move_speed.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Move_speed\" title=\"Move speed\">move speed</a></span>, <span style=\"font-weight:bold\">immunity from slows</span>, and <span style=\"font-weight:bold\">reduced incoming damage</span> while near the banner.</div>",
+            "<div class=\"ac-info-desc\">Slam the banner into the ground causing the sewers below to violently erupt, dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ec981a;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Weapon_Damage\" title=\"Weapon Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Bullet_damage.png/20px-Bullet_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Bullet_damage.png/40px-Bullet_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Weapon_Damage\" title=\"Weapon Damage\">bullet damage</a></span> while applying <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><span><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Status_Displacement.png/20px-Status_Displacement.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Status_Displacement.png/40px-Status_Displacement.png 2x\" width=\"20\"/></span></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Status_Effects\" title=\"Status Effects\">knockup</a></span> and <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Movement_Slow\" title=\"Movement Slow\"><img class=\"mw-file-element\" data-file-height=\"64\" data-file-width=\"64\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/20px-MoveSlow.png\" srcset=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/40px-MoveSlow.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Movement_Slow\" title=\"Movement Slow\">slow</a></span> to all enemies in the area. Rats will swarm out of the sewers, applying <span style=\"font-weight:bold\">Rat Swarm</span> to enemies they hit.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Rat_King&oldid=215646#Rule%2C_Ratannia%21",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Rule%2C_Ratannia%21.png",
+          "icon": "./assets/deadlock/hero-hero_ratking-ability-4.png",
+          "sourceSha256": "74baf5ce72d9df9aec4b0e6b29418b36d03173a264c3faff306b737f798a1df8",
+          "localSha256": "74baf5ce72d9df9aec4b0e6b29418b36d03173a264c3faff306b737f798a1df8",
+          "width": 137,
+          "height": 137
+        }
+      ],
+      "artwork": {
+        "body": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Rat_King_vertical.png",
+          "path": "./assets/deadlock/hero-hero_ratking-card.webp",
+          "sourceSha256": "f4fbfe37ac11d3a77be7015d78a94b3badd9928987faf21d68f1e931d757076f",
+          "localSha256": "51932822484f9e3e35e03f077ec11f651d8a0a955f62ebc164c0e3e141e0fede",
+          "width": 120,
+          "height": 200
+        },
+        "headshot": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Rat_King.png",
+          "path": "./assets/deadlock/hero-hero_ratking-headshot.webp",
+          "sourceSha256": "1b937a87597ef10b5a03fb5ef7b649887fbbabbf4cdc361e4fa3511a0547a799",
+          "localSha256": "c5ff37621d3d5e1d7dcd93bee34af7e0eca3d33137f56a8775c2947df123008b",
+          "width": 128,
+          "height": 128
+        },
+        "showcase": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Rat_King_Render.png",
+          "path": "./assets/deadlock/hero-hero_ratking-showcase.webp",
+          "sourceSha256": "2ab8b1d07b083c691d71468cd00f52e9eb6c99baca27417f5cdc881a5329e388",
+          "localSha256": "3b7d58b60e25a967c8864f96f71fae24574fc1a811d105354318cceccbfc5a94",
+          "width": 1779,
+          "height": 1440
+        },
+        "background": {
+          "sourceUrl": "https://cdn.deadlock.wiki/thumb/Ratking_bg_psd.png/1241px-Ratking_bg_psd.png",
+          "path": "./assets/deadlock/hero-hero_ratking-background.webp",
+          "sourceSha256": "6e32ef2a277e2035b90f461c7b397602c95f492e50d5a43402085c16824711ad",
+          "localSha256": "bd298e09fa54fb9b787f55c7726957eb1ebf27a6edf17f30864d39d4293082af",
+          "width": 1241,
+          "height": 700
+        }
+      }
+    },
+    {
+      "id": "hero_chessmaster",
+      "name": "Solomon",
+      "page": "Solomon",
+      "revision": 215788,
+      "sourceUrl": "https://deadlock.wiki/index.php?title=Solomon&oldid=215788",
+      "sourceHtmlSha256": "c6e1763bc8e8da76699eb343f10b48532b483125d515f7d4f8ec9313035b504e",
+      "descriptionHtml": [
+        "<p><b>Solomon</b> is a strategic chessmaster <a href=\"/Heroes\" title=\"Heroes\">Hero</a> who navigates his bishops, knights, and rooks around a fight before dropping the Queen in an ultimate checkmate. As a long-term chess player in <a href=\"/Cursed_Apple\" title=\"Cursed Apple\">Central Park</a>, he joined the <a class=\"mw-redirect\" href=\"/Ritual\" title=\"Ritual\">Ritual</a> to prevent the power of the <a class=\"mw-redirect\" href=\"/Patrons\" title=\"Patrons\">Patrons</a> from falling into the wrong hands. \n</p>",
+        "<p>Solomon remains calm and collected when facing a new challenger, so when the Patrons come calling, he approaches the city as if it's one giant chessboard. With <b><a class=\"mw-selflink-fragment\" href=\"#Setup_Bishop\">Setup Bishop</a></b> he advances, planting his loyal damage dealers ahead of him and sliding them across the streets with ease. <b><a class=\"mw-selflink-fragment\" href=\"#Kingside_Knight\">Kingside Knight</a></b> comes into play when it's time for defense, granting protection to allies and making tactical retreats when needed. <b><a class=\"mw-selflink-fragment\" href=\"#Rook_Battery\">Rook Battery</a></b> charges forward with great force, stalling enemies in their tracks. And with his final move, <b><a class=\"mw-selflink-fragment\" href=\"#Develop_Queen\">Develop Queen</a></b>, he locks down his enemies in an ultimate checkmate.\n</p>"
+      ],
+      "tagHtml": [
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(-2deg)\">Strategist</div>",
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(1deg)\">Focused</div>",
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(-2deg)\">Checkmate</div>"
+      ],
+      "abilities": [
+        {
+          "nameHtml": "<span class=\"ac-name\">Setup Bishop</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Create a <span style=\"font-weight:bold\">bishop</span> that remains in place indefinitely. <br/><br/><span style=\"font-style: italic;color:#C0C0C0\">Move (<b> Zoom / alt-fire</b>):</span> Moves the bishop, applying a fading <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Movement_Slow\" title=\"Movement Slow\"><img class=\"mw-file-element\" data-file-height=\"64\" data-file-width=\"64\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/20px-MoveSlow.png\" srcset=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/40px-MoveSlow.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Movement_Slow\" title=\"Movement Slow\">slow</a></span> and dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> to enemies it passes through. After a delay, activates diagonal squares that deal additional <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> when stepped on.<br/><br/><span style=\"font-style: italic;color:#C0C0C0\">Re-activate to recall all bishops, ending the ability.</span></div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Solomon&oldid=215788#Setup_Bishop",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Setup_Bishop.png",
+          "icon": "./assets/deadlock/hero-hero_chessmaster-ability-1.png",
+          "sourceSha256": "8cba6f7743dd65a330a2c46207390d9e515275d0aed6212107d064c9056ce4be",
+          "localSha256": "8cba6f7743dd65a330a2c46207390d9e515275d0aed6212107d064c9056ce4be",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Kingside Knight</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Promote an ally to be a <span style=\"font-weight:bold\">knight</span>, granting <span style=\"font-weight:bold\">bonus stamina</span> and <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Damage_Resistance\" title=\"Damage Resistance\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Bullet_Armor_%28item%29.png/20px-Bullet_Armor_%28item%29.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Bullet_Armor_%28item%29.png/40px-Bullet_Armor_%28item%29.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Barrier\" title=\"Barrier\">barrier</a></span> for a duration.<br/><br/>If self-cast you develop yourself as <span style=\"font-weight:bold\">king</span> instead, granting double the <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Damage_Resistance\" title=\"Damage Resistance\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Bullet_Armor_%28item%29.png/20px-Bullet_Armor_%28item%29.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Bullet_Armor_%28item%29.png/40px-Bullet_Armor_%28item%29.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Barrier\" title=\"Barrier\">barrier</a></span> but no stamina. <br/><br/><span style=\"font-style: italic;color:#C0C0C0\">Move (<b> Zoom / alt-fire</b>):</span> Moves the piece, making it <span style=\"font-weight:bold\">invulnerable</span> during the duration before landing. If self-cast, re-activate the ability to move instead.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Solomon&oldid=215788#Kingside_Knight",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Kingside_Knight.png",
+          "icon": "./assets/deadlock/hero-hero_chessmaster-ability-2.png",
+          "sourceSha256": "b5d04ac4ff4ae2ecbe6b0382335358a523ccb07dbac8205df88de60a99dc4deb",
+          "localSha256": "b5d04ac4ff4ae2ecbe6b0382335358a523ccb07dbac8205df88de60a99dc4deb",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Rook Battery</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Release a pair of <span style=\"font-weight:bold\">rooks</span> that travel forward, dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> and applying <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Status_Effects#Immobilized\" title=\"Status Effects\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Immobilize.png/20px-Immobilize.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Immobilize.png/40px-Immobilize.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Status_Effects#Immobilized\" title=\"Status Effects\">immobilize</a></span>. If the rooks hit a wall, they reflect back in the opposite direction. <br/><br/><span style=\"font-style: italic;color:#C0C0C0\">Re-Activate</span>: Split the rooks perpendicularly.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Solomon&oldid=215788#Rook_Battery",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Rook_Battery.png",
+          "icon": "./assets/deadlock/hero-hero_chessmaster-ability-3.png",
+          "sourceSha256": "92516f98efd1a4a5161a9489e7939e611ab72dbf7a97f3da497b61634c319c4a",
+          "localSha256": "92516f98efd1a4a5161a9489e7939e611ab72dbf7a97f3da497b61634c319c4a",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Develop Queen</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Summon a <span style=\"font-weight:bold\">queen</span> that crashes down, dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> in an area. After a delay, the queen releases squares in straight lines that deal <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> again and apply <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:inherit;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Stun\" title=\"Stun\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Status_Stun.png/20px-Status_Stun.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Status_Stun.png/40px-Status_Stun.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Stun\" title=\"Stun\">stun</a></span>. <br/><br/>Heroes hit that are low health are <span style=\"font-weight:bold\">checkmated</span>, executing them.  <br/><br/><span style=\"font-style: italic;color:#C0C0C0\">Move (<b> Zoom / alt-fire</b>):</span> The queen leaps to the target location, dealing the same effects again. <span style=\"font-style: italic;color:#C0C0C0\"><br/><br/>Re-activate to recall the queen early, ending the ability.</span></div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Solomon&oldid=215788#Develop_Queen",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Develop_Queen.png",
+          "icon": "./assets/deadlock/hero-hero_chessmaster-ability-4.png",
+          "sourceSha256": "4c8765964956aec7e3ec634fd33cea6b879902f2b23988b97ad59f2fe5e05482",
+          "localSha256": "4c8765964956aec7e3ec634fd33cea6b879902f2b23988b97ad59f2fe5e05482",
+          "width": 137,
+          "height": 137
+        }
+      ],
+      "artwork": {
+        "body": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Solomon_vertical.png",
+          "path": "./assets/deadlock/hero-hero_chessmaster-card.webp",
+          "sourceSha256": "67f55da4c8dea3e04e396bd83f135b51db54dea8fbdbcf90fb9865621097b323",
+          "localSha256": "466857219350cd05a83e358726fc03900a9d7f6276fc2b7b6411c93b1c8f1919",
+          "width": 120,
+          "height": 200
+        },
+        "headshot": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Solomon.png",
+          "path": "./assets/deadlock/hero-hero_chessmaster-headshot.webp",
+          "sourceSha256": "931ee6dc10e6d582461bf6c353e29cc9dce0b4518fc74f1bc8152a8fed386d73",
+          "localSha256": "03cfd8040e72725cab81fd6841abf186845a1d9793f259a0c804c0f24e4e9244",
+          "width": 128,
+          "height": 128
+        },
+        "showcase": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Solomon_Render.png",
+          "path": "./assets/deadlock/hero-hero_chessmaster-showcase.webp",
+          "sourceSha256": "1bc6cb568ccb133df1ec372597116d49c37f08580789531d224a2019794d8105",
+          "localSha256": "063f0fac46633161c4cc01346877d9e0b9e01e68c67ccbf8d2a4b4db9f1da4cd",
+          "width": 1769,
+          "height": 1440
+        },
+        "background": {
+          "sourceUrl": "https://cdn.deadlock.wiki/thumb/Chessmaster_bg_psd.png/1241px-Chessmaster_bg_psd.png",
+          "path": "./assets/deadlock/hero-hero_chessmaster-background.webp",
+          "sourceSha256": "3861e6d91db14cf0cd774b40e9ca99e2f1dd6a5d49c2787dcb01e0fc4dd5dc60",
+          "localSha256": "7862db5f55213a4ccedadd9880103459143d6ad0677317fd8286692d2811503c",
+          "width": 1241,
+          "height": 700
+        }
+      }
+    },
+    {
+      "id": "hero_artist",
+      "name": "Violet",
+      "page": "Violet",
+      "revision": 215724,
+      "sourceUrl": "https://deadlock.wiki/index.php?title=Violet&oldid=215724",
+      "sourceHtmlSha256": "23aeaa8be9398fcefc5900b6b0f54c22ccbc535d1bd8bda6e809cdd55d0f986e",
+      "descriptionHtml": [
+        "<p><b>Violet</b> is an artistic, nimble <a href=\"/Heroes\" title=\"Heroes\">Hero</a> that uses her paint and talent to bend the <a class=\"mw-redirect\" href=\"/Ritual\" title=\"Ritual\">Ritual</a> to her will. With ink and paint, she can empower her allies with one stroke while disrupting her foes with another. \n</p>",
+        "<p>Brush in hand, Violet approaches the ritual with the same precision she does her art, wielding <b><a class=\"mw-selflink-fragment\" href=\"#Living_Ink\">Living Ink</a></b> that both empowers her bullets, and draws mere inspiration into reality. When entering <b><a class=\"mw-selflink-fragment\" href=\"#Flow_State\">Flow State</a></b>, her ink glides easily, weaving towards danger to deal damage, or away from it to make a quick getaway. By creating a <b><a class=\"mw-selflink-fragment\" href=\"#Still_Life\">Still Life</a></b> Violet can truly capture her enemies' likeness to stunning results. And with <b><a class=\"mw-selflink-fragment\" href=\"#Abstract_Landscape\">Abstract Landscape</a></b> she surrounds herself and those nearby with her biggest and most ambitious piece yet, leaving onlookers completely speechless.\n</p>"
+      ],
+      "tagHtml": [
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(-2deg)\">Ambitious</div>",
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(1deg)\">Nimble</div>",
+        "<div class=\"infobox-h-herotag-pill\" style=\"transform:rotate(-2deg)\">Creative</div>"
+      ],
+      "abilities": [
+        {
+          "nameHtml": "<span class=\"ac-name\">Living Ink</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\"><span style=\"font-style: italic;color:#C0C0C0\">Empower (<b> Ability 1</b>):</span> Your next <span style=\"font-weight:bold\">3</span> bullets come to life, allowing you to steer them as they travel. The bullets deal increased <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ec981a;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Weapon_Damage\" title=\"Weapon Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Bullet_damage.png/20px-Bullet_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Bullet_damage.png/40px-Bullet_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Weapon_Damage\" title=\"Weapon Damage\">bullet damage</a></span> and splash <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> in a small area.<br/><br/>Each successful hit against a hero reduces <span style=\"font-weight:bold\">all ability cooldowns</span>, and half for <span style=\"font-weight:bold\">all item cooldowns</span>.</div>",
+            "<div class=\"ac-info-desc\"><span style=\"font-style: italic;color:#C0C0C0\">Draw (<b> Zoom / alt-fire</b>):</span> Paint a solid stroke of ink instead that blocks projectiles and characters from passing through.<br/><br/>The stroke can be destroyed with a heavy melee, but deals <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> to the attacker.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Violet&oldid=215724#Living_Ink",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Living_Ink.png",
+          "icon": "./assets/deadlock/hero-hero_artist-ability-1.png",
+          "sourceSha256": "4f195428dd51e606c3dd7c7b3cb73a0e21a2daefd7eab3c6b82576460df59c58",
+          "localSha256": "4f195428dd51e606c3dd7c7b3cb73a0e21a2daefd7eab3c6b82576460df59c58",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Flow State</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Drag a brush that continues to travel forward, leaving a trail that grants <span style=\"font-weight:bold\">bonus slide distance</span> for allies and a fading <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Movement_Slow\" title=\"Movement Slow\"><img class=\"mw-file-element\" data-file-height=\"64\" data-file-width=\"64\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/20px-MoveSlow.png\" srcset=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/40px-MoveSlow.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Movement_Slow\" title=\"Movement Slow\">slow</a></span> and <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> to enemies it passes through, increased the further it travels. <br/><br/>Re-activate the ability to flick the brush forward, ending the ability early but dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> in a larger area.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Violet&oldid=215724#Flow_State",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Flow_State.png",
+          "icon": "./assets/deadlock/hero-hero_artist-ability-2.png",
+          "sourceSha256": "6e2b0a130eca2f67d46e024e151d46e304cbe46cf52ad628e44effbe30bfa54a",
+          "localSha256": "6e2b0a130eca2f67d46e024e151d46e304cbe46cf52ad628e44effbe30bfa54a",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Still Life</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Choose a hero to be your <span style=\"font-weight:bold\">subject</span>, dealing <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage over time</a></span> as long as you are looking at them. <br/><br/>If the sketch is completed they take additional <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span>, suffer from <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:inherit;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Stun\" title=\"Stun\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Status_Stun.png/20px-Status_Stun.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Status_Stun.png/40px-Status_Stun.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Stun\" title=\"Stun\">stun</a></span>, and drop a <span style=\"font-weight:bold\">sketch</span> that can be picked up.<br/><br/> For each collected <span style=\"font-weight:bold\">sketch</span>, you permanently gain stats based on the hero.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Violet&oldid=215724#Still_Life",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Still_Life.png",
+          "icon": "./assets/deadlock/hero-hero_artist-ability-3.png",
+          "sourceSha256": "adb2e86ddeed3878fa704edf7fe237a4a909a9918b5c1166dfc5c3a32e71874d",
+          "localSha256": "adb2e86ddeed3878fa704edf7fe237a4a909a9918b5c1166dfc5c3a32e71874d",
+          "width": 137,
+          "height": 137
+        },
+        {
+          "nameHtml": "<span class=\"ac-name\">Abstract Landscape</span>",
+          "descriptionHtml": [
+            "<div class=\"ac-info-desc\">Create a circular display of ink that blocks vision and grants allies <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Power\" title=\"Spirit Power\"><img class=\"mw-file-element\" data-file-height=\"46\" data-file-width=\"48\" decoding=\"async\" height=\"19\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_Icon.png/20px-Spirit_Icon.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_Icon.png/40px-Spirit_Icon.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Spirit_Power\" title=\"Spirit Power\">Spirit</a></span>.<br/><br/>Enemies inside are revealed, and leaving causes them to take <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative;\"><span typeof=\"mw:File\"><a href=\"/Spirit_Damage\" title=\"Spirit Damage\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/20px-Spirit_damage.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Spirit_damage.png/40px-Spirit_damage.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Spirit_Damage\" title=\"Spirit Damage\">spirit damage</a></span> and suffer from <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#bc8ee8;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0)saturate(100%)invert(78%)sepia(43%)saturate(4738%)hue-rotate(215deg)brightness(100%)contrast(102%);\"><span typeof=\"mw:File\"><a href=\"/Silence\" title=\"Silence\"><img class=\"mw-file-element\" data-file-height=\"128\" data-file-width=\"128\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/Silence.png/20px-Silence.png\" srcset=\"https://cdn.deadlock.wiki/thumb/Silence.png/40px-Silence.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a class=\"mw-redirect\" href=\"/Silence\" title=\"Silence\">Silence</a></span> and <span class=\"no-blue-link\" style=\"text-wrap:nowrap; font-weight:bold; color:#ffefd7;\"><span style=\"position: relative; bottom: 2px; filter: brightness(0) invert(90%) sepia(20%) saturate(565%) hue-rotate(318deg) brightness(106%) contrast(104%); isolation: isolate;\"><span typeof=\"mw:File\"><a href=\"/Movement_Slow\" title=\"Movement Slow\"><img class=\"mw-file-element\" data-file-height=\"64\" data-file-width=\"64\" decoding=\"async\" height=\"20\" loading=\"lazy\" src=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/20px-MoveSlow.png\" srcset=\"https://cdn.deadlock.wiki/thumb/MoveSlow.png/40px-MoveSlow.png 2x\" width=\"20\"/></a></span></span><span style=\"color: inherit;\"> </span> <a href=\"/Movement_Slow\" title=\"Movement Slow\">slow</a></span>, destroying the ink in the process.</div>"
+          ],
+          "sourceUrl": "https://deadlock.wiki/index.php?title=Violet&oldid=215724#Abstract_Landscape",
+          "iconSourceUrl": "https://cdn.deadlock.wiki/Abstract_Landscape.png",
+          "icon": "./assets/deadlock/hero-hero_artist-ability-4.png",
+          "sourceSha256": "dbdac57df9f3ec664a78ed5232f608fe6abf8acdc390f7d605c0bccf526162b8",
+          "localSha256": "dbdac57df9f3ec664a78ed5232f608fe6abf8acdc390f7d605c0bccf526162b8",
+          "width": 137,
+          "height": 137
+        }
+      ],
+      "artwork": {
+        "body": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Violet_vertical.png",
+          "path": "./assets/deadlock/hero-hero_artist-card.webp",
+          "sourceSha256": "a566e7e6a263800c5eab8b2e6a31010ecf11e03b503586ccc1f74ba6c2c590a0",
+          "localSha256": "18af8d45ad53a0117caca71deb9a582ad679773b228ca1f509fb014c53077b96",
+          "width": 120,
+          "height": 200
+        },
+        "headshot": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Violet.png",
+          "path": "./assets/deadlock/hero-hero_artist-headshot.webp",
+          "sourceSha256": "5ea352d8a7a13486e8ba9ed8663434f30813c69986c9b9d841456711576ecb0c",
+          "localSha256": "e12b43acc3e81e523951dbb686d72f10e126f4fc9e8d4344141ff22bcee7211a",
+          "width": 128,
+          "height": 128
+        },
+        "showcase": {
+          "sourceUrl": "https://cdn.deadlock.wiki/Violet_Render.png",
+          "path": "./assets/deadlock/hero-hero_artist-showcase.webp",
+          "sourceSha256": "e73ba020804735c7ddd5e05b55dcc2ec068bedbf7c23910c36720b8dc2f4e7d8",
+          "localSha256": "2c43bfa046441632ef55b097ef0fa05e09956a601efebdd3949fca82ff00aa85",
+          "width": 1761,
+          "height": 1440
+        },
+        "background": {
+          "sourceUrl": "https://cdn.deadlock.wiki/thumb/Violet_select_background.png/1241px-Violet_select_background.png",
+          "path": "./assets/deadlock/hero-hero_artist-background.webp",
+          "sourceSha256": "219a6367753e2d4c3aaeb8a01759db15693cf87449b8c55dd23d79925393305a",
+          "localSha256": "d0374edc1d7f460df4382f4a49199d2dd388eb763aec32d0e40b6a809929f3aa",
+          "width": 1241,
+          "height": 700
+        }
+      }
+    }
+  ]
+}

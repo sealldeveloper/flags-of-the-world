@@ -1,6 +1,6 @@
 'use strict';
 // Bump the shell version when changing app assets. Never expire puzzle data here.
-const SHELL='puzzle-app-shell-v17', DATA='puzzle-daily-data-v1';
+const SHELL='puzzle-app-shell-v18', DATA='puzzle-daily-data-v1';
 const PAGES=['/','/crossword/','/crossword-nyt/','/crossword-nytmini/','/crossword-seattle/','/connections-nyt/','/flags/','/tld/','/deadlock-guess-who/','/scattegories/','/scattegories/local/','/jeopardy/','/jeopardy/display.html','/tierlist/'];
 const ASSETS=[
   '/app.webmanifest','/favicon.svg','/assets/theme.js','/assets/theme.css','/assets/app.js','/assets/library.mjs','/assets/library.css','/assets/daily.mjs',

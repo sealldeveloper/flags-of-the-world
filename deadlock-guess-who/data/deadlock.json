@@ -1,7 +1,7 @@
 {
   "source": "Deadlock game-file data via the Deadlock Static Assets API",
   "sourceUrl": "https://assets.deadlock-api.com/v2/heroes",
-  "generated": "2026-09-14",
+  "generated": "2026-10-31",
   "heroes": [
     {
       "id": "6",
@@ -96,6 +96,54 @@
         }
       ],
       "headshot": "./assets/deadlock/hero-77-headshot.webp"
+    },
+    {
+      "id": "hero_baba",
+      "name": "Baba",
+      "role": "",
+      "tags": [
+        "Cackling",
+        "Beady",
+        "Hexing"
+      ],
+      "playstyle": "Baba is a Hero in Deadlock. She is a hexing, spirit-draining witch who uses her long-legged bench to brawl in the front lines of the Ritual. Flinging scalding tea, cursed yarn, and breadcrumbs in equal measure, Baba is a cackling force to be reckoned with. In the heat of battle, Baba throws out her Threadsap, a chaotic spool of yarn that steals the very spirit of her enemies, granting her greater power. While her legs might not be what they used to, her trusty bench comes to life with a creak of metal, allowing her to run, jump, and kick with impressive vigor. Parkgoers know it's best to stay on Baba's good side, as at tea time you might find yourself splashed with one of Baba's Brews (some of them much sweeter than others), and when tea time is over - The Birds come out to play...",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/index.php?title=Baba&oldid=215550",
+      "sourceRevision": 215550,
+      "abilities": [
+        {
+          "name": "Threadsap",
+          "description": "Weave a scraggly thread that follows your crosshair before bursting along its path, dealing spirit damage and stealing enemy Spirit, increased in effectiveness for Baba. While holding stolen Spirit, Baba deals bonus spirit damage with every bullet.",
+          "icon": "./assets/deadlock/hero-hero_baba-ability-1.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Baba&oldid=215550#Threadsap"
+        },
+        {
+          "name": "Granny Long Legs",
+          "description": "Your bench's legs extend, granting bonus move speed, higher jumps, Debuff Resistance and Melee Resistance. Light Melee: Perform a kick that knocks enemies back. Heavy Melee: Perform a ground pound that applies knockup, slow, and deals spirit damage. Hold Crouch / slide to charge a high jump, release to jump.",
+          "icon": "./assets/deadlock/hero-hero_baba-ability-2.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Baba&oldid=215550#Granny_Long_Legs"
+        },
+        {
+          "name": "Baba's Brew",
+          "description": "Brew a pot of tea that applies a magical effect in an area when thrown, cycling over time in a random order between a soothing barrier, Silence, or scalding burn that deals spirit damage over time and reduces spirit resist. Press Zoom / alt-fire to pause or resume brewing.",
+          "icon": "./assets/deadlock/hero-hero_baba-ability-3.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Baba&oldid=215550#Baba%27s_Brew"
+        },
+        {
+          "name": "Feed The Birds",
+          "description": "Cover targets in front of you with bread, adding a stacking slow . When the channel ends a flock of pigeons bombard the targets, dealing spirit damage and hexing each target into a pigeon, increasing in both damage and duration based on bread count.",
+          "icon": "./assets/deadlock/hero-hero_baba-ability-4.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Baba&oldid=215550#Feed_The_Birds"
+        }
+      ],
+      "body": "./assets/deadlock/hero-hero_baba-card.webp",
+      "showcase": "./assets/deadlock/hero-hero_baba-showcase.webp",
+      "background": "./assets/deadlock/hero-hero_baba-background.webp",
+      "headshot": "./assets/deadlock/hero-hero_baba-headshot.webp"
     },
     {
       "id": "15",
@@ -284,6 +332,54 @@
         }
       ],
       "headshot": "./assets/deadlock/hero-81-headshot.webp"
+    },
+    {
+      "id": "hero_deadpack",
+      "name": "Deadman Danny",
+      "role": "",
+      "tags": [
+        "Reckless",
+        "High-flying",
+        "Explosive"
+      ],
+      "playstyle": "Deadman Danny is a daring and explosive Hero with a rocket launcher, a rocket jetpack, and a series of additional rocket skills to blow his opponents away. With only the most powerful of permanently-attached rocket packs, Danny is excited to surprise and amaze all potential Fairfax Industries customers. Today, Fairfax Industries is proud to introduce their most valuable salesman: Deadman Danny. Wielding a rocket launcher and flying high above the streets of New York (courtesy of the Chimera Mk1 - the latest and greatest in self-adhered aviation technology), Danny rains his Strix Salvo missiles down upon foes, marking them for future attacks. Jettison Fuel is a handy trick that both expels heat from the Chimera System, while also dousing nearby enemies in the warm embrace of a firey inferno. Yet his most impressive tactic has always been his ability to Close the Deal, wowing prospective customers with an explosive hands-on demonstration of all that Fairfax has to offer.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/index.php?title=Deadman_Danny&oldid=215598",
+      "sourceRevision": 215598,
+      "abilities": [
+        {
+          "name": "Strix Salvo",
+          "description": "Launch a salvo of spirit missiles that lodge into the ground along a line. The missiles explode after a delay or upon detecting an enemy, dealing spirit damage and marking the target. Shooting a marked enemy with a charged shot consumes a mark to deal bonus spirit damage and apply a fading slow. Hold and drag to select the angle.",
+          "icon": "./assets/deadlock/hero-hero_deadpack-ability-1.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Deadman_Danny&oldid=215598#Strix_Salvo"
+        },
+        {
+          "name": "Chimera Mk1",
+          "description": "Hold Jump / mantle to fly, building up heat. When max heat is reached, your jetpack will begin to overheat. Overheating: After a short delay, dive to the ground. Upon impact, create an explosion that deals damage and launches you and nearby enemies. If no hero is hit, you stun yourself. Press Ability 2 to dive early. Cooling Down: After overheating, the jetpack cannot be used until it fully cools down. Slows affect you while airborne. You always explode on death.",
+          "icon": "./assets/deadlock/hero-hero_deadpack-ability-2.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Deadman_Danny&oldid=215598#Chimera_Mk1"
+        },
+        {
+          "name": "Jettison Fuel",
+          "description": "Spray fuel dealing weapon damage over time and shredding bullet resist, building up to a huge backblast that deals spirit damage and knocks you backwards. Vents the jetpack when dealing damage.",
+          "icon": "./assets/deadlock/hero-hero_deadpack-ability-3.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Deadman_Danny&oldid=215598#Jettison_Fuel"
+        },
+        {
+          "name": "Close The Deal",
+          "description": "Grab an enemy and give them a hands-on demonstration, flying high into the air before crashing back to the ground. You and the participant take spirit damage over time while falling and spirit damage upon impact. Damage is increased to enemies under 50% health.",
+          "icon": "./assets/deadlock/hero-hero_deadpack-ability-4.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Deadman_Danny&oldid=215598#Close_The_Deal"
+        }
+      ],
+      "body": "./assets/deadlock/hero-hero_deadpack-card.webp",
+      "showcase": "./assets/deadlock/hero-hero_deadpack-showcase.webp",
+      "background": "./assets/deadlock/hero-hero_deadpack-background.webp",
+      "headshot": "./assets/deadlock/hero-hero_deadpack-headshot.webp"
     },
     {
       "id": "64",
@@ -991,6 +1087,54 @@
       "headshot": "./assets/deadlock/hero-18-headshot.webp"
     },
     {
+      "id": "hero_nurse",
+      "name": "Nurse Harrow",
+      "role": "",
+      "tags": [
+        "Strict",
+        "Terrifying",
+        "Savior"
+      ],
+      "playstyle": "Nurse Harrow is a draining, healing Hero with dangerous tools and a terrible bedside manner. To some, her practices may seem unorthodox, her patients at the Marble Hill Possession Ward cannot say that the results aren't effective. With Leech Therapy, she throws a jar full of leeches that attach to oncoming enemies, draining their health and energy, before crawling back to deliver their haul. Cracking open one of her vials, she releases her Wretched Vapors, possessing her allies with a powerful boost of effectiveness - though subjects should be warned of the side effects when the vapors wear off. To efficiently keep her teammates fighting their best, she loads her syringe full of Healing Needles to inject medicine directly into their veins. And when her patience runs out, she opens her bag to release all the Lurking Terrors captured inside, making her adversaries run for cover.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/index.php?title=Nurse_Harrow&oldid=215641",
+      "sourceRevision": 215641,
+      "abilities": [
+        {
+          "name": "Leech Therapy",
+          "description": "Throw a jar of leeches that attach to enemies, dealing spirit damage over time and eating away at the duration of enemy buffs. Harrow can pick up leeches after they finish feeding, healing her for the health drained and permanently granting regeneration and fire rate. 25% of your leech stacks are lost on death.",
+          "icon": "./assets/deadlock/hero-hero_nurse-ability-1.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Nurse_Harrow&oldid=215641#Leech_Therapy"
+        },
+        {
+          "name": "Wretched Vapors",
+          "description": "Crack open a vial to release an ethereal vapor onto yourself or an ally that causes a rush, then a crash. Specter Rush: While it lasts, increases the speed of all actions and temporarily numbs all incoming damage creating looming specters. Specter Crash: When the vapors wear off, all actions are slower and any remaining specters deal their delayed damage plus extra damage. Incoming healing will prioritize removing specters first, preventing them from dealing damage.",
+          "icon": "./assets/deadlock/hero-hero_nurse-ability-2.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Nurse_Harrow&oldid=215641#Wretched_Vapors"
+        },
+        {
+          "name": "Healing Needles",
+          "description": "Load your weapon with a full clip of syringes that heal allies. Dealing damage recovers charges, and each leech you have collected slowly restores them. Reloading spends a charge for a fresh clip. Unused syringes are refunded as a partial charge. Recast to put them away.",
+          "icon": "./assets/deadlock/hero-hero_nurse-ability-3.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Nurse_Harrow&oldid=215641#Healing_Needles"
+        },
+        {
+          "name": "Lurking Terrors",
+          "description": "Open your bag and reveal the horrors you carry inside, dealing spirit damage over time to enemies in front of you. Enemies looking at you build up terror and cannot use stamina or movement abilities. At max terror, they flee in fear away from you. Each leech you have collected adds fear duration. Enemies facing away from you take 50% damage unless feared.",
+          "icon": "./assets/deadlock/hero-hero_nurse-ability-4.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Nurse_Harrow&oldid=215641#Lurking_Terrors"
+        }
+      ],
+      "body": "./assets/deadlock/hero-hero_nurse-card.webp",
+      "showcase": "./assets/deadlock/hero-hero_nurse-showcase.webp",
+      "background": "./assets/deadlock/hero-hero_nurse-background.webp",
+      "headshot": "./assets/deadlock/hero-hero_nurse-headshot.webp"
+    },
+    {
       "id": "67",
       "name": "Paige",
       "role": "",
@@ -1130,6 +1274,54 @@
         }
       ],
       "headshot": "./assets/deadlock/hero-50-headshot.webp"
+    },
+    {
+      "id": "hero_ratking",
+      "name": "Rat King",
+      "role": "",
+      "tags": [
+        "Scrappy",
+        "Regal",
+        "Tenacious"
+      ],
+      "playstyle": "Rat King is a scrappy, tanky Hero fighting out of the sewers and into the streets of the Cursed Apple. Summoning swarms of rats to his whims, he leads the charge into battle with heavy armor and a plan to turn Long Island into a rat utopia. Rodent-hating citizens of Manhattan won't be prepared to see his Scrap Grenade bouncing down Broadway, nor for his Swarm of Rats biting at their heels. By donning his Royal Pestments, the Rat King shakes off incoming damage, allowing him to bravely lead the charge into battle. His loyal subjects will feel awed and inspired when they see the great Banner of Ratannia waving in the middle of combat, and those who oppose him will rue the day they ever thought they could overthrow the king.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/index.php?title=Rat_King&oldid=215646",
+      "sourceRevision": 215646,
+      "abilities": [
+        {
+          "name": "Scrap Grenade",
+          "description": "Throw a grenade of scrap that detonates multiple times, dealing bullet damage and applying slow. The grenade can be meleed to knock it away. The final detonation has a longer fuse but increased detonation radius, deals increased bullet damage and applies a stronger slow.",
+          "icon": "./assets/deadlock/hero-hero_ratking-ability-1.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Rat_King&oldid=215646#Scrap_Grenade"
+        },
+        {
+          "name": "Rat Swarm",
+          "description": "Call forth a swarm of rats that leap onto enemies, dealing spirit damage over time and reducing their bullet resist with every bite. The more rats are attached, the faster they will bite the target. Enemies can have multiple rats attached, but can shake off a rat early by performing a ground or air dash.",
+          "icon": "./assets/deadlock/hero-hero_ratking-ability-2.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Rat_King&oldid=215646#Rat_Swarm"
+        },
+        {
+          "name": "Royal Pestments",
+          "description": "Adorn scrappy armor, gaining barrier based on your max health. As long as the armor holds, bullets have a chance to be deflected back towards the attacker. The barrier does not benefit from resists.",
+          "icon": "./assets/deadlock/hero-hero_ratking-ability-3.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Rat_King&oldid=215646#Royal_Pestments"
+        },
+        {
+          "name": "Rule, Ratannia!",
+          "description": "Charge up and summon the banner of Ratannia, granting all nearby allies increased move speed, immunity from slows, and reduced incoming damage while near the banner. Slam the banner into the ground causing the sewers below to violently erupt, dealing bullet damage while applying knockup and slow to all enemies in the area. Rats will swarm out of the sewers, applying Rat Swarm to enemies they hit.",
+          "icon": "./assets/deadlock/hero-hero_ratking-ability-4.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Rat_King&oldid=215646#Rule%2C_Ratannia%21"
+        }
+      ],
+      "body": "./assets/deadlock/hero-hero_ratking-card.webp",
+      "showcase": "./assets/deadlock/hero-hero_ratking-showcase.webp",
+      "background": "./assets/deadlock/hero-hero_ratking-background.webp",
+      "headshot": "./assets/deadlock/hero-hero_ratking-headshot.webp"
     },
     {
       "id": "79",
@@ -1367,6 +1559,54 @@
       "headshot": "./assets/deadlock/hero-60-headshot.webp"
     },
     {
+      "id": "hero_chessmaster",
+      "name": "Solomon",
+      "role": "",
+      "tags": [
+        "Strategist",
+        "Focused",
+        "Checkmate"
+      ],
+      "playstyle": "Solomon is a strategic chessmaster Hero who navigates his bishops, knights, and rooks around a fight before dropping the Queen in an ultimate checkmate. As a long-term chess player in Central Park, he joined the Ritual to prevent the power of the Patrons from falling into the wrong hands. Solomon remains calm and collected when facing a new challenger, so when the Patrons come calling, he approaches the city as if it's one giant chessboard. With Setup Bishop he advances, planting his loyal damage dealers ahead of him and sliding them across the streets with ease. Kingside Knight comes into play when it's time for defense, granting protection to allies and making tactical retreats when needed. Rook Battery charges forward with great force, stalling enemies in their tracks. And with his final move, Develop Queen, he locks down his enemies in an ultimate checkmate.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/index.php?title=Solomon&oldid=215788",
+      "sourceRevision": 215788,
+      "abilities": [
+        {
+          "name": "Setup Bishop",
+          "description": "Create a bishop that remains in place indefinitely. Move ( Zoom / alt-fire): Moves the bishop, applying a fading slow and dealing spirit damage to enemies it passes through. After a delay, activates diagonal squares that deal additional spirit damage when stepped on. Re-activate to recall all bishops, ending the ability.",
+          "icon": "./assets/deadlock/hero-hero_chessmaster-ability-1.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Solomon&oldid=215788#Setup_Bishop"
+        },
+        {
+          "name": "Kingside Knight",
+          "description": "Promote an ally to be a knight, granting bonus stamina and barrier for a duration. If self-cast you develop yourself as king instead, granting double the barrier but no stamina. Move ( Zoom / alt-fire): Moves the piece, making it invulnerable during the duration before landing. If self-cast, re-activate the ability to move instead.",
+          "icon": "./assets/deadlock/hero-hero_chessmaster-ability-2.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Solomon&oldid=215788#Kingside_Knight"
+        },
+        {
+          "name": "Rook Battery",
+          "description": "Release a pair of rooks that travel forward, dealing spirit damage and applying immobilize. If the rooks hit a wall, they reflect back in the opposite direction. Re-Activate: Split the rooks perpendicularly.",
+          "icon": "./assets/deadlock/hero-hero_chessmaster-ability-3.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Solomon&oldid=215788#Rook_Battery"
+        },
+        {
+          "name": "Develop Queen",
+          "description": "Summon a queen that crashes down, dealing spirit damage in an area. After a delay, the queen releases squares in straight lines that deal spirit damage again and apply stun. Heroes hit that are low health are checkmated, executing them. Move ( Zoom / alt-fire): The queen leaps to the target location, dealing the same effects again. Re-activate to recall the queen early, ending the ability.",
+          "icon": "./assets/deadlock/hero-hero_chessmaster-ability-4.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Solomon&oldid=215788#Develop_Queen"
+        }
+      ],
+      "body": "./assets/deadlock/hero-hero_chessmaster-card.webp",
+      "showcase": "./assets/deadlock/hero-hero_chessmaster-showcase.webp",
+      "background": "./assets/deadlock/hero-hero_chessmaster-background.webp",
+      "headshot": "./assets/deadlock/hero-hero_chessmaster-headshot.webp"
+    },
+    {
       "id": "69",
       "name": "The Doorman",
       "role": "",
@@ -1553,6 +1793,54 @@
         }
       ],
       "headshot": "./assets/deadlock/hero-3-headshot.webp"
+    },
+    {
+      "id": "hero_artist",
+      "name": "Violet",
+      "role": "",
+      "tags": [
+        "Ambitious",
+        "Nimble",
+        "Creative"
+      ],
+      "playstyle": "Violet is an artistic, nimble Hero that uses her paint and talent to bend the Ritual to her will. With ink and paint, she can empower her allies with one stroke while disrupting her foes with another. Brush in hand, Violet approaches the ritual with the same precision she does her art, wielding Living Ink that both empowers her bullets, and draws mere inspiration into reality. When entering Flow State, her ink glides easily, weaving towards danger to deal damage, or away from it to make a quick getaway. By creating a Still Life Violet can truly capture her enemies' likeness to stunning results. And with Abstract Landscape she surrounds herself and those nearby with her biggest and most ambitious piece yet, leaving onlookers completely speechless.",
+      "playstyleSource": "Deadlock Wiki",
+      "playstyleSourceUrl": "https://deadlock.wiki/index.php?title=Violet&oldid=215724",
+      "sourceRevision": 215724,
+      "abilities": [
+        {
+          "name": "Living Ink",
+          "description": "Empower ( Ability 1): Your next 3 bullets come to life, allowing you to steer them as they travel. The bullets deal increased bullet damage and splash spirit damage in a small area. Each successful hit against a hero reduces all ability cooldowns, and half for all item cooldowns. Draw ( Zoom / alt-fire): Paint a solid stroke of ink instead that blocks projectiles and characters from passing through. The stroke can be destroyed with a heavy melee, but deals spirit damage to the attacker.",
+          "icon": "./assets/deadlock/hero-hero_artist-ability-1.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Violet&oldid=215724#Living_Ink"
+        },
+        {
+          "name": "Flow State",
+          "description": "Drag a brush that continues to travel forward, leaving a trail that grants bonus slide distance for allies and a fading slow and spirit damage to enemies it passes through, increased the further it travels. Re-activate the ability to flick the brush forward, ending the ability early but dealing spirit damage in a larger area.",
+          "icon": "./assets/deadlock/hero-hero_artist-ability-2.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Violet&oldid=215724#Flow_State"
+        },
+        {
+          "name": "Still Life",
+          "description": "Choose a hero to be your subject, dealing spirit damage over time as long as you are looking at them. If the sketch is completed they take additional spirit damage, suffer from stun, and drop a sketch that can be picked up. For each collected sketch, you permanently gain stats based on the hero.",
+          "icon": "./assets/deadlock/hero-hero_artist-ability-3.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Violet&oldid=215724#Still_Life"
+        },
+        {
+          "name": "Abstract Landscape",
+          "description": "Create a circular display of ink that blocks vision and grants allies Spirit. Enemies inside are revealed, and leaving causes them to take spirit damage and suffer from Silence and slow, destroying the ink in the process.",
+          "icon": "./assets/deadlock/hero-hero_artist-ability-4.png",
+          "textSource": "Deadlock Wiki",
+          "textSourceUrl": "https://deadlock.wiki/index.php?title=Violet&oldid=215724#Abstract_Landscape"
+        }
+      ],
+      "body": "./assets/deadlock/hero-hero_artist-card.webp",
+      "showcase": "./assets/deadlock/hero-hero_artist-showcase.webp",
+      "background": "./assets/deadlock/hero-hero_artist-background.webp",
+      "headshot": "./assets/deadlock/hero-hero_artist-headshot.webp"
     },
     {
       "id": "35",
@@ -1796,5 +2084,7 @@
     "license": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
     "retrieved": "2026-09-15"
-  }
+  },
+  "additionalSource": "Deadlock Wiki, pinned revisions with verbatim plain-text extraction",
+  "additionalSourceUrl": "https://deadlock.wiki/Template:Hero_Navbox"
 }

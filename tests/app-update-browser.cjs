@@ -15,6 +15,7 @@ const server=http.createServer(async(req,res)=>{
  try{
   let body=await fs.readFile(file);
   if(pathname==='/sw.js')body=Buffer.from(body.toString().replace(/SHELL='puzzle-app-shell-v\d+'/,`SHELL='puzzle-app-shell-${version}'`));
+  if(pathname==='/deadlock-guess-who/data/deadlock.json'&&version==='v1'){const roster=JSON.parse(body);roster.heroes=roster.heroes.filter(hero=>!hero.id.startsWith('hero_'));body=Buffer.from(JSON.stringify(roster));}
   res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','Cache-Control':'no-store'});res.end(body);
  }catch(_){res.writeHead(404);res.end();}
 });
@@ -38,6 +39,8 @@ async function update(page){return page.evaluate(async()=>{
   const saved=await p.evaluate(()=>localStorage.getItem('nyt-mini-xw-progress-2026-10-02'));
   await p.goto(base+'/?date=2026-10-02');await p.waitForSelector('[data-game="mini"][data-status="in-progress"]');
   await p.evaluate(async()=>{await(await caches.open('unrelated-app-cache')).put('/unrelated-marker',new Response('keep'));window.PuzzleTheme.setPreference('dark');});
+  assert.equal(await p.evaluate(async()=>((await(await caches.match('/deadlock-guess-who/data/deadlock.json')).json()).heroes.length)),38);
+  await p.evaluate(()=>localStorage.setItem('guess-who-v1:deadlock',JSON.stringify({eliminated:['6'],secretId:'6'})));
   // An incomplete new shell must never replace a usable installed app.
   version='v2';failInstall=true;assert.equal(await update(p),'redundant');
   assert(await p.evaluate(async()=>{const reg=await navigator.serviceWorker.getRegistration();return !reg.waiting&&reg.active.state==='activated'&&(await caches.keys()).includes('puzzle-app-shell-v1');}));
@@ -50,6 +53,9 @@ async function update(page){return page.evaluate(async()=>{
   const keys=await p.evaluate(()=>caches.keys());assert(keys.includes('puzzle-app-shell-v3'));assert(!keys.includes('puzzle-app-shell-v1'));assert(!keys.includes('puzzle-app-shell-v2'));assert(keys.includes('puzzle-daily-data-v1'));assert(keys.includes('unrelated-app-cache'));
   assert.equal(await p.evaluate(()=>localStorage.getItem('nyt-mini-xw-progress-2026-10-02')),saved);assert.equal(await p.evaluate(()=>window.PuzzleTheme.preference),'dark');
   assert.equal(await p.evaluate(async()=>await(await(await caches.open('unrelated-app-cache')).match('/unrelated-marker')).text()),'keep');
+  // A roster update replaces the downloaded 38-hero JSON without clearing saves.
+  assert.equal(await p.evaluate(async()=>((await(await caches.match('/deadlock-guess-who/data/deadlock.json')).json()).heroes.length)),44);
+  await p.goto(base+'/deadlock-guess-who/');await p.locator('#game-view:not(.hidden)').waitFor();assert.equal(await p.locator('.secret-picker-card').count(),44);assert.equal(await p.locator('.secret-picker-card.is-current').getAttribute('title'),'Abrams');await p.locator('.secret-picker-card[title="Abrams"]').click();assert.equal(await p.locator('#remaining-count').textContent(),'43');
   // A connected-but-stalled navigation falls back to its downloaded page, bounded by 5s.
   stall=true;const began=Date.now();await p.goto(base+'/flags/');assert(Date.now()-began<12000);assert.equal(await p.title(),'Flag Game');stall=false;
   // Unknown URLs neither enter app caches nor receive a misleading home-page fallback.
@@ -62,6 +68,6 @@ async function update(page){return page.evaluate(async()=>{
   await p.reload();await p.locator('#albums .album-card').getByRole('button',{name:'Open',exact:true}).click();assert.equal(await p.locator('#album-name').inputValue(),'Offline album');
   assert.equal(await p.locator('#board .tier-name').count(),5);
   const optimized=await p.evaluate(async()=>{const canvas=document.createElement('canvas');canvas.width=canvas.height=16;canvas.getContext('2d').fillRect(0,0,16,16);const bitmap=await createImageBitmap(canvas),blob=await(await import('./lossless.mjs')).encodeLossless(bitmap);bitmap.close();return{type:blob.type,size:blob.size};});assert.equal(optimized.type,'image/webp');assert(optimized.size>0);
-  await context.close();console.log('PASS interrupted install, explicit waiting-update activation, native save/theme/data/unrelated cache retention, stalled-network fallback, unknown-route isolation, offline Tier List authoring/persistence and an actual offline lossless WASM encode.');
+  await context.close();console.log('PASS interrupted install, explicit waiting-update activation, native save/theme/data/unrelated cache retention, 38-to-44 Deadlock roster refresh with preserved secret/elimination, stalled-network fallback, unknown-route isolation, offline Tier List authoring/persistence and an actual offline lossless WASM encode.');
  }finally{await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);server.closeAllConnections();server.close();process.exit(1);});
