@@ -3,7 +3,7 @@ import {authorizeRemote,fetchRemoteBlob,PLACEHOLDER} from './remote-images.mjs';
 let remoteLoad,remoteUrl,loadVersion=0;
 const dialog=document.querySelector('#image-dialog'),stage=document.querySelector('#image-stage'),picture=document.querySelector('#zoom-image'),pointers=new Map();
 let image=null,scale=1,fitScale=1,panX=0,panY=0,fitted=true,dragged=false,suppressClickUntil=0,previousFocus=null;
-const fitValue=()=>Math.min(4,(stage.clientWidth-32)/image.width,(stage.clientHeight-32)/image.height);
+const fitValue=()=>Math.min(2,(stage.clientWidth-48)/image.width,stage.clientHeight*.5/image.height);
 function render(){
   if(!image)return;
   const width=image.width*scale,height=image.height*scale;
