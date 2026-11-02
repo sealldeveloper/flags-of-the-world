@@ -1,6 +1,6 @@
 // Archive only the two anonymous public daily responses. No accounts or paid archives.
 import{readFile,writeFile,mkdir,readdir,rename}from'node:fs/promises';
-import{fileURLToPath}from'node:url';import path from'node:path';import{createHash}from'node:crypto';import{gzipSync}from'node:zlib';
+import{fileURLToPath}from'node:url';import path from'node:path';import{createHash}from'node:crypto';import{gzipSync,gunzipSync}from'node:zlib';
 import{validatePublic,validDate,etDate}from'./model.mjs';
 const ROOT=path.dirname(fileURLToPath(import.meta.url));
 export const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
@@ -17,8 +17,9 @@ export async function archive({root=path.join(ROOT,'puzzles'),today,reveal,now=n
  const live=today==null;today??=await readPublic('https://krillion.io/api/today');if(live&&today.date!==etDate(now))throw Error('The public daily response is stale or has a different New York date');reveal??=await readPublic('https://krillion.io/api/reveal?date='+encodeURIComponent(today.date));validatePublic(today,reveal);
  const prompts=[];let newBanks=0;
  for(const prompt of today.prompts){
-  const sheet=reveal.prompts.find(p=>p.id===prompt.id),raw=Buffer.from(JSON.stringify({version:1,text:sheet.text,answers:sheet.answers})),hash=digest(raw),compressed=gzipSync(raw,{level:9,mtime:0}),file=`banks/${hash}.json.gz`,target=path.join(root,file);
-  try{const existing=await readFile(target);if(digest(existing)!==digest(compressed))throw Error('An immutable answer bank does not match its hash');}catch(error){if(error.code!=='ENOENT')throw error;await atomic(target,compressed);newBanks++;}
+  const sheet=reveal.prompts.find(p=>p.id===prompt.id),raw=Buffer.from(JSON.stringify({version:1,text:sheet.text,answers:sheet.answers})),hash=digest(raw),file=`banks/${hash}.json.gz`,target=path.join(root,file);
+  let compressed;
+  try{const existing=await readFile(target),expanded=gunzipSync(existing,{maxOutputLength:64*1024*1024});if(digest(expanded)!==hash||!expanded.equals(raw))throw Error('An immutable answer bank does not match its content hash');compressed=existing;}catch(error){if(error.code!=='ENOENT')throw error;compressed=gzipSync(raw,{level:9,mtime:0});await atomic(target,compressed);newBanks++;}
   prompts.push({...prompt,bank:file,rawSha256:hash,sha256:digest(compressed),bytes:compressed.length,expandedBytes:raw.length,answerCount:sheet.answers.length});
  }
  const content={version:1,date:today.date,dayNumber:today.dayNumber,resetsAt:today.resetsAt,prompts},contentSha256=digest(JSON.stringify(content)),filename=`${today.date.slice(0,4)}/${today.date.slice(5,7)}/${today.date}.json`,target=path.join(root,filename);
