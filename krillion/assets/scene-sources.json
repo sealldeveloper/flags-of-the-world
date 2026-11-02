@@ -1,0 +1,710 @@
+{
+  "source": "https://krillion.io/",
+  "method": "Original ocean canvas layers captured in an isolated browser using restored public daily fixtures. No submissions recorded. DOM question and outcome UI are excluded.",
+  "files": [
+    {
+      "file": "scene-1920-intro.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "intro",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "1a68602f3b43b7b0ca64b48e8e574970454e074e40c8bb15d90aed509882fefe",
+      "bytes": 461644
+    },
+    {
+      "file": "scene-1920-round-1.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "round-1",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "b31423387de2acb8276f983ef4a314dcf9e248bae2033ea64d3390cae9913657",
+      "bytes": 26034
+    },
+    {
+      "file": "scene-1920-round-2.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "round-2",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "38205a296bfee6debf4ed7b38b8a4333ed2f74d42c87bb1a9f1b7a994ac973fc",
+      "bytes": 776158
+    },
+    {
+      "file": "scene-1920-round-3.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "round-3",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "d037b61cc7bbdf23dd08692762dc3d807ecd2f51a11eac036115a61a0be952e4",
+      "bytes": 199868
+    },
+    {
+      "file": "scene-1920-round-4.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "round-4",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "88f373540e32a1eb71d80cf9fe29944623ed9d5f562f589eec6fdb1a28b9ee3a",
+      "bytes": 595498
+    },
+    {
+      "file": "scene-1920-round-5.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "round-5",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "7282b7508647873d4e6b98a0bbd64d288f0b099562aa2e35dc84972866a972d7",
+      "bytes": 650608
+    },
+    {
+      "file": "scene-1920-round-6.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "round-6",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "96272cfe3c87f438f6bf090f87ed1565444ada01055de85da5e3c086611a920d",
+      "bytes": 485216
+    },
+    {
+      "file": "scene-1920-round-7.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "round-7",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "5a95780f5b6ca0c272bd40de28514cb03429fae011636a89d3b4fd993eb58e2e",
+      "bytes": 399632
+    },
+    {
+      "file": "scene-1920-feedback-1.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "feedback-1",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "b9e317198f658ad4aa1be1a66cadcc17fb9e15e3d251942a4dedcced8880ba78",
+      "bytes": 710568
+    },
+    {
+      "file": "scene-1920-feedback-2.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "feedback-2",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "20cf424957c1c7fe22c908f603ecaceb79f2eb68527e57cb1e8a8da5c4fce96b",
+      "bytes": 249058
+    },
+    {
+      "file": "scene-1920-feedback-3.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "feedback-3",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "575ac384ce2dcf59960e07a3758d219efdd7b299306627b39bbc2d3aa5e53a37",
+      "bytes": 370262
+    },
+    {
+      "file": "scene-1920-feedback-4.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "feedback-4",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "3561caf1b7e40ee5ec193f8878954d8c5904873242d59d881a1cfa5c9c74d393",
+      "bytes": 681292
+    },
+    {
+      "file": "scene-1920-feedback-5.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "feedback-5",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "0aa545a64ccef214596c2bccaa6f43686910203ee723db53486e6bf096e58127",
+      "bytes": 588898
+    },
+    {
+      "file": "scene-1920-feedback-6.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "feedback-6",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "21c38e77e5a4817fedfe6592fb73bc89611f1542edca146141a1ffd93c66d0c5",
+      "bytes": 434064
+    },
+    {
+      "file": "scene-1920-feedback-7.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "feedback-7",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "eeebb59a336d5389e8834c4c2166e891b58859b59f73af8da74413560fd73ae6",
+      "bytes": 251454
+    },
+    {
+      "file": "scene-1920-done.webp",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "phase": "done",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "40bdb466ce098b14f10d9a9f87457570185e4b56e0e3c955b4c55dca904030df",
+      "bytes": 419290
+    },
+    {
+      "file": "scene-1024-intro.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "intro",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "81936a88b72ceab19c763f990c7b874959e6111194f04328d86b9713f14d62a1",
+      "bytes": 12950
+    },
+    {
+      "file": "scene-1024-round-1.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "round-1",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "2407c3bf5a531472c6a1850c8f38f1043b15e10f81357b5c3229f6fd00499832",
+      "bytes": 16690
+    },
+    {
+      "file": "scene-1024-round-2.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "round-2",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "002df8ce8eb2eefd574f0602de802831a2da55b084b4be63066f848425d8c335",
+      "bytes": 11366
+    },
+    {
+      "file": "scene-1024-round-3.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "round-3",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "f8d7b65b4c0cfdaf16d108b0e63244a71d2cd90c2a00d94bbe93ce95dedc64c5",
+      "bytes": 2716
+    },
+    {
+      "file": "scene-1024-round-4.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "round-4",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "0d998dda23698d01bfd85abc9b85bedd0c0172211093213a09ef43f3522a1e26",
+      "bytes": 2786
+    },
+    {
+      "file": "scene-1024-round-5.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "round-5",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "08accea7e20f29632627eb935b05b44c38652d3dd71dacd5a9d832bc73e31ed5",
+      "bytes": 2800
+    },
+    {
+      "file": "scene-1024-round-6.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "round-6",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "a4cca7f1f0c6bbd2aa6f1ccb2036874182a52a8964ef9fd45f92ebecd001e50c",
+      "bytes": 1614
+    },
+    {
+      "file": "scene-1024-round-7.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "round-7",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "ac9c8116b3631bab670d2af50d9efdc2a4f5fd4a479f0b56d58d9fad835610ec",
+      "bytes": 1520
+    },
+    {
+      "file": "scene-1024-feedback-1.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "feedback-1",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "110cb4b0ad1e3d74ce49033d93acd1dc35a08899bf6c560a8dc0db39b31d3d02",
+      "bytes": 12358
+    },
+    {
+      "file": "scene-1024-feedback-2.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "feedback-2",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "818da2402f282226ddbee9224266f934191146267a69b5a297098af53d010e04",
+      "bytes": 251604
+    },
+    {
+      "file": "scene-1024-feedback-3.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "feedback-3",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "a8eaaba142facef1b557f134b566581174524e15600320bd9d2daca1f9c929ba",
+      "bytes": 2144
+    },
+    {
+      "file": "scene-1024-feedback-4.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "feedback-4",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "a1ff80eff7a8c838cc2ce4970918b230ba36ab95bfbb2f71b57c3dc8acae7e47",
+      "bytes": 279298
+    },
+    {
+      "file": "scene-1024-feedback-5.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "feedback-5",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "6e198c0e185a2c736f264c918d34c9199b55ca1197bdb68bdacade1abf457e13",
+      "bytes": 2278
+    },
+    {
+      "file": "scene-1024-feedback-6.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "feedback-6",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "f0d0a3f953db7d04f843d765fc5ececc2880ea080c6820be80cecef6140acc5d",
+      "bytes": 300154
+    },
+    {
+      "file": "scene-1024-feedback-7.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "feedback-7",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "8370e229f56805e4a159564f458e51065716871d664b64b20cd47cb5a0e56baa",
+      "bytes": 1582
+    },
+    {
+      "file": "scene-1024-done.webp",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "phase": "done",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "667f777b5522fb80e480e57ff3267aa80d519dbee55f4a762954e5d55a189677",
+      "bytes": 241250
+    },
+    {
+      "file": "scene-390-intro.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "intro",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "7a87f14ae42a48a7f2b1986f1a99ff586ae63e16c094252a641456bf798c8f2b",
+      "bytes": 54918
+    },
+    {
+      "file": "scene-390-round-1.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "round-1",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "d261f185127a06c3eea290a5fcb718b123fe05c430d75af90def9c1b3591462e",
+      "bytes": 59708
+    },
+    {
+      "file": "scene-390-round-2.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "round-2",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "97021fe702c45718664477a5e844eb4024e3280b0affd10d4a3718fe2dce741c",
+      "bytes": 194166
+    },
+    {
+      "file": "scene-390-round-3.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "round-3",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "6e379c395110196775fb9e0aaac1c082955be7cfd5154159d6318b86cb1ead7e",
+      "bytes": 2658
+    },
+    {
+      "file": "scene-390-round-4.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "round-4",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "8a899f215eb8678ca80bbafb9a458e82ac461017228ba94654cb5857c5a0a417",
+      "bytes": 2612
+    },
+    {
+      "file": "scene-390-round-5.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "round-5",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "76dddea96abaf3b993e3da37097c960ae41c942d71d875d94f419c343fd61d61",
+      "bytes": 1990
+    },
+    {
+      "file": "scene-390-round-6.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "round-6",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "3484005f6d34823abd55177fe10e74c61b9965afbddbec7597eae2ee3a28d962",
+      "bytes": 205470
+    },
+    {
+      "file": "scene-390-round-7.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "round-7",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "f1d4e9eb29dadc4a71e1d6108a293353b59b6f94ced85a2c288702f0cbefa225",
+      "bytes": 1260
+    },
+    {
+      "file": "scene-390-feedback-1.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "feedback-1",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "b9a5a5c51291b4d05c20c0722b2987e297be387f1a008ee176dac3dd0e11766e",
+      "bytes": 13068
+    },
+    {
+      "file": "scene-390-feedback-2.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "feedback-2",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "0db55b1a3df69079b6915811ea82822258d2a4a0252b8a2bfedf30f52c2578dc",
+      "bytes": 2694
+    },
+    {
+      "file": "scene-390-feedback-3.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "feedback-3",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "42ca4016fa29bfea7fed83d01ba74fb7075bed1d7e6e79f230d03af609c45507",
+      "bytes": 153394
+    },
+    {
+      "file": "scene-390-feedback-4.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "feedback-4",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "f52b5edaddddbb621078b42346ce39122e3cb3e81920d7f3a72fac5212990c45",
+      "bytes": 2596
+    },
+    {
+      "file": "scene-390-feedback-5.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "feedback-5",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "244da303d956929cbd9dcf49328e284d43755d0614c360083bbd610d4a6b6613",
+      "bytes": 2110
+    },
+    {
+      "file": "scene-390-feedback-6.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "feedback-6",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "66db62501017b31cd38f418fe992cd73e1f7bce7c1ccd8a236acc17604a6e54b",
+      "bytes": 1362
+    },
+    {
+      "file": "scene-390-feedback-7.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "feedback-7",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "ef09df4e9ae9810f9dd9fbc46e6925df3fcc737e33afd9ad78c732e02b2faa17",
+      "bytes": 1340
+    },
+    {
+      "file": "scene-390-done.webp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "phase": "done",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "e1081b91286a37459aa0284749fcc7395de50c3da1230a5832c23045837a6634",
+      "bytes": 207858
+    },
+    {
+      "file": "scene-320-intro.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "intro",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "5ee50666d894802cf42e1a72d1f8347e1a4af94801f00a78c8e5ff57e2cabef2",
+      "bytes": 37878
+    },
+    {
+      "file": "scene-320-round-1.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "round-1",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "0602f63a9e94fbac770a02865e21b4b0a1613e7b61726072031a389b8db3b7ad",
+      "bytes": 14362
+    },
+    {
+      "file": "scene-320-round-2.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "round-2",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "efa30643fb24496bdab2bd7ffd38f83944c58158ccc9f9101d19e2ccd536e570",
+      "bytes": 128306
+    },
+    {
+      "file": "scene-320-round-3.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "round-3",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "96d2bbb5a1e7f19636c4b12d23093ed81ddbd873fb66081b14773e245327f9d0",
+      "bytes": 2348
+    },
+    {
+      "file": "scene-320-round-4.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "round-4",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "baa5903581fcaf93b36a5a8fd14fd2d3f4a9fc7d6ec4c0a617cd9c3ac3c1e691",
+      "bytes": 2292
+    },
+    {
+      "file": "scene-320-round-5.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "round-5",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "36cf4983e1fa02ba0cf209458ed93b6f8e1855935aa509526fd2b0718c71ded1",
+      "bytes": 1684
+    },
+    {
+      "file": "scene-320-round-6.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "round-6",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "c29b4af556fdaa42fe69864995ad26e3f821ddfd9f39299a609b01f552dc19ed",
+      "bytes": 1136
+    },
+    {
+      "file": "scene-320-round-7.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "round-7",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "f5661092b2b4f1815ce79bf3a4378b7a2fcebbad5bad83ac3264576dbff339f4",
+      "bytes": 1138
+    },
+    {
+      "file": "scene-320-feedback-1.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "feedback-1",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "2b5a62411452063a79a0d9d648bbec5ee7c2ca42cfb0809750d207cd4ada06bf",
+      "bytes": 5544
+    },
+    {
+      "file": "scene-320-feedback-2.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "feedback-2",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "ec6fca4968b8102f92918942bde785dc2b0a176d9d8e2bbb2767a4ab7c8d468b",
+      "bytes": 104282
+    },
+    {
+      "file": "scene-320-feedback-3.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "feedback-3",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "3913f633dec434cce58cdb470ed5e51ed60368753e2db3160b9358ab82142bd5",
+      "bytes": 1836
+    },
+    {
+      "file": "scene-320-feedback-4.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "feedback-4",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "c26140357d702967bb4a05f9b76300337f4ff47a5b784a4bf162dd1e5455300e",
+      "bytes": 1990
+    },
+    {
+      "file": "scene-320-feedback-5.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "feedback-5",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "a067d888fcea945c5d76128d92f0e433f94e6cc330dbb1ca5e7d6a81a243a1fd",
+      "bytes": 2064
+    },
+    {
+      "file": "scene-320-feedback-6.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "feedback-6",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "7ec0954c06c0d586bee3ed3c609d3743f015d1e8144d650be7e6441162331efb",
+      "bytes": 1256
+    },
+    {
+      "file": "scene-320-feedback-7.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "feedback-7",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "418d68dfd4664a67f98366d11a8f8f9dc9f74eef113a684a433e47d34f2200f8",
+      "bytes": 1212
+    },
+    {
+      "file": "scene-320-done.webp",
+      "viewport": {
+        "width": 320,
+        "height": 740
+      },
+      "phase": "done",
+      "layer": "canvas.ds-sea + canvas.ds-fore",
+      "sha256": "f8ad9ac4701cb650c4900ebe65c08eed62c2cdef73a5ee51e0e10bb8918cd59f",
+      "bytes": 146776
+    }
+  ]
+}

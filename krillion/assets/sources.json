@@ -1,0 +1,66 @@
+{
+  "source": "Krillion original visual assets",
+  "capturedAt": "2026-11-02T12:41:09.397Z",
+  "files": [
+    {
+      "file": "plankton.png",
+      "source": "https://krillion.io/tiers/plankton.png",
+      "sha256": "1f919d23c4017ffb2021f717b7dc6c4daeff835bd34d63d640fc43fa8903c32d",
+      "bytes": 30392
+    },
+    {
+      "file": "tooclever.png",
+      "source": "https://krillion.io/tiers/tooclever.png",
+      "sha256": "a864e03c9a400936a57505fbcc733144764358bef06d83676734cc828f891f04",
+      "bytes": 25481
+    },
+    {
+      "file": "schooler.png",
+      "source": "https://krillion.io/tiers/schooler.png",
+      "sha256": "681c4fc59a6e69f56177c2ad60141e0ae7b300e93c5ca4e6f7a0aea1a630c7cb",
+      "bytes": 22651
+    },
+    {
+      "file": "rare.png",
+      "source": "https://krillion.io/tiers/rare.png",
+      "sha256": "66f8ed212ef3af289b5e9722a76f2910960b9f1f3b2cececa62cc1b841e6ca81",
+      "bytes": 29398
+    },
+    {
+      "file": "deepcut.png",
+      "source": "https://krillion.io/tiers/deepcut.png",
+      "sha256": "e277e22dddb88c124f877a6770c3878da3aefa272594bd01eaf2d1c03e57bc2e",
+      "bytes": 33622
+    },
+    {
+      "file": "krillion.png",
+      "source": "https://krillion.io/tiers/krillion.png",
+      "sha256": "d49ce39bfc67662302818102b4ea65d02ac0009fb26686de2aca211c30802aa8",
+      "bytes": 23876
+    },
+    {
+      "file": "puffer.png",
+      "source": "https://krillion.io/gen/party/puffer-0.png",
+      "sha256": "3a7da476e1c3c89b7f8a1d6d78d7110dda0931a82bac0b8d4fa7acb29bd2475e",
+      "bytes": 14521
+    },
+    {
+      "file": "water-bg.webp",
+      "source": "https://krillion.io/water-bg.webp",
+      "sha256": "de12bf25b6da550e2c6937e2bf06f6ba7ff45dd6d4a0357b494a9a57baae6ef9",
+      "bytes": 27804
+    },
+    {
+      "file": "vt323-latin.woff2",
+      "source": "https://krillion.io/_next/static/media/0c8c4ded07fff55c-s.p.2tcyrya9o07vu.woff2",
+      "sha256": "043a60145af2ddbcd0a6452625cb0bfc4e18b222c76dcd1d4a0106715472faba",
+      "bytes": 7192
+    },
+    {
+      "file": "evil.png",
+      "source": "https://krillion.io/tiers/evil-krill-white-v2.png",
+      "sha256": "09f53be38c01e0b18bb9cc8cbf60f6461a21a9dc6cdd807026d0b163102be32f",
+      "bytes": 15825
+    }
+  ]
+}

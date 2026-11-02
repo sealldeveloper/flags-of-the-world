@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "source": "https://krillion.io/",
+  "puzzles": [
+    {
+      "date": "2026-11-02",
+      "dayNumber": 110,
+      "file": "2026/11/2026-11-02.json",
+      "contentSha256": "6b55d47d437a3433452b7a74e492b38b7a1ecaf90d0b9aa16a07edeb3c6f7d03",
+      "answerCount": 122994
+    }
+  ]
+}

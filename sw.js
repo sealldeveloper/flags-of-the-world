@@ -1,7 +1,7 @@
 'use strict';
 // Bump the shell version when changing app assets. Never expire puzzle data here.
-const SHELL='puzzle-app-shell-v18', DATA='puzzle-daily-data-v1';
-const PAGES=['/','/crossword/','/crossword-nyt/','/crossword-nytmini/','/crossword-seattle/','/connections-nyt/','/flags/','/tld/','/deadlock-guess-who/','/scattegories/','/scattegories/local/','/jeopardy/','/jeopardy/display.html','/tierlist/'];
+const SHELL='puzzle-app-shell-v19', DATA='puzzle-daily-data-v1';
+const PAGES=['/','/crossword/','/crossword-nyt/','/crossword-nytmini/','/crossword-seattle/','/connections-nyt/','/flags/','/tld/','/deadlock-guess-who/','/scattegories/','/scattegories/local/','/jeopardy/','/jeopardy/display.html','/tierlist/','/krillion/'];
 const ASSETS=[
   '/app.webmanifest','/favicon.svg','/assets/theme.js','/assets/theme.css','/assets/app.js','/assets/library.mjs','/assets/library.css','/assets/daily.mjs',
   '/assets/app-icon-192.png','/assets/app-icon-512.png','/assets/app-icon-maskable-512.png',
@@ -13,8 +13,15 @@ const ASSETS=[
   '/jeopardy/favicon.svg',
   '/tierlist/style.css','/tierlist/model.mjs','/tierlist/media.mjs','/tierlist/media-source.mjs','/tierlist/raster.mjs','/tierlist/images.mjs','/tierlist/progressive.mjs','/tierlist/lossless.mjs','/tierlist/lossless-worker.mjs','/tierlist/vendor/webp/encode.js','/tierlist/vendor/webp/utils.js','/tierlist/vendor/webp/meta.js','/tierlist/vendor/webp/codec/enc/webp_enc.js','/tierlist/vendor/webp/codec/enc/webp_enc.wasm','/tierlist/codec.mjs','/tierlist/storage.mjs','/tierlist/invite.mjs','/tierlist/room.mjs','/tierlist/ui.mjs','/tierlist/sort.mjs','/tierlist/viewer.mjs','/tierlist/tiermaker.mjs','/tierlist/social.mjs','/tierlist/activity.mjs','/tierlist/ratings.mjs','/tierlist/rating-panel.mjs','/tierlist/feedback.mjs','/tierlist/files.mjs','/tierlist/group-image.mjs','/tierlist/group-export.mjs','/tierlist/icon.svg',
   '/uno/transport.mjs',
+  '/krillion/style.css','/krillion/ui.mjs','/krillion/model.mjs','/krillion/reader.mjs','/krillion/answer-worker.mjs','/krillion/assets/offline.json',
 ];
-self.addEventListener('install',event=>event.waitUntil(caches.open(SHELL).then(cache=>cache.addAll([...PAGES,...ASSETS].map(url=>new Request(url,{cache:'reload'}))))));
+self.addEventListener('install',event=>event.waitUntil((async()=>{
+  const cache=await caches.open(SHELL);
+  await cache.addAll([...PAGES,...ASSETS].map(url=>new Request(url,{cache:'reload'})));
+  const response=await cache.match('/krillion/assets/offline.json'),art=await response.json();
+  if(!Array.isArray(art)||!art.length||art.length>128||art.some(name=>typeof name!=='string'||!/^[a-z0-9-]+\.(webp|png|woff2)$/.test(name)))throw Error('Invalid Krillion artwork manifest');
+  await cache.addAll(art.map(name=>new Request('/krillion/assets/'+name,{cache:'reload'})));
+})()));
 self.addEventListener('activate',event=>event.waitUntil((async()=>{
   for(const key of await caches.keys())if(key.startsWith('puzzle-app-shell-')&&key!==SHELL)await caches.delete(key);
   await self.clients.claim();
@@ -45,6 +52,16 @@ self.addEventListener('fetch',event=>{
   }
   if(ASSETS.includes(url.pathname)){
     event.respondWith(networkFirst(request,url.pathname,SHELL));return;
+  }
+  if(/^\/krillion\/assets\/[a-z0-9-]+\.(webp|png|woff2)$/.test(url.pathname)){
+    event.respondWith(networkFirst(request,url.pathname,SHELL));return;
+  }
+  if(/^\/krillion\/puzzles\/banks\/[a-f0-9]{64}\.json\.gz$/.test(url.pathname)){
+    // Only the reader writes these immutable entries, after both SHA-256 checks.
+    event.respondWith((async()=>{const cache=await openCache(DATA),saved=await matchCache(cache,url.pathname);return saved&&request.cache!=='reload'&&request.cache!=='no-cache'?saved:fetch(request);})());return;
+  }
+  if(/^\/krillion\/puzzles\/(manifest\.json|20\d{2}\/\d{2}\/20\d{2}-\d{2}-\d{2}\.json)$/.test(url.pathname)){
+    event.respondWith(networkFirst(request,url.pathname,DATA));return;
   }
   if(/^\/(crossword-nyt|crossword-nytmini|connections-nyt)\/puzzles\//.test(url.pathname)){
     // The daily module validates JSON and saves API fallbacks under these same URLs.

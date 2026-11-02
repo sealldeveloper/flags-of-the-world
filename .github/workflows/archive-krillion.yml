@@ -1,0 +1,51 @@
+name: Archive public Krillion daily
+
+on:
+  schedule:
+    # Just after midnight New York in both DST offsets, with later retries.
+    - cron: '15 4,5,9,17 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: archive-krillion
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate archive code
+        run: node --test tests/krillion.test.mjs
+      - name: Capture the current public daily and complete answer sheet
+        run: node krillion/archive.mjs
+      - name: Commit dated snapshot and content-addressed answer banks
+        id: publish
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -- krillion/puzzles/
+          git diff --cached --quiet && echo "Public snapshot is unchanged" && exit 0
+          git commit -m "feat(krillion): archive public daily $(date -u +%Y-%m-%d)"
+          for attempt in 1 2 3; do
+            git pull --rebase origin main
+            git push origin HEAD:main && { echo "changed=true" >> "$GITHUB_OUTPUT"; exit 0; }
+          done
+          echo "Could not publish the archive after three attempts"
+          exit 1
+      # GITHUB_TOKEN pushes do not trigger the legacy Pages build automatically.
+      - name: Refresh the published archive
+        if: steps.publish.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds"
