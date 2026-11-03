@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "date": "2026-11-03",
+  "dayNumber": 111,
+  "resetsAt": "2026-11-04T05:00:00.000Z",
+  "prompts": [
+    {
+      "id": "p1",
+      "text": "Name a TV show that released or had a new season this year or last year",
+      "bank": "banks/d55ce515c69e65d7d7823b397aeb925ed5d9011b156683e44a9fa5568a54c309.json.gz",
+      "rawSha256": "d55ce515c69e65d7d7823b397aeb925ed5d9011b156683e44a9fa5568a54c309",
+      "sha256": "b7211adfd8055a6f948a12425b3b836b9cde241814831504652905b65db16325",
+      "bytes": 409422,
+      "expandedBytes": 2484744,
+      "answerCount": 40444
+    },
+    {
+      "id": "p2",
+      "text": "Name a superhero that can fly",
+      "bank": "banks/a447be7d20be67d0773d07facea1081e55bf67c7f1239ff0c14f5bafafef6227.json.gz",
+      "rawSha256": "a447be7d20be67d0773d07facea1081e55bf67c7f1239ff0c14f5bafafef6227",
+      "sha256": "bb432d4e0e8ef21ffa86399420ff800923604658a1cb0ae8e0b27cf1573b1eb4",
+      "bytes": 15885,
+      "expandedBytes": 128492,
+      "answerCount": 2454
+    },
+    {
+      "id": "p3",
+      "text": "Name a skincare brand",
+      "bank": "banks/c5ffffa66a25ee8b53d2f45fd199bf0684e978c8f40ddae8750eb10453507fe9.json.gz",
+      "rawSha256": "c5ffffa66a25ee8b53d2f45fd199bf0684e978c8f40ddae8750eb10453507fe9",
+      "sha256": "645a4fd69d0c4ae3519c2715b524443323f7b828f9572ce3fb6800fe554f779b",
+      "bytes": 113319,
+      "expandedBytes": 1013390,
+      "answerCount": 19397
+    },
+    {
+      "id": "p4",
+      "text": "Name any Pokémon",
+      "bank": "banks/739703a8bcc91733ae26014d36362245bbfaffd8c8fa790fb5d0a5d6f1287a4e.json.gz",
+      "rawSha256": "739703a8bcc91733ae26014d36362245bbfaffd8c8fa790fb5d0a5d6f1287a4e",
+      "sha256": "d4adc0a85a75b39604deab90415ebfa91af51a61cbf4111e9c71c61ba16f11bd",
+      "bytes": 6128,
+      "expandedBytes": 49939,
+      "answerCount": 1025
+    },
+    {
+      "id": "p5",
+      "text": "Name a team sport (no esports, board games or card games)",
+      "bank": "banks/80d299edcab0105ba7ba18c9e0394d68bfd972a67c28a8f25257bb6b92caf255.json.gz",
+      "rawSha256": "80d299edcab0105ba7ba18c9e0394d68bfd972a67c28a8f25257bb6b92caf255",
+      "sha256": "ead5752b0e6e65b8421d82725f21f07161261fbb5eec7909ebdd7c98072a7f4c",
+      "bytes": 6394,
+      "expandedBytes": 51447,
+      "answerCount": 938
+    },
+    {
+      "id": "p6",
+      "text": "Name someone currently serving in a national government or parliament.",
+      "bank": "banks/858b546f8b510544d90a84f9b7856ca48a7c6255cf3652ea3195d489f3dee272.json.gz",
+      "rawSha256": "858b546f8b510544d90a84f9b7856ca48a7c6255cf3652ea3195d489f3dee272",
+      "sha256": "f6d497d09b2165fe5eb0062e48de867297bf5374276774e426e0287a53095e99",
+      "bytes": 317932,
+      "expandedBytes": 2111639,
+      "answerCount": 35852
+    },
+    {
+      "id": "p7",
+      "text": "Name a type of container (no appliances)",
+      "bank": "banks/335102de597b203cd620fbe4f5a639101d021a1e3bbb4ccf3b17081673dfac59.json.gz",
+      "rawSha256": "335102de597b203cd620fbe4f5a639101d021a1e3bbb4ccf3b17081673dfac59",
+      "sha256": "123795f3cda06681d893c26865cf4a0540fe2aee61483eda848c86af816192b2",
+      "bytes": 14412,
+      "expandedBytes": 123794,
+      "answerCount": 2385
+    }
+  ],
+  "contentSha256": "cc862bbb4523625215a44486ae416c79bafddc28ff0181a930407a26c70c2dd4",
+  "capturedAt": "2026-11-03T11:53:57.994Z",
+  "source": {
+    "name": "Krillion",
+    "url": "https://krillion.io/",
+    "today": "https://krillion.io/api/today",
+    "reveal": "https://krillion.io/api/reveal?date=2026-11-03"
+  },
+  "matching": "Public canonical answer sheet. Private server aliases, corrections and live popularity are not exported."
+}
