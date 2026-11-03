@@ -7,32 +7,32 @@
     {
       "id": "p1",
       "text": "Name a TV show that released or had a new season this year or last year",
-      "bank": "banks/d55ce515c69e65d7d7823b397aeb925ed5d9011b156683e44a9fa5568a54c309.json.gz",
-      "rawSha256": "d55ce515c69e65d7d7823b397aeb925ed5d9011b156683e44a9fa5568a54c309",
-      "sha256": "b7211adfd8055a6f948a12425b3b836b9cde241814831504652905b65db16325",
-      "bytes": 409422,
-      "expandedBytes": 2484744,
-      "answerCount": 40444
+      "bank": "banks/de0c4de1bdb97ae0f6ed093cd5d282fe2ec59b928fbd5d0119a0a0ba1875a694.json.gz",
+      "rawSha256": "de0c4de1bdb97ae0f6ed093cd5d282fe2ec59b928fbd5d0119a0a0ba1875a694",
+      "sha256": "ada16d4d8483073198aad951cbbc668325f47ccd8d76582fc0100cdb5121d779",
+      "bytes": 410394,
+      "expandedBytes": 2490895,
+      "answerCount": 40550
     },
     {
       "id": "p2",
       "text": "Name a superhero that can fly",
-      "bank": "banks/a447be7d20be67d0773d07facea1081e55bf67c7f1239ff0c14f5bafafef6227.json.gz",
-      "rawSha256": "a447be7d20be67d0773d07facea1081e55bf67c7f1239ff0c14f5bafafef6227",
-      "sha256": "bb432d4e0e8ef21ffa86399420ff800923604658a1cb0ae8e0b27cf1573b1eb4",
-      "bytes": 15885,
-      "expandedBytes": 128492,
-      "answerCount": 2454
+      "bank": "banks/e302f92f091acc78f574f011df16022bcb754ad8e1be97d022d54c3a14b75b5d.json.gz",
+      "rawSha256": "e302f92f091acc78f574f011df16022bcb754ad8e1be97d022d54c3a14b75b5d",
+      "sha256": "ab76b5d346ad2ea4e564b74dbfffbc088a9090536b8baec41d4b404aea88be84",
+      "bytes": 15963,
+      "expandedBytes": 129101,
+      "answerCount": 2465
     },
     {
       "id": "p3",
       "text": "Name a skincare brand",
-      "bank": "banks/c5ffffa66a25ee8b53d2f45fd199bf0684e978c8f40ddae8750eb10453507fe9.json.gz",
-      "rawSha256": "c5ffffa66a25ee8b53d2f45fd199bf0684e978c8f40ddae8750eb10453507fe9",
-      "sha256": "645a4fd69d0c4ae3519c2715b524443323f7b828f9572ce3fb6800fe554f779b",
-      "bytes": 113319,
-      "expandedBytes": 1013390,
-      "answerCount": 19397
+      "bank": "banks/81bbefb40b2997bf01fbc88ca96ebbc514b32d2ec03311029e912edef5b323ee.json.gz",
+      "rawSha256": "81bbefb40b2997bf01fbc88ca96ebbc514b32d2ec03311029e912edef5b323ee",
+      "sha256": "6cdca4105e4e7e2f07fbb2216e312bf0210d8feb0833901f4523d0b85082aacb",
+      "bytes": 113951,
+      "expandedBytes": 1018364,
+      "answerCount": 19490
     },
     {
       "id": "p4",
@@ -47,36 +47,36 @@
     {
       "id": "p5",
       "text": "Name a team sport (no esports, board games or card games)",
-      "bank": "banks/80d299edcab0105ba7ba18c9e0394d68bfd972a67c28a8f25257bb6b92caf255.json.gz",
-      "rawSha256": "80d299edcab0105ba7ba18c9e0394d68bfd972a67c28a8f25257bb6b92caf255",
-      "sha256": "ead5752b0e6e65b8421d82725f21f07161261fbb5eec7909ebdd7c98072a7f4c",
-      "bytes": 6394,
-      "expandedBytes": 51447,
-      "answerCount": 938
+      "bank": "banks/fd649f2ee0567ec212b4b0513e6377f6b8a6cdd5582ab8fd8068251cc3e10dc9.json.gz",
+      "rawSha256": "fd649f2ee0567ec212b4b0513e6377f6b8a6cdd5582ab8fd8068251cc3e10dc9",
+      "sha256": "86a6160360b0591716a035164e7d09f438b3bb26e6e9fe845270b9b9a1dae475",
+      "bytes": 6592,
+      "expandedBytes": 52726,
+      "answerCount": 960
     },
     {
       "id": "p6",
       "text": "Name someone currently serving in a national government or parliament.",
-      "bank": "banks/858b546f8b510544d90a84f9b7856ca48a7c6255cf3652ea3195d489f3dee272.json.gz",
-      "rawSha256": "858b546f8b510544d90a84f9b7856ca48a7c6255cf3652ea3195d489f3dee272",
-      "sha256": "f6d497d09b2165fe5eb0062e48de867297bf5374276774e426e0287a53095e99",
-      "bytes": 317932,
-      "expandedBytes": 2111639,
-      "answerCount": 35852
+      "bank": "banks/2adee8ef4f6bbdc43164b4516d5ff2d7c4b17f194d8bc8d34a506e53ccb59f7d.json.gz",
+      "rawSha256": "2adee8ef4f6bbdc43164b4516d5ff2d7c4b17f194d8bc8d34a506e53ccb59f7d",
+      "sha256": "34dc8a9cef3b6c80ee2c9e35730d4bc39bb11743bfb9394985f42bdeaae0f734",
+      "bytes": 319541,
+      "expandedBytes": 2122802,
+      "answerCount": 36048
     },
     {
       "id": "p7",
       "text": "Name a type of container (no appliances)",
-      "bank": "banks/335102de597b203cd620fbe4f5a639101d021a1e3bbb4ccf3b17081673dfac59.json.gz",
-      "rawSha256": "335102de597b203cd620fbe4f5a639101d021a1e3bbb4ccf3b17081673dfac59",
-      "sha256": "123795f3cda06681d893c26865cf4a0540fe2aee61483eda848c86af816192b2",
-      "bytes": 14412,
-      "expandedBytes": 123794,
-      "answerCount": 2385
+      "bank": "banks/71a9d6e7e86e2a23c1900b90ad5cfcf5c29b8cc2692f270cf566106770efbdb2.json.gz",
+      "rawSha256": "71a9d6e7e86e2a23c1900b90ad5cfcf5c29b8cc2692f270cf566106770efbdb2",
+      "sha256": "463303134c7fd8b0628f41f7408da3e14cfc7796594dc34bfc870361054f8f30",
+      "bytes": 14742,
+      "expandedBytes": 126476,
+      "answerCount": 2433
     }
   ],
-  "contentSha256": "cc862bbb4523625215a44486ae416c79bafddc28ff0181a930407a26c70c2dd4",
-  "capturedAt": "2026-11-03T11:53:57.994Z",
+  "contentSha256": "706ca06d45d5796ccfecae83bc04d167115b8f2196b8588625fefe77c60c1ea3",
+  "capturedAt": "2026-11-03T22:17:29.326Z",
   "source": {
     "name": "Krillion",
     "url": "https://krillion.io/",
