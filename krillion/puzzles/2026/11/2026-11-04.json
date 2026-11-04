@@ -7,52 +7,52 @@
     {
       "id": "p1",
       "text": "Name something that's mined from the ground",
-      "bank": "banks/d0c9c3aee146be71deb99002e5d2c925a8429594b582c93413443921256b0701.json.gz",
-      "rawSha256": "d0c9c3aee146be71deb99002e5d2c925a8429594b582c93413443921256b0701",
-      "sha256": "e42f7178a48e8bbaf8337a63f451af57343f0113a93ef3c7562e18a73a3cebb2",
-      "bytes": 12167,
-      "expandedBytes": 105805,
-      "answerCount": 1951
+      "bank": "banks/f9e21ae252779b98801d66d2607f609199cde0c8dbd1bb506d60afaa2a9c6ccc.json.gz",
+      "rawSha256": "f9e21ae252779b98801d66d2607f609199cde0c8dbd1bb506d60afaa2a9c6ccc",
+      "sha256": "378423e2503bdae0d522b5c06559d95e63038bcae86bb646032a37b11bc16d25",
+      "bytes": 12223,
+      "expandedBytes": 106245,
+      "answerCount": 1959
     },
     {
       "id": "p2",
       "text": "Name a sea animal that isn't a fish or a bird",
-      "bank": "banks/2279306ba37f2ac752aad74b8d3b54f96d35c3339c35e5807da430987f223240.json.gz",
-      "rawSha256": "2279306ba37f2ac752aad74b8d3b54f96d35c3339c35e5807da430987f223240",
-      "sha256": "3b1e2539f4b3fcc0e71031430aae13ceb97ea2f56efb46a34f61ee69fe004b74",
-      "bytes": 77617,
-      "expandedBytes": 701093,
-      "answerCount": 11821
+      "bank": "banks/5ee5e5d30b80a6a2e3ac7a3b29d578ef5dbd21e3cd4b05b75d0fd115cc10d698.json.gz",
+      "rawSha256": "5ee5e5d30b80a6a2e3ac7a3b29d578ef5dbd21e3cd4b05b75d0fd115cc10d698",
+      "sha256": "bebeec03ede4f17f12f1bc8179b5386652ec3ba21fa2fb72d102fe4dba864261",
+      "bytes": 77642,
+      "expandedBytes": 701388,
+      "answerCount": 11826
     },
     {
       "id": "p3",
       "text": "Name something that's naturally blue",
-      "bank": "banks/8c00c918e45b6e09dba8be349299ddfd9c6873dfe6f56cf24ae2a7f92fcb38e9.json.gz",
-      "rawSha256": "8c00c918e45b6e09dba8be349299ddfd9c6873dfe6f56cf24ae2a7f92fcb38e9",
-      "sha256": "d2e4e3d83fbfa1fb1de72aaf2765049c0048d883f9efd66ea6df031b45e17da9",
-      "bytes": 27288,
-      "expandedBytes": 226568,
-      "answerCount": 3863
+      "bank": "banks/6acfa0e1cadf6ca26f48f0cc33e3f012e2a76e90ce349475d2b7fee4e63240ed.json.gz",
+      "rawSha256": "6acfa0e1cadf6ca26f48f0cc33e3f012e2a76e90ce349475d2b7fee4e63240ed",
+      "sha256": "270d61f709bcfe6e445053b53d7f32bc8854ab4ed3b95d57a21094c70c7e5d08",
+      "bytes": 27417,
+      "expandedBytes": 227527,
+      "answerCount": 3880
     },
     {
       "id": "p4",
       "text": "Name an item used for eating or serving food (like a plate or spoon)",
-      "bank": "banks/fd99e80e2754cf7373311cd26acd6ab46447497f50b33876e1d72aa764200644.json.gz",
-      "rawSha256": "fd99e80e2754cf7373311cd26acd6ab46447497f50b33876e1d72aa764200644",
-      "sha256": "d42ccabed93cca95a180717d364587812fd57aff97d9d8c2dfa9f46b679e0454",
-      "bytes": 13828,
-      "expandedBytes": 117820,
-      "answerCount": 2281
+      "bank": "banks/5f29b1218063cdcf5f18ce22775adf60190ca0722051f437e14928863964af0f.json.gz",
+      "rawSha256": "5f29b1218063cdcf5f18ce22775adf60190ca0722051f437e14928863964af0f",
+      "sha256": "23dced3e5ea6f3d1be306457dcd38dfbdf974bc64ba7d6066c2e1770b9aaf578",
+      "bytes": 13848,
+      "expandedBytes": 117983,
+      "answerCount": 2284
     },
     {
       "id": "p5",
       "text": "Name a sci-fi movie (tagged Sci-Fi on IMDb, 1,000+ votes)",
-      "bank": "banks/89362ceac6e2ce766474d790d517e0cbef67365497244ba1e374356abe71805e.json.gz",
-      "rawSha256": "89362ceac6e2ce766474d790d517e0cbef67365497244ba1e374356abe71805e",
-      "sha256": "5287acc890d167c30c60b0bcf51fdd4d6284a4fb1ff3cf1da4f8275276e0a3bc",
-      "bytes": 35393,
-      "expandedBytes": 244249,
-      "answerCount": 4144
+      "bank": "banks/738069c83bd424422fae85c26320595396df35cd6fc0ce7a658944efb15f2e0b.json.gz",
+      "rawSha256": "738069c83bd424422fae85c26320595396df35cd6fc0ce7a658944efb15f2e0b",
+      "sha256": "c4f76bf86eb76b0fff672357f7861f322ebd5c3d51118abd30dde784b8a9b1b9",
+      "bytes": 35482,
+      "expandedBytes": 244869,
+      "answerCount": 4153
     },
     {
       "id": "p6",
@@ -67,16 +67,16 @@
     {
       "id": "p7",
       "text": "Name a dessert that's made out of dough",
-      "bank": "banks/7ee108f6f6e596c22b10a0a74f98855430439e395b81422b31e25c1ee649fe16.json.gz",
-      "rawSha256": "7ee108f6f6e596c22b10a0a74f98855430439e395b81422b31e25c1ee649fe16",
-      "sha256": "851a67102206e2c92092f552d55775589731ab8e59149023c86b72298876e1c7",
-      "bytes": 37130,
-      "expandedBytes": 284260,
-      "answerCount": 5203
+      "bank": "banks/87c6a2fc91bd70a4d962dd1c5fb1238e59f07accaff0ce7aad45d973f0c7ee9e.json.gz",
+      "rawSha256": "87c6a2fc91bd70a4d962dd1c5fb1238e59f07accaff0ce7aad45d973f0c7ee9e",
+      "sha256": "b10914129990239a709065d0939f8e6b4c13549524f9c8ae7377c7cac402fffa",
+      "bytes": 37198,
+      "expandedBytes": 284818,
+      "answerCount": 5213
     }
   ],
-  "contentSha256": "77933fe64cce91f5cbda4fcc7aeec95c312a7006d3b611ed870d2b078810ac27",
-  "capturedAt": "2026-11-04T12:05:11.139Z",
+  "contentSha256": "1e583ded033e09c809a9b14b03dc1b6cf5bccdec358254cd2cbfedb190f50742",
+  "capturedAt": "2026-11-04T22:37:33.680Z",
   "source": {
     "name": "Krillion",
     "url": "https://krillion.io/",
