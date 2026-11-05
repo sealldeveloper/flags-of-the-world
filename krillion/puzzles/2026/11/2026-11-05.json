@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "date": "2026-11-05",
+  "dayNumber": 113,
+  "resetsAt": "2026-11-06T05:00:00.000Z",
+  "prompts": [
+    {
+      "id": "p1",
+      "text": "Name an animal that can run faster than a human",
+      "bank": "banks/29c0505b57bee6894156e5d1e39d76e2681e2d3b843c19c2efbf51fa5f63202e.json.gz",
+      "rawSha256": "29c0505b57bee6894156e5d1e39d76e2681e2d3b843c19c2efbf51fa5f63202e",
+      "sha256": "61c448d60b870c102d786ab05f7aa7001561845941b50373091c636e56844314",
+      "bytes": 2660,
+      "expandedBytes": 18475,
+      "answerCount": 342
+    },
+    {
+      "id": "p2",
+      "text": "Name a movie from Pixar, DreamWorks Animation, Illumination, Disney Animation (including Disneytoon and Disney TV Animation), Sony Pictures Animation or Blue Sky Studios",
+      "bank": "banks/e3ca636ce79d75a9e95088dfb0282fcef78a80c45aa7c889abcffdc569a46b36.json.gz",
+      "rawSha256": "e3ca636ce79d75a9e95088dfb0282fcef78a80c45aa7c889abcffdc569a46b36",
+      "sha256": "f3323d42804d24c158021e29c74e5d5f6dc2ceae313d622c5282db6a3593673b",
+      "bytes": 3269,
+      "expandedBytes": 18033,
+      "answerCount": 292
+    },
+    {
+      "id": "p3",
+      "text": "Name a milk-based drink",
+      "bank": "banks/93f11659fd6fe435132f8bda24210d5607645dd1776a14a40105025bfc41690d.json.gz",
+      "rawSha256": "93f11659fd6fe435132f8bda24210d5607645dd1776a14a40105025bfc41690d",
+      "sha256": "0571b73b1b675499bb220ef72973bbce828307a4baba4da7316b484e06843328",
+      "bytes": 12245,
+      "expandedBytes": 91511,
+      "answerCount": 1668
+    },
+    {
+      "id": "p4",
+      "text": "Name a country that shares a land border with at least four other countries",
+      "bank": "banks/0ddbe0807efd7f79189ec920f8b9c6324ee422e5694349108b4742419af69792.json.gz",
+      "rawSha256": "0ddbe0807efd7f79189ec920f8b9c6324ee422e5694349108b4742419af69792",
+      "sha256": "43bed91f708667346522ca3da4532abdd1956c69a5dfb98db49fa6bb6e51a465",
+      "bytes": 748,
+      "expandedBytes": 4258,
+      "answerCount": 84
+    },
+    {
+      "id": "p5",
+      "text": "Name a god from mythology (Hindu, Greek, Roman, Norse or Egyptian)",
+      "bank": "banks/d505d4969b7e38eca39c6671ec82a04908637fcaec7d8f8d6a360cc1f5cb44a4.json.gz",
+      "rawSha256": "d505d4969b7e38eca39c6671ec82a04908637fcaec7d8f8d6a360cc1f5cb44a4",
+      "sha256": "c1dfa07108c51ad45ffcb8545d7b0d7df2dcc9df719d674c85476d5f476e0e3c",
+      "bytes": 12636,
+      "expandedBytes": 122204,
+      "answerCount": 2445
+    },
+    {
+      "id": "p6",
+      "text": "Name a type of dress",
+      "bank": "banks/aa271345fc11e7c644f1d08a2c924b1957d8e60fba102886fd6b22752930e236.json.gz",
+      "rawSha256": "aa271345fc11e7c644f1d08a2c924b1957d8e60fba102886fd6b22752930e236",
+      "sha256": "bf08ebe2f9097c6e4db4979161a0a49332a6be981817b69348d2ba53dc255007",
+      "bytes": 23582,
+      "expandedBytes": 199551,
+      "answerCount": 3560
+    },
+    {
+      "id": "p7",
+      "text": "Name a type of balloon (it's my birthday)",
+      "bank": "banks/832b8c33ae26bd984d1b7c99e89ad1b5cb7d1becc917360a19da627026f4e771.json.gz",
+      "rawSha256": "832b8c33ae26bd984d1b7c99e89ad1b5cb7d1becc917360a19da627026f4e771",
+      "sha256": "ae2f36a07e4ed45a0fe96af1cabf8bbb2de2ea83827ac747b6e0f64b020012f8",
+      "bytes": 1586,
+      "expandedBytes": 12118,
+      "answerCount": 209
+    }
+  ],
+  "contentSha256": "0e333fd5ea5d50ab801eec444bb8d32e4b4c18d5326da62bfcc018de74f0ffe0",
+  "capturedAt": "2026-11-05T12:17:38.914Z",
+  "source": {
+    "name": "Krillion",
+    "url": "https://krillion.io/",
+    "today": "https://krillion.io/api/today",
+    "reveal": "https://krillion.io/api/reveal?date=2026-11-05"
+  },
+  "matching": "Public canonical answer sheet. Private server aliases, corrections and live popularity are not exported."
+}
