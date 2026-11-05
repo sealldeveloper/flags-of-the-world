@@ -30,11 +30,15 @@ The browser reads only this repository's files. A worker decompresses and verifi
 
 The player preserves seven rounds, three-second previews, 25-second answer windows, retrying rejected answers, original tier scores, a 700-point maximum and ten metres per point. Drafts, pauses, results and settings are browser-local and separated by date. Archive replay is permitted. Reloads restore valid progress. Opening menus pauses the local timer.
 
-Service-worker shell v19 includes the player, font, sprites and ocean artwork. Successfully validated answer banks are saved in the existing puzzle-data cache. After a dive's answer sheets have loaded and the app shell is installed, playback can continue offline. Browser storage can be unavailable, evicted or cleared. GitHub remains the durable archive, not browser storage.
+Service-worker shell v20 includes the player, font, sprites and ocean artwork. Successfully validated answer banks are saved in the existing puzzle-data cache. After a dive's answer sheets have loaded and the app shell is installed, playback can continue offline. Browser storage can be unavailable, evicted or cleared. GitHub remains the durable archive, not browser storage.
 
 ### Matching boundary
 
-The public reveal response contains canonical accepted answers and their scores, not the private server's complete alias/correction implementation. Offline matching supports case, Unicode compatibility normalization and whitespace normalization. It deliberately does not invent fuzzy matches or claim that every typo/alias accepted by the live server is reproduced. The private correction control is visibly unavailable. Live player popularity, percentiles, accounts, purchases and multiplayer are not fabricated. Links for those services open the original site.
+The public reveal response contains canonical accepted answers and their scores, not the private server's complete alias/correction implementation. Existing exact matches keep their original case/Unicode-compatibility/whitespace handling. Local autocorrect additionally considers accent, punctuation, article, spacing and English plural variants. Unicode letters are retained, including non-Latin names. A bounded adjacent-transposition/edit-distance matcher permits one edit for names of 5–8 characters and at most two when both spellings have at least nine characters. Equal-distance or normalized collisions are declined.
+
+Every non-exact match is a suggestion, not an accepted answer. Confirm it with a second Enter or the Use answer button before the 25-second timer expires. Editing the guess cancels the suggestion. Pending suggestions survive reloads and are checked again against the archived bank. An unconfirmed suggestion earns no points on timeout. The settings switch can disable local autocorrect and return to strict matching.
+
+The matcher is independently implemented and runs in the existing answer worker, including offline. It uses only our archived canonical answers, not Krillion Free's code, private dictionary, server or score assignments. Confirmation awards the matched archived answer's unchanged official tier and score. No semantic aliases, new valid answers or rarity values are invented. This approximates typo correction, not Krillion's complete private alias behavior. Live player popularity, percentiles, accounts, purchases and multiplayer are not fabricated. Links for those services open the original site.
 
 ## Visual preservation and attribution
 
@@ -53,6 +57,7 @@ export CHROMIUM_PATH=/path/to/chromium
 node tests/krillion-browser.cjs
 BROWSER=firefox node tests/krillion-browser.cjs
 node tests/krillion-errors.cjs
+node tests/krillion-corrections.cjs
 SERVICE_WORKERS=allow node tests/krillion-browser.cjs
 ```
 

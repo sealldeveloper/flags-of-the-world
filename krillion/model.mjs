@@ -29,6 +29,7 @@ export function bearing(score){return score>=450?'One in a krillion. Trench dwel
 export function validSave(value,puzzle){
  if(value?.version!==VERSION||value.date!==puzzle.date||!Array.isArray(value.results)||value.results.length>7||!Number.isInteger(value.round)||value.round<0||value.round>6||!['intro','preview','answering','feedback','done'].includes(value.phase))return false;
  if(value.results.some((r,i)=>r?.promptId!==puzzle.prompts[i]?.id||r.promptText!==puzzle.prompts[i]?.text||!(r.tier===null&&r.score===0||Object.hasOwn(TIERS,r.tier)&&TIERS[r.tier].score===r.score)))return false;
+ if(value.correction!=null&&(value.phase!=='answering'||typeof value.correction.raw!=='string'||!value.correction.raw||value.correction.raw.length>256||typeof value.correction.answer!=='string'||!value.correction.answer||value.correction.answer.length>2000||value.correction.raw!==String(value.draft||'').trim()))return false;
  if(value.phase==='intro')return value.round===0&&value.results.length===0;
  if(value.phase==='done')return value.round===6&&value.results.length===7;
  if(value.phase==='feedback')return value.results.length===value.round+1;

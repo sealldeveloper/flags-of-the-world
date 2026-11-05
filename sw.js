@@ -1,6 +1,6 @@
 'use strict';
 // Bump the shell version when changing app assets. Never expire puzzle data here.
-const SHELL='puzzle-app-shell-v19', DATA='puzzle-daily-data-v1';
+const SHELL='puzzle-app-shell-v20', DATA='puzzle-daily-data-v1';
 const PAGES=['/','/crossword/','/crossword-nyt/','/crossword-nytmini/','/crossword-seattle/','/connections-nyt/','/flags/','/tld/','/deadlock-guess-who/','/scattegories/','/scattegories/local/','/jeopardy/','/jeopardy/display.html','/tierlist/','/krillion/'];
 const ASSETS=[
   '/app.webmanifest','/favicon.svg','/assets/theme.js','/assets/theme.css','/assets/app.js','/assets/library.mjs','/assets/library.css','/assets/daily.mjs',
@@ -13,7 +13,7 @@ const ASSETS=[
   '/jeopardy/favicon.svg',
   '/tierlist/style.css','/tierlist/model.mjs','/tierlist/media.mjs','/tierlist/media-source.mjs','/tierlist/raster.mjs','/tierlist/images.mjs','/tierlist/progressive.mjs','/tierlist/lossless.mjs','/tierlist/lossless-worker.mjs','/tierlist/vendor/webp/encode.js','/tierlist/vendor/webp/utils.js','/tierlist/vendor/webp/meta.js','/tierlist/vendor/webp/codec/enc/webp_enc.js','/tierlist/vendor/webp/codec/enc/webp_enc.wasm','/tierlist/codec.mjs','/tierlist/storage.mjs','/tierlist/invite.mjs','/tierlist/room.mjs','/tierlist/ui.mjs','/tierlist/sort.mjs','/tierlist/viewer.mjs','/tierlist/tiermaker.mjs','/tierlist/social.mjs','/tierlist/activity.mjs','/tierlist/ratings.mjs','/tierlist/rating-panel.mjs','/tierlist/feedback.mjs','/tierlist/files.mjs','/tierlist/group-image.mjs','/tierlist/group-export.mjs','/tierlist/icon.svg',
   '/uno/transport.mjs',
-  '/krillion/style.css','/krillion/ui.mjs','/krillion/model.mjs','/krillion/reader.mjs','/krillion/answer-worker.mjs','/krillion/assets/offline.json',
+  '/krillion/style.css','/krillion/ui.mjs','/krillion/model.mjs','/krillion/matching.mjs','/krillion/reader.mjs','/krillion/answer-worker.mjs','/krillion/assets/offline.json',
 ];
 self.addEventListener('install',event=>event.waitUntil((async()=>{
   const cache=await caches.open(SHELL);
