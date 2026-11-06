@@ -30,7 +30,7 @@ The browser reads only this repository's files. A worker decompresses and verifi
 
 The player preserves seven rounds, three-second previews, 25-second answer windows, retrying rejected answers, original tier scores, a 700-point maximum and ten metres per point. Drafts, pauses, results and settings are browser-local and separated by date. Archive replay is permitted. Reloads restore valid progress. Opening menus pauses the local timer.
 
-Service-worker shell v20 includes the player, font, sprites and ocean artwork. Successfully validated answer banks are saved in the existing puzzle-data cache. After a dive's answer sheets have loaded and the app shell is installed, playback can continue offline. Browser storage can be unavailable, evicted or cleared. GitHub remains the durable archive, not browser storage.
+Service-worker shell v21 includes the player, font, sprites and ocean artwork. Successfully validated answer banks are saved in the existing puzzle-data cache. After a dive's answer sheets have loaded and the app shell is installed, playback can continue offline. Browser storage can be unavailable, evicted or cleared. GitHub remains the durable archive, not browser storage.
 
 ### Matching boundary
 
@@ -42,9 +42,15 @@ The matcher is independently implemented and runs in the existing answer worker,
 
 ## Visual preservation and attribution
 
-The daily-game presentation follows Krillion's ocean layout, VT323 font, pixel controls, score/depth HUD, prompt cards, answer dock, tiers, result sheet and wardrobe presentation. The player is independently implemented. The original ocean renderer is not vendored: its environmental canvas-layer poses are preserved as lossless WebP scenes at 1920×1080, 1024×768, 390×844 and 320×740. DOM question and outcome UI are not baked into the scenes. This preserves the original artwork while allowing future prompts and answers to render independently. It is not a byte-identical copy of the original animated application.
+The daily-game presentation follows Krillion's ocean layout, VT323 font, pixel controls, score/depth HUD, prompt cards, answer dock, tiers, result sheet and wardrobe presentation. The player and animation renderer are independently implemented, not a vendored copy of the original application.
 
-`assets/sources.json` records original asset URLs and hashes. `assets/scene-sources.json` records canvas layer, viewport, phase and local hash for each reference-rendered scene. Reference captures use isolated browser contexts and the anonymous public answer-sheet fixture. They do not send source-game submissions. Original game/artwork credit remains with Krillion. VT323 is distributed under the included `assets/VT323-OFL.txt`. No original analytics, advertising scripts, account code or payment code are included.
+Normal playback now uses a continuously scrolling 2D ocean rather than swapping still scenes. Unchanged original sky, upper-ocean, mid-ocean and trench artwork is combined with independently drawn waves, fish, marine snow, bubbles, depth rulers and tier effects. The camera descends over 2.4 seconds with cubic easing and damped follow-through. Accepted answers sink through tier markers for the observed original durations: 3.4 seconds for Plankton, 3 seconds for Too Clever and Schooler, 3.4 seconds for Rare, 4.3 seconds for Deep Cut, and 4.6 seconds for One in a Krillion. A miss takes 0.9 seconds. Card/dock entrances, landed banners, companion movement, score/depth counting and the return to the surface are animated separately.
+
+`motion.mjs` is a presentation-only timeline. Results are saved immediately and retain their original points. Plunge effects run after the answer window has closed, never consume the next round's time, and do not alter the three-second preview or 25-second answer window. The next-round control unlocks on landing. Restored feedback does not replay the plunge. Menus pause the visual timeline, hidden pages stop the render loop, and reduced-motion/low-power settings finish active effects immediately with static rendering. Counter overlays are hidden from assistive technology, while the actual saved score remains accessible.
+
+The original environmental canvas poses are still preserved as lossless WebP fallback scenes at 1920×1080, 1024×768, 390×844 and 320×740. DOM question/outcome UI is not baked into those scenes. The animated reconstruction follows the original motion style and observed timings, not every random particle, seasonal effect, sound or exact animation frame.
+
+`assets/sources.json` records original asset URLs and hashes. `assets/ocean-sources.json` records unchanged source URLs and hashes for the four live ocean artwork layers. `assets/scene-sources.json` records canvas layer, viewport, phase and local hash for each reference-rendered scene. Reference captures use isolated browser contexts and the anonymous public answer-sheet fixture. They do not send source-game submissions. Original game/artwork credit remains with Krillion. VT323 is distributed under the included `assets/VT323-OFL.txt`. No original analytics, advertising scripts, account code or payment code are included.
 
 ## Browser verification
 
@@ -58,7 +64,9 @@ node tests/krillion-browser.cjs
 BROWSER=firefox node tests/krillion-browser.cjs
 node tests/krillion-errors.cjs
 node tests/krillion-corrections.cjs
+node tests/krillion-motion.cjs
+BROWSER=firefox node tests/krillion-motion.cjs
 SERVICE_WORKERS=allow node tests/krillion-browser.cjs
 ```
 
-`BASE_URL` selects a preview or production origin. `SCREENSHOT_DIR` selects the visual evidence directory. Browser tests use the actual archived answer banks and verify local scoring, retries, paused menus, all rounds, answer search, persistence, responsive dialogs and original-style views. The service-worker variant checks actual offline playback. Physical mobile devices and unpublished private-server matching behavior are outside the verification scope.
+`BASE_URL` selects a preview or production origin. `SCREENSHOT_DIR` selects the visual evidence directory. Browser tests use the actual archived answer banks and verify local scoring, retries, paused menus, all rounds, answer search, persistence, responsive dialogs and original-style views. The service-worker variant checks actual offline playback. Motion tests additionally use actual archived answers for available tiers and a separately labelled synthetic Too Clever fixture when that tier is absent from the public reveal. They cover tier-duration effects, continuous depth/camera changes, pause/visibility behavior, live preference changes, and reduced-motion/low-power operation. Physical mobile devices, long OS suspension and unpublished private-server matching behavior are outside the verification scope.

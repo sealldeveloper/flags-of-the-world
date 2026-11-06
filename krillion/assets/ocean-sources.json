@@ -1,0 +1,29 @@
+{
+  "source": "Krillion original ocean artwork, unchanged bytes",
+  "files": [
+    {
+      "file": "ocean-sky.webp",
+      "source": "https://krillion.io/gen/optimized/v1/bg-sky.webp",
+      "sha256": "d3efded204f673cce41a0bceecdcf6dde3d20fe88754ae2ad474b28dd8fefca6",
+      "bytes": 40218
+    },
+    {
+      "file": "ocean-top.webp",
+      "source": "https://krillion.io/gen/optimized/v1/bg-top.webp",
+      "sha256": "1b6d43be3117a2e943d7fe103c01804baad046b3a001e9c1cd60082f61284c8c",
+      "bytes": 84294
+    },
+    {
+      "file": "ocean-mid.webp",
+      "source": "https://krillion.io/gen/optimized/v1/bg-mid.webp",
+      "sha256": "b974175c8ba092b153a6292688ad038983d740f0cda9ed651f8c1f73cfebe1c3",
+      "bytes": 87524
+    },
+    {
+      "file": "ocean-trench.webp",
+      "source": "https://krillion.io/gen/optimized/v1/bg-trench.webp",
+      "sha256": "c7d07c5d4bc942ea9e280afc13828dc93c1234fe2b07f27551c17e6ec1e42171",
+      "bytes": 112290
+    }
+  ]
+}
