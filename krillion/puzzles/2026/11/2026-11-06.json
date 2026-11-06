@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "date": "2026-11-06",
+  "dayNumber": 114,
+  "resetsAt": "2026-11-07T05:00:00.000Z",
+  "prompts": [
+    {
+      "id": "p1",
+      "text": "Name a fruit or vegetable that is red on the inside.",
+      "bank": "banks/7cc9630fa531d436f471a84d217140d12de55d85fe8a28969f89d2a9eb2431b1.json.gz",
+      "rawSha256": "7cc9630fa531d436f471a84d217140d12de55d85fe8a28969f89d2a9eb2431b1",
+      "sha256": "8a8c84048ff2f03f11e5c8629e819de1247e6bc331c24b5c8cea8c8e09e542c9",
+      "bytes": 1292,
+      "expandedBytes": 8333,
+      "answerCount": 150
+    },
+    {
+      "id": "p2",
+      "text": "Name a setting you can change in a video game’s settings.",
+      "bank": "banks/5bbb44abf6a95aca60bb2d654fe4c3f753ddb5998f414d1f999f3db5d7aabf70.json.gz",
+      "rawSha256": "5bbb44abf6a95aca60bb2d654fe4c3f753ddb5998f414d1f999f3db5d7aabf70",
+      "sha256": "38d1c5b026147011986658953cc67bbd991fcf07c00a935a2c111d8a5168649c",
+      "bytes": 11420,
+      "expandedBytes": 89304,
+      "answerCount": 1571
+    },
+    {
+      "id": "p3",
+      "text": "Name a country with \"and\" in its name",
+      "bank": "banks/563beceb81eaec80dc6c9a8490d26d2f8ffa036609b9acb879ef4df179bb5a4e.json.gz",
+      "rawSha256": "563beceb81eaec80dc6c9a8490d26d2f8ffa036609b9acb879ef4df179bb5a4e",
+      "sha256": "ee3cec8f36ff168d1ec150485f010861ce8476aa9ae2250af3f91e568932fc65",
+      "bytes": 438,
+      "expandedBytes": 1387,
+      "answerCount": 22
+    },
+    {
+      "id": "p4",
+      "text": "Name something players aim at to score in a sport (like a hoop).",
+      "bank": "banks/ee474eb222e1155c4b702a77e5a4d7fd97a059b87aebedf8e17d130cc0873fed.json.gz",
+      "rawSha256": "ee474eb222e1155c4b702a77e5a4d7fd97a059b87aebedf8e17d130cc0873fed",
+      "sha256": "2e8f3765d241c8d2116cdcd2f498612c941cada8d59e772a5c5eaa2c5c63ab68",
+      "bytes": 1663,
+      "expandedBytes": 10755,
+      "answerCount": 203
+    },
+    {
+      "id": "p5",
+      "text": "Name a high-protein food ingredient—at least 8g of protein per 100g.",
+      "bank": "banks/22d8aba1f48c7aaa3987ebb940d1284715249eba5f242294e8c80d91b6a71481.json.gz",
+      "rawSha256": "22d8aba1f48c7aaa3987ebb940d1284715249eba5f242294e8c80d91b6a71481",
+      "sha256": "fb512d3af81fca020c67923e3baa50f77becfffe3d0e62e28afaab2badc87929",
+      "bytes": 23175,
+      "expandedBytes": 185571,
+      "answerCount": 3507
+    },
+    {
+      "id": "p6",
+      "text": "Name a way a person can feel, emotionally or physically (one word only)",
+      "bank": "banks/69201c093a7e58327a1e7bc9cd7bbf36ebad9ff6a22d43c5805dc3cb58c64a42.json.gz",
+      "rawSha256": "69201c093a7e58327a1e7bc9cd7bbf36ebad9ff6a22d43c5805dc3cb58c64a42",
+      "sha256": "6c957f9fd36041e7a90791769972c290922d6fb34e77cdb56590d61866981881",
+      "bytes": 9320,
+      "expandedBytes": 91241,
+      "answerCount": 1881
+    },
+    {
+      "id": "p7",
+      "text": "Name something people wear that is designed for protection (everyday clothing doesn’t count)",
+      "bank": "banks/e58757c69cabb04f6cbbd727e6838cc2769de193e24d78f35694046038eebd5d.json.gz",
+      "rawSha256": "e58757c69cabb04f6cbbd727e6838cc2769de193e24d78f35694046038eebd5d",
+      "sha256": "3ba743deb71d3697afd66bfc1f8352bdbc64e40062614c9ebda6923fe98c5a84",
+      "bytes": 9329,
+      "expandedBytes": 75953,
+      "answerCount": 1379
+    }
+  ],
+  "contentSha256": "524e1cd5fd39a6a38fa1d049359eabf2cde72b1cdddd1c6075ff4b3bd8542842",
+  "capturedAt": "2026-11-06T12:04:15.292Z",
+  "source": {
+    "name": "Krillion",
+    "url": "https://krillion.io/",
+    "today": "https://krillion.io/api/today",
+    "reveal": "https://krillion.io/api/reveal?date=2026-11-06"
+  },
+  "matching": "Public canonical answer sheet. Private server aliases, corrections and live popularity are not exported."
+}
