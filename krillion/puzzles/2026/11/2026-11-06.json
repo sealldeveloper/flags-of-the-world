@@ -17,12 +17,12 @@
     {
       "id": "p2",
       "text": "Name a setting you can change in a video game’s settings.",
-      "bank": "banks/5bbb44abf6a95aca60bb2d654fe4c3f753ddb5998f414d1f999f3db5d7aabf70.json.gz",
-      "rawSha256": "5bbb44abf6a95aca60bb2d654fe4c3f753ddb5998f414d1f999f3db5d7aabf70",
-      "sha256": "38d1c5b026147011986658953cc67bbd991fcf07c00a935a2c111d8a5168649c",
-      "bytes": 11420,
-      "expandedBytes": 89304,
-      "answerCount": 1571
+      "bank": "banks/2a89afd1429ba3e13d4c65bf900094d435e1808e41ca8865d2eb75e03abfb341.json.gz",
+      "rawSha256": "2a89afd1429ba3e13d4c65bf900094d435e1808e41ca8865d2eb75e03abfb341",
+      "sha256": "c341bece5987fbf37600555e7567d43362e803ce569d2b7853b4269fbe7e9b09",
+      "bytes": 11507,
+      "expandedBytes": 90048,
+      "answerCount": 1585
     },
     {
       "id": "p3",
@@ -75,8 +75,8 @@
       "answerCount": 1379
     }
   ],
-  "contentSha256": "524e1cd5fd39a6a38fa1d049359eabf2cde72b1cdddd1c6075ff4b3bd8542842",
-  "capturedAt": "2026-11-06T12:04:15.292Z",
+  "contentSha256": "2367c4d5a9ea0584f69bd5ffc59c3205b2bf73675d1c89a7bc6b040b0e371280",
+  "capturedAt": "2026-11-06T22:06:18.560Z",
   "source": {
     "name": "Krillion",
     "url": "https://krillion.io/",
