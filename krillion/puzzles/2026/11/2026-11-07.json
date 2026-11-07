@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "date": "2026-11-07",
+  "dayNumber": 115,
+  "resetsAt": "2026-11-08T05:00:00.000Z",
+  "prompts": [
+    {
+      "id": "p1",
+      "text": "Name a food with a filling inside.",
+      "bank": "banks/0160670664b1e7dea1bec03081ddf79398804747e08a61ba0fd0cbbfbb7687b3.json.gz",
+      "rawSha256": "0160670664b1e7dea1bec03081ddf79398804747e08a61ba0fd0cbbfbb7687b3",
+      "sha256": "8d0e92c9db7b8d98ecb79a02a5da58bd90737f58ca7089e34faea46df96e09ae",
+      "bytes": 32368,
+      "expandedBytes": 246570,
+      "answerCount": 4534
+    },
+    {
+      "id": "p2",
+      "text": "Name an animated TV show that isn't meant for kids (no anime).",
+      "bank": "banks/0b0af673558773eb9035e0b225e419915c88337b3d412f09d6e2eaf89dcc3402.json.gz",
+      "rawSha256": "0b0af673558773eb9035e0b225e419915c88337b3d412f09d6e2eaf89dcc3402",
+      "sha256": "8da48e21e215df67c92eb26a6b4e3d1bd4680351f1b6b081749668fa1964c2a8",
+      "bytes": 17748,
+      "expandedBytes": 102000,
+      "answerCount": 1732
+    },
+    {
+      "id": "p3",
+      "text": "Name a country bigger than the UK but smaller than Egypt, by area.",
+      "bank": "banks/2e37c3f083e0c7804e54e0b5239b07ee0ec4ad70bb0a110ff254c50607e0dca0.json.gz",
+      "rawSha256": "2e37c3f083e0c7804e54e0b5239b07ee0ec4ad70bb0a110ff254c50607e0dca0",
+      "sha256": "0f37ef68eef1c9c1aa74e30969625d7efa970d7e44f3b18f9c8625d0a08ca4b7",
+      "bytes": 578,
+      "expandedBytes": 2569,
+      "answerCount": 48
+    },
+    {
+      "id": "p4",
+      "text": "Name a cardio exercise.",
+      "bank": "banks/1badc766c80799910ab7862696e3a110b71855d8a3ce4dac11b85e41bb6dcbc7.json.gz",
+      "rawSha256": "1badc766c80799910ab7862696e3a110b71855d8a3ce4dac11b85e41bb6dcbc7",
+      "sha256": "fe6aff3f4e22d46b6774065ce0fa8e28c4b9fd1fc9fa44fe0fc42f3dc08578f9",
+      "bytes": 4568,
+      "expandedBytes": 32741,
+      "answerCount": 627
+    },
+    {
+      "id": "p5",
+      "text": "Name a song released in 2025 or 2026 with over 10 million Spotify streams.",
+      "bank": "banks/7ed5437fad19a6e5a6d65d270db1be7325ad302876effa1cea31b7fb9e1634dd.json.gz",
+      "rawSha256": "7ed5437fad19a6e5a6d65d270db1be7325ad302876effa1cea31b7fb9e1634dd",
+      "sha256": "4a8ab8c54cec3163246cca85e1ed3bfcda3fe26371fd0681be11298b05973121",
+      "bytes": 66784,
+      "expandedBytes": 471908,
+      "answerCount": 8792
+    },
+    {
+      "id": "p6",
+      "text": "Name a red sauce, dip or condiment.",
+      "bank": "banks/ad37215201ad980b42281fe92f178b13cef2ccda9fe0a00d4dd4782cde02aeec.json.gz",
+      "rawSha256": "ad37215201ad980b42281fe92f178b13cef2ccda9fe0a00d4dd4782cde02aeec",
+      "sha256": "1199317fe3cfa5b11544a3e831de77fa3f45825e1037d4f1574c03158224e06d",
+      "bytes": 5448,
+      "expandedBytes": 37927,
+      "answerCount": 681
+    },
+    {
+      "id": "p7",
+      "text": "Name an app or website where you book things (like Expedia for travel).",
+      "bank": "banks/4249f3bce4e4b80079c0ab2251084ae41117028fe46e5fbf635042e9e50adbba.json.gz",
+      "rawSha256": "4249f3bce4e4b80079c0ab2251084ae41117028fe46e5fbf635042e9e50adbba",
+      "sha256": "c9beb530ce8077a5090940482af0c1a33b37c399caf1da0f8b9c7d5affc6eb8d",
+      "bytes": 53538,
+      "expandedBytes": 444837,
+      "answerCount": 8248
+    }
+  ],
+  "contentSha256": "f6338f07271a189e16c7b8cad16c07509006fd77c11198a92a5fcde64b4e786d",
+  "capturedAt": "2026-11-07T11:02:10.652Z",
+  "source": {
+    "name": "Krillion",
+    "url": "https://krillion.io/",
+    "today": "https://krillion.io/api/today",
+    "reveal": "https://krillion.io/api/reveal?date=2026-11-07"
+  },
+  "matching": "Public canonical answer sheet. Private server aliases, corrections and live popularity are not exported."
+}
