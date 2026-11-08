@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "date": "2026-11-08",
+  "dayNumber": 116,
+  "resetsAt": "2026-11-09T05:00:00.000Z",
+  "prompts": [
+    {
+      "id": "p1",
+      "text": "Name a recurring household bill",
+      "bank": "banks/043d01324ad2bc1d382fffd20ddbd07da4a5e67345da73117eb5c89c31d3e123.json.gz",
+      "rawSha256": "043d01324ad2bc1d382fffd20ddbd07da4a5e67345da73117eb5c89c31d3e123",
+      "sha256": "f21e8877170b5334729536ed058b6347e801eb946901e2ecd7c6e92caef6f90a",
+      "bytes": 2934,
+      "expandedBytes": 20622,
+      "answerCount": 358
+    },
+    {
+      "id": "p2",
+      "text": "Name an animal that stings",
+      "bank": "banks/e22a4e525bb1323ea65473d91e4466c24ef010da338299928ad20f1e39c41e56.json.gz",
+      "rawSha256": "e22a4e525bb1323ea65473d91e4466c24ef010da338299928ad20f1e39c41e56",
+      "sha256": "d03b28b0027af5515a413bea106a965b6777a32224e8a2bb1b12daecdaa576c6",
+      "bytes": 47404,
+      "expandedBytes": 411972,
+      "answerCount": 6682
+    },
+    {
+      "id": "p3",
+      "text": "Name a living bird bigger than a chicken",
+      "bank": "banks/fbd6b7d8847d8d73bc84cbabf68839eae937f5f5e054d96b3e0859c1a714a05f.json.gz",
+      "rawSha256": "fbd6b7d8847d8d73bc84cbabf68839eae937f5f5e054d96b3e0859c1a714a05f",
+      "sha256": "a76e5b63dbce6d207df472ae5cba8a785a702f7ce962985f7024de7f36c37551",
+      "bytes": 5613,
+      "expandedBytes": 46664,
+      "answerCount": 813
+    },
+    {
+      "id": "p4",
+      "text": "Name a place or landmark with Great or Grand in its name (like the Grand Canyon)",
+      "bank": "banks/cc507821fd63c4a5b4cc06ad2ef379f57e08865f71de893cdeac0a717db821d3.json.gz",
+      "rawSha256": "cc507821fd63c4a5b4cc06ad2ef379f57e08865f71de893cdeac0a717db821d3",
+      "sha256": "417c831319baa9a7e84cd2f6c705f0a68868e7bf0bcde0896747b2245ec63f23",
+      "bytes": 186032,
+      "expandedBytes": 1498179,
+      "answerCount": 22544
+    },
+    {
+      "id": "p5",
+      "text": "Name any item in Minecraft (older versions count too)",
+      "bank": "banks/29a7f9876e5601d2096b2232d6c0c01bfc2ead7326b9cd09d432a3b879d3c51e.json.gz",
+      "rawSha256": "29a7f9876e5601d2096b2232d6c0c01bfc2ead7326b9cd09d432a3b879d3c51e",
+      "sha256": "2935a4ec63609dd847849d106fb2c47857f404d96bd5f4163f0fd7658790209f",
+      "bytes": 13481,
+      "expandedBytes": 138179,
+      "answerCount": 2414
+    },
+    {
+      "id": "p6",
+      "text": "Name something you empty regularly at home",
+      "bank": "banks/75a49b4215e408c7c897ea2012215c1f32441035f63efd9c8c912104c8b75a9b.json.gz",
+      "rawSha256": "75a49b4215e408c7c897ea2012215c1f32441035f63efd9c8c912104c8b75a9b",
+      "sha256": "d52fa11f8f14a8090b1e00692c9f3bd196d08ad1686ef79e38468ba1e01eabe0",
+      "bytes": 2445,
+      "expandedBytes": 15862,
+      "answerCount": 289
+    },
+    {
+      "id": "p7",
+      "text": "Name a method of advertising",
+      "bank": "banks/00641ec12544593f5a0362f74337cf80110e184a3b64dc012ab32eccdb9db1b1.json.gz",
+      "rawSha256": "00641ec12544593f5a0362f74337cf80110e184a3b64dc012ab32eccdb9db1b1",
+      "sha256": "73021d9ca415b13cbcaad3c80ceeb41423d38ab5e9f0153ce3b1b6150849e98c",
+      "bytes": 6435,
+      "expandedBytes": 45946,
+      "answerCount": 817
+    }
+  ],
+  "contentSha256": "9196d4248d4623eeae238456ed3c3aad9446f40411a48e46823f217c99f89352",
+  "capturedAt": "2026-11-08T11:15:18.226Z",
+  "source": {
+    "name": "Krillion",
+    "url": "https://krillion.io/",
+    "today": "https://krillion.io/api/today",
+    "reveal": "https://krillion.io/api/reveal?date=2026-11-08"
+  },
+  "matching": "Public canonical answer sheet. Private server aliases, corrections and live popularity are not exported."
+}
