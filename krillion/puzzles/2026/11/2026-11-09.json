@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "date": "2026-11-09",
+  "dayNumber": 117,
+  "resetsAt": "2026-11-10T05:00:00.000Z",
+  "prompts": [
+    {
+      "id": "p1",
+      "text": "Name a podcast (1K+ ratings on Spotify)",
+      "bank": "banks/49f938d21df2f23c21453ceac5e92947689ee932bbc9245825f444330d015fc3.json.gz",
+      "rawSha256": "49f938d21df2f23c21453ceac5e92947689ee932bbc9245825f444330d015fc3",
+      "sha256": "6304b352893ea1c2453a2f3f6bf140aac14ad504297c76351f91b96763acf2e0",
+      "bytes": 110149,
+      "expandedBytes": 571487,
+      "answerCount": 9056
+    },
+    {
+      "id": "p2",
+      "text": "Name a villain from Star Wars, DC, or Lord of the Rings",
+      "bank": "banks/03fcde49b652eeb42b12dacc219649513fc8a0214900856143985222de9e7a85.json.gz",
+      "rawSha256": "03fcde49b652eeb42b12dacc219649513fc8a0214900856143985222de9e7a85",
+      "sha256": "34b50e8ee2e5582799e42c7a65b5ede2d02936493a948eb11f3b54969ea09c00",
+      "bytes": 152397,
+      "expandedBytes": 1362515,
+      "answerCount": 26165
+    },
+    {
+      "id": "p3",
+      "text": "Name a part of the human body below the waist",
+      "bank": "banks/5797e27c0333585b484495853e9d884a037612ac156dff7243608ee9637632e8.json.gz",
+      "rawSha256": "5797e27c0333585b484495853e9d884a037612ac156dff7243608ee9637632e8",
+      "sha256": "e06e97ea9e1fd6dd926be0da5a5a246f8c9b6f1faa488729f0153186bfa7754e",
+      "bytes": 17317,
+      "expandedBytes": 186945,
+      "answerCount": 2661
+    },
+    {
+      "id": "p4",
+      "text": "Name a language with more than 10 million total speakers",
+      "bank": "banks/7f4dce29f82dcec8be8eb58a154cfe20941b5da28b5d928271bf6cb9773da6a1.json.gz",
+      "rawSha256": "7f4dce29f82dcec8be8eb58a154cfe20941b5da28b5d928271bf6cb9773da6a1",
+      "sha256": "d7d3bff0202085952471c2c8530bbdb421edfcdf9a5e37d143723a482fc05e17",
+      "bytes": 950,
+      "expandedBytes": 6090,
+      "answerCount": 123
+    },
+    {
+      "id": "p5",
+      "text": "Name an animal that eats bugs (documented regular part of diet)",
+      "bank": "banks/cb7d3821a945aafd72a37947dd509ad3038b3af0ad32fa92c871df630c4d7940.json.gz",
+      "rawSha256": "cb7d3821a945aafd72a37947dd509ad3038b3af0ad32fa92c871df630c4d7940",
+      "sha256": "027fd897a1a51bfa5ed3513c8bb010606a7b00137d88f4408010e209826799a7",
+      "bytes": 299714,
+      "expandedBytes": 2550859,
+      "answerCount": 41264
+    },
+    {
+      "id": "p6",
+      "text": "Name a toy brand",
+      "bank": "banks/310a163896ea1ae1bfa24769ca60cffc1fba44e406e528f9d8813e42812bd046.json.gz",
+      "rawSha256": "310a163896ea1ae1bfa24769ca60cffc1fba44e406e528f9d8813e42812bd046",
+      "sha256": "9e099127318a45a7395aff9307d4be5152d71d090c3e7be84834f96e6ebdae18",
+      "bytes": 50048,
+      "expandedBytes": 417363,
+      "answerCount": 7946
+    },
+    {
+      "id": "p7",
+      "text": "Name a country with \"in\" in its name",
+      "bank": "banks/45a604d66ab279bef1fb2154b69360b05be0b851a1b007097448df63e2c82ae4.json.gz",
+      "rawSha256": "45a604d66ab279bef1fb2154b69360b05be0b851a1b007097448df63e2c82ae4",
+      "sha256": "5b9bb81286cada72bfc82f099ba794071d6cdd7c4fdd83931ae362fc07d1d16f",
+      "bytes": 488,
+      "expandedBytes": 1732,
+      "answerCount": 30
+    }
+  ],
+  "contentSha256": "e656f0c4f3c9db91a46adbf4dcc727a00f0514e0d87ec23f8ee3baf7a393eae9",
+  "capturedAt": "2026-11-09T12:49:55.276Z",
+  "source": {
+    "name": "Krillion",
+    "url": "https://krillion.io/",
+    "today": "https://krillion.io/api/today",
+    "reveal": "https://krillion.io/api/reveal?date=2026-11-09"
+  },
+  "matching": "Public canonical answer sheet. Private server aliases, corrections and live popularity are not exported."
+}
