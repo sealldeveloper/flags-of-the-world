@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "date": "2026-11-10",
+  "dayNumber": 118,
+  "resetsAt": "2026-11-11T05:00:00.000Z",
+  "prompts": [
+    {
+      "id": "p1",
+      "text": "Name a Disney Channel, Nickelodeon or Cartoon Network show",
+      "bank": "banks/e285bf0104672f33f754b2e0c369395965fada50876e0fdc419551c9e1088091.json.gz",
+      "rawSha256": "e285bf0104672f33f754b2e0c369395965fada50876e0fdc419551c9e1088091",
+      "sha256": "a36752070b041c2f30c515f14cf6ba3603f0948cb6b9c3a34f0342af256deaa5",
+      "bytes": 27295,
+      "expandedBytes": 170130,
+      "answerCount": 2892
+    },
+    {
+      "id": "p2",
+      "text": "Name a branch or denomination of Christianity, Islam, Hinduism, Judaism, or Buddhism",
+      "bank": "banks/fece48063152be6d46eaa95873021d13d27730450be8a36d25bb51e50b2282ff.json.gz",
+      "rawSha256": "fece48063152be6d46eaa95873021d13d27730450be8a36d25bb51e50b2282ff",
+      "sha256": "122a3e2016fc91de99fef173649780d7857eee6551e8383178681ad5e5e9e64c",
+      "bytes": 37554,
+      "expandedBytes": 303947,
+      "answerCount": 4543
+    },
+    {
+      "id": "p3",
+      "text": "Name a sports team whose logo contains red (NFL, NBA, MLB, NHL, IPL, Premier League, La Liga, Bundesliga, Serie A, Ligue 1, or UEFA Champions League)",
+      "bank": "banks/70285833b80fa2980718a580e80726f7bae5ac378e72b9e0d62d8be7b1479266.json.gz",
+      "rawSha256": "70285833b80fa2980718a580e80726f7bae5ac378e72b9e0d62d8be7b1479266",
+      "sha256": "d1dc584e844133399edf551dec6eec4bdd619e2f68e2953c0f88f4f259d7ad87",
+      "bytes": 1541,
+      "expandedBytes": 7723,
+      "answerCount": 137
+    },
+    {
+      "id": "p4",
+      "text": "Name any anime (listed on MAL)",
+      "bank": "banks/128f653f03ba599f37b981d59b37b21cc6dc41c8e619106d3d54a74ebd24dde1.json.gz",
+      "rawSha256": "128f653f03ba599f37b981d59b37b21cc6dc41c8e619106d3d54a74ebd24dde1",
+      "sha256": "0a4cd74e37542f6eafe8f741d0a425ad6272a4d4fab8c3a51f32791eac2c2c30",
+      "bytes": 296433,
+      "expandedBytes": 1756524,
+      "answerCount": 26505
+    },
+    {
+      "id": "p5",
+      "text": "Name a song by Taylor Swift, Ariana Grande, Olivia Rodrigo, or Sabrina Carpenter.",
+      "bank": "banks/639ea769830a64f8a5be06594c6380c160b9dc7dda44337a1703a260d87de8b2.json.gz",
+      "rawSha256": "639ea769830a64f8a5be06594c6380c160b9dc7dda44337a1703a260d87de8b2",
+      "sha256": "986c9e0b3085bca081d3a4729b4bde11b125b2eb6466581c6bf5d99fa8009c73",
+      "bytes": 9706,
+      "expandedBytes": 62820,
+      "answerCount": 1135
+    },
+    {
+      "id": "p6",
+      "text": "Name a flower that naturally blooms blue, purple, or red",
+      "bank": "banks/c6ca34112d3f36a4aa24f73de696959c6bc2a5a3ce625678916cf2489bf9cfbd.json.gz",
+      "rawSha256": "c6ca34112d3f36a4aa24f73de696959c6bc2a5a3ce625678916cf2489bf9cfbd",
+      "sha256": "ace96884ea4d290f07cdd9d0771a41e03cc28f732c1b679e08f77529f0bfa0e5",
+      "bytes": 49983,
+      "expandedBytes": 441102,
+      "answerCount": 7482
+    },
+    {
+      "id": "p7",
+      "text": "Name a country whose second letter is O",
+      "bank": "banks/4fa0aacbe744f1b1c325200cde03ae76073f2fcebb64d289466d24c7730b0376.json.gz",
+      "rawSha256": "4fa0aacbe744f1b1c325200cde03ae76073f2fcebb64d289466d24c7730b0376",
+      "sha256": "4643062ab07ef14e3d8c8f67acb9018790d7a89620bedc250421e3580b3558a5",
+      "bytes": 457,
+      "expandedBytes": 1772,
+      "answerCount": 32
+    }
+  ],
+  "contentSha256": "9e6a1cee6bdbcca150808704e82c2d9f5f05010e7c252b5e192cbf671f85f377",
+  "capturedAt": "2026-11-10T12:36:48.665Z",
+  "source": {
+    "name": "Krillion",
+    "url": "https://krillion.io/",
+    "today": "https://krillion.io/api/today",
+    "reveal": "https://krillion.io/api/reveal?date=2026-11-10"
+  },
+  "matching": "Public canonical answer sheet. Private server aliases, corrections and live popularity are not exported."
+}

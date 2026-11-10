@@ -3,6 +3,13 @@
   "source": "https://krillion.io/",
   "puzzles": [
     {
+      "date": "2026-11-10",
+      "dayNumber": 118,
+      "file": "2026/11/2026-11-10.json",
+      "contentSha256": "9e6a1cee6bdbcca150808704e82c2d9f5f05010e7c252b5e192cbf671f85f377",
+      "answerCount": 42726
+    },
+    {
       "date": "2026-11-09",
       "dayNumber": 117,
       "file": "2026/11/2026-11-09.json",
