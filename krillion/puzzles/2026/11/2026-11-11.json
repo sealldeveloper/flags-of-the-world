@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "date": "2026-11-11",
+  "dayNumber": 119,
+  "resetsAt": "2026-11-12T05:00:00.000Z",
+  "prompts": [
+    {
+      "id": "p1",
+      "text": "Name a country where at least 50% of people speak English",
+      "bank": "banks/e3e22ae71d0148e47f6432287dff5c5a9769c9f64c272d45d247aad01d1e60fb.json.gz",
+      "rawSha256": "e3e22ae71d0148e47f6432287dff5c5a9769c9f64c272d45d247aad01d1e60fb",
+      "sha256": "4009059272380b1b6c1c0ef8aa43de07ee92af0b4c6fd5f4cdd81255ae9e63ec",
+      "bytes": 880,
+      "expandedBytes": 4971,
+      "answerCount": 96
+    },
+    {
+      "id": "p2",
+      "text": "Name a bodily function or biological process (like breathing)",
+      "bank": "banks/a32d0ea709983af2d95ea486b0e4f6072372cd5cef387cdf842d04c0b83fe9c6.json.gz",
+      "rawSha256": "a32d0ea709983af2d95ea486b0e4f6072372cd5cef387cdf842d04c0b83fe9c6",
+      "sha256": "90056d88b8db04662aea611d37b3f53e3921fcbfb59a2df8b9d30cdfa5f488af",
+      "bytes": 14850,
+      "expandedBytes": 122058,
+      "answerCount": 2047
+    },
+    {
+      "id": "p3",
+      "text": "Name a one-word animal that starts with T",
+      "bank": "banks/9cdc15fafd676db4dbf6e6042a265034409d169d056030b6958bc931675371d7.json.gz",
+      "rawSha256": "9cdc15fafd676db4dbf6e6042a265034409d169d056030b6958bc931675371d7",
+      "sha256": "ae0e7ddbdf1e41fd0d0a2d099dd49281059bdba374373f8c78001ecf47068284",
+      "bytes": 22715,
+      "expandedBytes": 261479,
+      "answerCount": 4952
+    },
+    {
+      "id": "p4",
+      "text": "Name something that has a needle",
+      "bank": "banks/834cd7122b99a35267586834899051331987055c3120855550270aebd51a59d0.json.gz",
+      "rawSha256": "834cd7122b99a35267586834899051331987055c3120855550270aebd51a59d0",
+      "sha256": "7031585cde4cf35397127566b12b7fb800a93426220ad8335e060c750591deeb",
+      "bytes": 14030,
+      "expandedBytes": 111599,
+      "answerCount": 1936
+    },
+    {
+      "id": "p5",
+      "text": "Name an original movie or show from Netflix, Prime Video, Apple TV, or Disney+",
+      "bank": "banks/2426d33058b071f2b5303b8f16f2a107eeeb69303f57a11685d1e4b644db16e8.json.gz",
+      "rawSha256": "2426d33058b071f2b5303b8f16f2a107eeeb69303f57a11685d1e4b644db16e8",
+      "sha256": "75ca15947459ab267a75224625a822f77697124866d0fef46eae4b3059d3d341",
+      "bytes": 85443,
+      "expandedBytes": 528285,
+      "answerCount": 8706
+    },
+    {
+      "id": "p6",
+      "text": "Name a named object in space that's bigger than Earth's Moon (like Jupiter)",
+      "bank": "banks/60c71d23d6fe2f93e56e3f18e4492ec90442198f9c88ff5d39451d54dcf9fd2f.json.gz",
+      "rawSha256": "60c71d23d6fe2f93e56e3f18e4492ec90442198f9c88ff5d39451d54dcf9fd2f",
+      "sha256": "94bbd441adb0850f0ffc2e59fdb2543e4fe20760b94559287e99d4cd63659607",
+      "bytes": 106671,
+      "expandedBytes": 1565090,
+      "answerCount": 30287
+    },
+    {
+      "id": "p7",
+      "text": "Name a character from Mario, Zelda, Donkey Kong, Sonic, or Kirby",
+      "bank": "banks/95dd04a222d5e9aa830efd9cc3608b5f8742447166e70e107525c3331e1e4fbf.json.gz",
+      "rawSha256": "95dd04a222d5e9aa830efd9cc3608b5f8742447166e70e107525c3331e1e4fbf",
+      "sha256": "83955aea9dc2d7ce526990d1123b09b037354c99781eb4a8685ab960eee4558e",
+      "bytes": 51867,
+      "expandedBytes": 508948,
+      "answerCount": 9913
+    }
+  ],
+  "contentSha256": "c62d03a2be340715f862ddd427771d3ebf5f6f300dbe7271a1c7831898c39969",
+  "capturedAt": "2026-11-11T11:51:53.867Z",
+  "source": {
+    "name": "Krillion",
+    "url": "https://krillion.io/",
+    "today": "https://krillion.io/api/today",
+    "reveal": "https://krillion.io/api/reveal?date=2026-11-11"
+  },
+  "matching": "Public canonical answer sheet. Private server aliases, corrections and live popularity are not exported."
+}
