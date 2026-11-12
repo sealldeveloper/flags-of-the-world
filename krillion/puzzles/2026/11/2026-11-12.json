@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "date": "2026-11-12",
+  "dayNumber": 120,
+  "resetsAt": "2026-11-13T05:00:00.000Z",
+  "prompts": [
+    {
+      "id": "p1",
+      "text": "Name something you can see in the sky (no living or manmade things)",
+      "bank": "banks/0b58c807987794b0c423518e159692e198b211af6a757aaaf4f90985a1340900.json.gz",
+      "rawSha256": "0b58c807987794b0c423518e159692e198b211af6a757aaaf4f90985a1340900",
+      "sha256": "134eb77e9cfaf5249760a31680247edb0f70e9f0ee61962d10a46d4770e6615f",
+      "bytes": 11354,
+      "expandedBytes": 95683,
+      "answerCount": 1739
+    },
+    {
+      "id": "p2",
+      "text": "Name a material or product that comes from animals (excluding meat and dairy)",
+      "bank": "banks/5a1616e14cd6cbc1b81993a9c9503ea83df0576e967490455f6e1ce867ba4dd5.json.gz",
+      "rawSha256": "5a1616e14cd6cbc1b81993a9c9503ea83df0576e967490455f6e1ce867ba4dd5",
+      "sha256": "96a74a59dc724ef46c16f4f040ce65e00eb2e2601bf1802aaea67837135a2004",
+      "bytes": 5842,
+      "expandedBytes": 45351,
+      "answerCount": 857
+    },
+    {
+      "id": "p3",
+      "text": "Name a vegetable smaller than an onion (culinary definition of “vegetable”)",
+      "bank": "banks/51ccc2c1f7f219685206e42cba2a1bd168f79270f7cc1e4a938fc86f1d0cba98.json.gz",
+      "rawSha256": "51ccc2c1f7f219685206e42cba2a1bd168f79270f7cc1e4a938fc86f1d0cba98",
+      "sha256": "d4c5a4451f6de4fd2465873a90a91b7acf0f445591b2deb1e19bdeb964c4007c",
+      "bytes": 5252,
+      "expandedBytes": 37998,
+      "answerCount": 699
+    },
+    {
+      "id": "p4",
+      "text": "Name a TV game show",
+      "bank": "banks/cb66deab58fc0b7d56a5b9c9f9067f0a0978de63fa43a334c4a22924a19e2d37.json.gz",
+      "rawSha256": "cb66deab58fc0b7d56a5b9c9f9067f0a0978de63fa43a334c4a22924a19e2d37",
+      "sha256": "7fd600cc2ec2fb1bacb7871562de7b99d3b0fd0b93d2de81e41dc65a57ee0fa1",
+      "bytes": 57156,
+      "expandedBytes": 368417,
+      "answerCount": 6433
+    },
+    {
+      "id": "p5",
+      "text": "Name a dance move (named moves)",
+      "bank": "banks/4da159a4b7676b8e1524099b215546370e8b358c08e88221b19e87c8a38bb0ae.json.gz",
+      "rawSha256": "4da159a4b7676b8e1524099b215546370e8b358c08e88221b19e87c8a38bb0ae",
+      "sha256": "4ab63a28ec054543876a0860a3f5c1a3667ea3f6e86cd9c5e99f87bc1e907d23",
+      "bytes": 25843,
+      "expandedBytes": 213619,
+      "answerCount": 4008
+    },
+    {
+      "id": "p6",
+      "text": "Name a type of injury (like a sprain, not a sprained ankle)",
+      "bank": "banks/b12c407f5529b78c6900f7766f3dde6f2fccc49ce51de47a66c4c8ca2ca8bf80.json.gz",
+      "rawSha256": "b12c407f5529b78c6900f7766f3dde6f2fccc49ce51de47a66c4c8ca2ca8bf80",
+      "sha256": "f8082e64cd038a2d6c5413cfc9dedee7e7a3eaad2cff23ff91429f871e4b7900",
+      "bytes": 2028,
+      "expandedBytes": 13351,
+      "answerCount": 245
+    },
+    {
+      "id": "p7",
+      "text": "Name a chocolate that has caramel in it",
+      "bank": "banks/6005ae5cba88d64b80010158bf5bd2484191bdb7133d1a568fa1290971e5de29.json.gz",
+      "rawSha256": "6005ae5cba88d64b80010158bf5bd2484191bdb7133d1a568fa1290971e5de29",
+      "sha256": "68889d7ddc7d3aad23ce19965bdd9bbc7bad0bab6588ea57745f97abd59e419e",
+      "bytes": 10331,
+      "expandedBytes": 65192,
+      "answerCount": 942
+    }
+  ],
+  "contentSha256": "5e286cec589b0b8c89551d51f745d6f7a894b4d41a18475031f617728e36dbec",
+  "capturedAt": "2026-11-12T12:40:18.462Z",
+  "source": {
+    "name": "Krillion",
+    "url": "https://krillion.io/",
+    "today": "https://krillion.io/api/today",
+    "reveal": "https://krillion.io/api/reveal?date=2026-11-12"
+  },
+  "matching": "Public canonical answer sheet. Private server aliases, corrections and live popularity are not exported."
+}
