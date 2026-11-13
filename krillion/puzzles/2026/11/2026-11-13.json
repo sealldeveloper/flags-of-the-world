@@ -37,21 +37,21 @@
     {
       "id": "p4",
       "text": "Name an invention that existed before 1500 (no food or drinks).",
-      "bank": "banks/63c260c83c71c48671af68cac97862547ec48bf2adcfc858347436f42022d113.json.gz",
-      "rawSha256": "63c260c83c71c48671af68cac97862547ec48bf2adcfc858347436f42022d113",
-      "sha256": "c897a5fb16a890a9ea5044bf6748b62d53a1f11779afbc2632c7b532fc6fdf4f",
-      "bytes": 38722,
-      "expandedBytes": 327889,
+      "bank": "banks/2edb89d6ab7432a966779da8257f52e0258e07425a5ede4640210a8e61487a41.json.gz",
+      "rawSha256": "2edb89d6ab7432a966779da8257f52e0258e07425a5ede4640210a8e61487a41",
+      "sha256": "c6e97e0faffe13e2964d409a8bf00d82a454da66d157093b9f2722afbc539644",
+      "bytes": 38736,
+      "expandedBytes": 327973,
       "answerCount": 6330
     },
     {
       "id": "p5",
-      "text": "Name anyone who has acted in an MCU film.",
-      "bank": "banks/6e3a27a2478ad5d519678699b388a2b16ab653e965eb2d8925965fefefbb6072.json.gz",
-      "rawSha256": "6e3a27a2478ad5d519678699b388a2b16ab653e965eb2d8925965fefefbb6072",
-      "sha256": "cd63bd14810fbafba7a9460dc1f9bf6a1f82cda1e90a76d7aa571ea7d9a018fa",
-      "bytes": 18729,
-      "expandedBytes": 131563,
+      "text": "Name anyone who has acted in a Marvel Cinematic Universe film.",
+      "bank": "banks/fbb20df00897d11a9deba6162c03a960fccbb0a0d3c943a1894d41a2bb209533.json.gz",
+      "rawSha256": "fbb20df00897d11a9deba6162c03a960fccbb0a0d3c943a1894d41a2bb209533",
+      "sha256": "d09756fd609a32e2a22edcee355def5c2ccd70897ec9f7ca37caace47ac1eb19",
+      "bytes": 18741,
+      "expandedBytes": 131584,
       "answerCount": 2381
     },
     {
@@ -75,8 +75,8 @@
       "answerCount": 2077
     }
   ],
-  "contentSha256": "8b394c17f5a226432d7e66c612ec5cc6ede35196fbb8eabbe0ce5891e1a86faa",
-  "capturedAt": "2026-11-13T12:10:19.382Z",
+  "contentSha256": "3d1266269634f9cd44b77060eb4543b752eab26862c2d684984cfdae1d4c8b45",
+  "capturedAt": "2026-11-13T22:35:35.204Z",
   "source": {
     "name": "Krillion",
     "url": "https://krillion.io/",
