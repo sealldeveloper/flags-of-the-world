@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "date": "2026-11-13",
+  "dayNumber": 121,
+  "resetsAt": "2026-11-14T05:00:00.000Z",
+  "prompts": [
+    {
+      "id": "p1",
+      "text": "Name a video game you can play on PS5, Xbox Series X, Nintendo Switch 1 or 2.",
+      "bank": "banks/7e6fe6ba5be469b7dda4a05cb131c8cb92de109da64647c16b9f12f13896e811.json.gz",
+      "rawSha256": "7e6fe6ba5be469b7dda4a05cb131c8cb92de109da64647c16b9f12f13896e811",
+      "sha256": "2f3990e92b3d0336b4bef0ab998cd94f17d7d73758c1b69461da5a33dc267a4f",
+      "bytes": 265657,
+      "expandedBytes": 1786942,
+      "answerCount": 29167
+    },
+    {
+      "id": "p2",
+      "text": "Name a country that has been colonized by Spain or Portugal.",
+      "bank": "banks/c052246f5175df599dc4d9353156d2c5bc5812f87fcb91c54b438ce2f92c3f15.json.gz",
+      "rawSha256": "c052246f5175df599dc4d9353156d2c5bc5812f87fcb91c54b438ce2f92c3f15",
+      "sha256": "13879a90376b32f3dbdbc6e8253b751c6dafc75a533fe7401b7ca698cac01bf7",
+      "bytes": 696,
+      "expandedBytes": 3245,
+      "answerCount": 60
+    },
+    {
+      "id": "p3",
+      "text": "Name a chemical element that makes up the human body.",
+      "bank": "banks/f58b48260e831402e4dc45619ab53738efed6dd65777acb34c648b40db257330.json.gz",
+      "rawSha256": "f58b48260e831402e4dc45619ab53738efed6dd65777acb34c648b40db257330",
+      "sha256": "74faf4d3f2be9550635db13bafa4514fdea4e9e3879d2f57c4e9be30c45ee662",
+      "bytes": 615,
+      "expandedBytes": 3402,
+      "answerCount": 66
+    },
+    {
+      "id": "p4",
+      "text": "Name an invention that existed before 1500 (no food or drinks).",
+      "bank": "banks/63c260c83c71c48671af68cac97862547ec48bf2adcfc858347436f42022d113.json.gz",
+      "rawSha256": "63c260c83c71c48671af68cac97862547ec48bf2adcfc858347436f42022d113",
+      "sha256": "c897a5fb16a890a9ea5044bf6748b62d53a1f11779afbc2632c7b532fc6fdf4f",
+      "bytes": 38722,
+      "expandedBytes": 327889,
+      "answerCount": 6330
+    },
+    {
+      "id": "p5",
+      "text": "Name anyone who has acted in an MCU film.",
+      "bank": "banks/6e3a27a2478ad5d519678699b388a2b16ab653e965eb2d8925965fefefbb6072.json.gz",
+      "rawSha256": "6e3a27a2478ad5d519678699b388a2b16ab653e965eb2d8925965fefefbb6072",
+      "sha256": "cd63bd14810fbafba7a9460dc1f9bf6a1f82cda1e90a76d7aa571ea7d9a018fa",
+      "bytes": 18729,
+      "expandedBytes": 131563,
+      "answerCount": 2381
+    },
+    {
+      "id": "p6",
+      "text": "Name a book that has been adapted into a movie.",
+      "bank": "banks/506484ad76b22b6f862883c481d566625d77a53ed4a3eab968fc3fddafdfb407.json.gz",
+      "rawSha256": "506484ad76b22b6f862883c481d566625d77a53ed4a3eab968fc3fddafdfb407",
+      "sha256": "20941bfa81681a58674d69279c4ca46d8ceb65a38ad1d5a93215fecbdbe39a58",
+      "bytes": 188986,
+      "expandedBytes": 1233326,
+      "answerCount": 20776
+    },
+    {
+      "id": "p7",
+      "text": "Name a feature in TikTok.",
+      "bank": "banks/a23b32dfd572aa8201c7b2eba093490208d656ef8b892757d9b9520ad5323a8c.json.gz",
+      "rawSha256": "a23b32dfd572aa8201c7b2eba093490208d656ef8b892757d9b9520ad5323a8c",
+      "sha256": "07b9274b9300c38d0e7a1bfa9dc64fa134a0744b10469c8b7a9d7d4bc1a035ad",
+      "bytes": 14508,
+      "expandedBytes": 110985,
+      "answerCount": 2077
+    }
+  ],
+  "contentSha256": "8b394c17f5a226432d7e66c612ec5cc6ede35196fbb8eabbe0ce5891e1a86faa",
+  "capturedAt": "2026-11-13T12:10:19.382Z",
+  "source": {
+    "name": "Krillion",
+    "url": "https://krillion.io/",
+    "today": "https://krillion.io/api/today",
+    "reveal": "https://krillion.io/api/reveal?date=2026-11-13"
+  },
+  "matching": "Public canonical answer sheet. Private server aliases, corrections and live popularity are not exported."
+}
