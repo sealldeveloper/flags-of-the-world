@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "date": "2026-11-14",
+  "dayNumber": 122,
+  "resetsAt": "2026-11-15T05:00:00.000Z",
+  "prompts": [
+    {
+      "id": "p1",
+      "text": "Name a billionaire.",
+      "bank": "banks/343dc3966cc38ae7cd09407a57c529db196248554b65c0c6b771dd1916709fae.json.gz",
+      "rawSha256": "343dc3966cc38ae7cd09407a57c529db196248554b65c0c6b771dd1916709fae",
+      "sha256": "d5e0e227f22bb95691fbf9c0cfa04d8526306a158c1dd4501ee14f3fec912a70",
+      "bytes": 37754,
+      "expandedBytes": 290921,
+      "answerCount": 5262
+    },
+    {
+      "id": "p2",
+      "text": "Name an extinct animal that isn't an insect or invertebrate.",
+      "bank": "banks/41f4d441e742f33577b8126b1fda6f8cde7f24784d271b4854091558de7c9e12.json.gz",
+      "rawSha256": "41f4d441e742f33577b8126b1fda6f8cde7f24784d271b4854091558de7c9e12",
+      "sha256": "e2f00cae8dd49a90125307a52cc325fe070fcd821d1e8b5d802c4c8e47db2042",
+      "bytes": 105494,
+      "expandedBytes": 1088295,
+      "answerCount": 20215
+    },
+    {
+      "id": "p3",
+      "text": "Name a living animal that moves on 2 feet and can't fly.",
+      "bank": "banks/2ad778b1f9c47b2c5a5a8135b58a1b216f109436fa73d72aed78f8c11cc4b659.json.gz",
+      "rawSha256": "2ad778b1f9c47b2c5a5a8135b58a1b216f109436fa73d72aed78f8c11cc4b659",
+      "sha256": "a2669fafd58ebefe4627001b6bac0b6cdfce1ce76262e6bec2553e231c9eb9a4",
+      "bytes": 2771,
+      "expandedBytes": 20363,
+      "answerCount": 340
+    },
+    {
+      "id": "p4",
+      "text": "Name a ball sport where you don't score by getting the ball into or through an object.",
+      "bank": "banks/c641bed94430853633c9a5a65b53f5e50353f68c1ff1e2fa109a2a4222da5923.json.gz",
+      "rawSha256": "c641bed94430853633c9a5a65b53f5e50353f68c1ff1e2fa109a2a4222da5923",
+      "sha256": "3e7394fc3cbf54614f5b1a41ebac5d869873b80847b86f290e6720739fbdf8ba",
+      "bytes": 4391,
+      "expandedBytes": 34170,
+      "answerCount": 626
+    },
+    {
+      "id": "p5",
+      "text": "Name any island (must be inhabited).",
+      "bank": "banks/aecbe67771662dbe6c24f4d426979ddc8a81a09cc4cd4955373d0641b3f9764e.json.gz",
+      "rawSha256": "aecbe67771662dbe6c24f4d426979ddc8a81a09cc4cd4955373d0641b3f9764e",
+      "sha256": "17eba26269e01eda230f51d5f9d2bdae355db623c671bfac1bce9c4b3b578795",
+      "bytes": 54981,
+      "expandedBytes": 505977,
+      "answerCount": 9298
+    },
+    {
+      "id": "p6",
+      "text": "Name a fictional way to travel.",
+      "bank": "banks/c111877612602bd26392ae08a640074d65f1dcfc9a70febf599a347c0d54d75f.json.gz",
+      "rawSha256": "c111877612602bd26392ae08a640074d65f1dcfc9a70febf599a347c0d54d75f",
+      "sha256": "2ae1c6eed870c0c3eb8810978dbaac681a54d29146124f8dc7b2f9a12c38e51f",
+      "bytes": 366445,
+      "expandedBytes": 2830206,
+      "answerCount": 48705
+    },
+    {
+      "id": "p7",
+      "text": "Name any national government agency.",
+      "bank": "banks/b196056e40b249028d94f01ba1db4771342845be37e62d883f1ef1f17aebd7d6.json.gz",
+      "rawSha256": "b196056e40b249028d94f01ba1db4771342845be37e62d883f1ef1f17aebd7d6",
+      "sha256": "0cebfa5ca7e5b05ab89c09a0d12b2a8b0ba2df533e021c264da4dce0b2b9932b",
+      "bytes": 281692,
+      "expandedBytes": 2059108,
+      "answerCount": 26521
+    }
+  ],
+  "contentSha256": "3e0a1e3dc9b459da2beddad79bcc99f1c39f81bd9cb8f8d3c1c04d2666fa8e49",
+  "capturedAt": "2026-11-14T11:27:10.064Z",
+  "source": {
+    "name": "Krillion",
+    "url": "https://krillion.io/",
+    "today": "https://krillion.io/api/today",
+    "reveal": "https://krillion.io/api/reveal?date=2026-11-14"
+  },
+  "matching": "Public canonical answer sheet. Private server aliases, corrections and live popularity are not exported."
+}
