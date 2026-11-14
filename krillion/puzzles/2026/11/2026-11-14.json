@@ -7,22 +7,22 @@
     {
       "id": "p1",
       "text": "Name a billionaire.",
-      "bank": "banks/343dc3966cc38ae7cd09407a57c529db196248554b65c0c6b771dd1916709fae.json.gz",
-      "rawSha256": "343dc3966cc38ae7cd09407a57c529db196248554b65c0c6b771dd1916709fae",
-      "sha256": "d5e0e227f22bb95691fbf9c0cfa04d8526306a158c1dd4501ee14f3fec912a70",
-      "bytes": 37754,
-      "expandedBytes": 290921,
-      "answerCount": 5262
+      "bank": "banks/cc084b42f8aa7dbea9ab718f3ff2e15da292f4efc5e6901185e98fc534cea0e9.json.gz",
+      "rawSha256": "cc084b42f8aa7dbea9ab718f3ff2e15da292f4efc5e6901185e98fc534cea0e9",
+      "sha256": "f6c79d6f526b9019588a089ebce9c56c70d75fa1db037b3fc1b528d1d6488657",
+      "bytes": 37874,
+      "expandedBytes": 291704,
+      "answerCount": 5276
     },
     {
       "id": "p2",
       "text": "Name an extinct animal that isn't an insect or invertebrate.",
-      "bank": "banks/41f4d441e742f33577b8126b1fda6f8cde7f24784d271b4854091558de7c9e12.json.gz",
-      "rawSha256": "41f4d441e742f33577b8126b1fda6f8cde7f24784d271b4854091558de7c9e12",
-      "sha256": "e2f00cae8dd49a90125307a52cc325fe070fcd821d1e8b5d802c4c8e47db2042",
-      "bytes": 105494,
-      "expandedBytes": 1088295,
-      "answerCount": 20215
+      "bank": "banks/ad3eaf8bfd52c94748e5c3222ca8ffe7f2c4a848b9779272d8a470a79a52852f.json.gz",
+      "rawSha256": "ad3eaf8bfd52c94748e5c3222ca8ffe7f2c4a848b9779272d8a470a79a52852f",
+      "sha256": "a01c2bdedd59466ace8526e4a4b31d1a5bf8a5d5a0950ace41821982cb973090",
+      "bytes": 105505,
+      "expandedBytes": 1088353,
+      "answerCount": 20216
     },
     {
       "id": "p3",
@@ -47,36 +47,36 @@
     {
       "id": "p5",
       "text": "Name any island (must be inhabited).",
-      "bank": "banks/aecbe67771662dbe6c24f4d426979ddc8a81a09cc4cd4955373d0641b3f9764e.json.gz",
-      "rawSha256": "aecbe67771662dbe6c24f4d426979ddc8a81a09cc4cd4955373d0641b3f9764e",
-      "sha256": "17eba26269e01eda230f51d5f9d2bdae355db623c671bfac1bce9c4b3b578795",
-      "bytes": 54981,
-      "expandedBytes": 505977,
-      "answerCount": 9298
+      "bank": "banks/4b4eff5b06ded89b98fcc5b49acc0ceec391a1dc366ad6ca35b9493eee0f756b.json.gz",
+      "rawSha256": "4b4eff5b06ded89b98fcc5b49acc0ceec391a1dc366ad6ca35b9493eee0f756b",
+      "sha256": "c4a0f1f8a9eba696efed7f59f046bb5978f57cb40cfdf7aadf9cd76c2bc78390",
+      "bytes": 55000,
+      "expandedBytes": 506146,
+      "answerCount": 9301
     },
     {
       "id": "p6",
       "text": "Name a fictional way to travel.",
-      "bank": "banks/c111877612602bd26392ae08a640074d65f1dcfc9a70febf599a347c0d54d75f.json.gz",
-      "rawSha256": "c111877612602bd26392ae08a640074d65f1dcfc9a70febf599a347c0d54d75f",
-      "sha256": "2ae1c6eed870c0c3eb8810978dbaac681a54d29146124f8dc7b2f9a12c38e51f",
-      "bytes": 366445,
-      "expandedBytes": 2830206,
-      "answerCount": 48705
+      "bank": "banks/6b69b80beb1bbf5583418231925bbf55cd4921314f04b1def0eb3b729416ab76.json.gz",
+      "rawSha256": "6b69b80beb1bbf5583418231925bbf55cd4921314f04b1def0eb3b729416ab76",
+      "sha256": "40b88eb12affdd4b5278c31d94120ac3ed1ffbdf566a8faace813e848feb9399",
+      "bytes": 366666,
+      "expandedBytes": 2831851,
+      "answerCount": 48733
     },
     {
       "id": "p7",
       "text": "Name any national government agency.",
-      "bank": "banks/b196056e40b249028d94f01ba1db4771342845be37e62d883f1ef1f17aebd7d6.json.gz",
-      "rawSha256": "b196056e40b249028d94f01ba1db4771342845be37e62d883f1ef1f17aebd7d6",
-      "sha256": "0cebfa5ca7e5b05ab89c09a0d12b2a8b0ba2df533e021c264da4dce0b2b9932b",
-      "bytes": 281692,
-      "expandedBytes": 2059108,
-      "answerCount": 26521
+      "bank": "banks/9e8129b4518689b21d11fd78122aec991916e78a553cabcaccff65c697de96c5.json.gz",
+      "rawSha256": "9e8129b4518689b21d11fd78122aec991916e78a553cabcaccff65c697de96c5",
+      "sha256": "a0023030c0a4c9ec594a514b62f7a81e796e0c49ece192308b68f3a0c417c69b",
+      "bytes": 281924,
+      "expandedBytes": 2060906,
+      "answerCount": 26548
     }
   ],
-  "contentSha256": "3e0a1e3dc9b459da2beddad79bcc99f1c39f81bd9cb8f8d3c1c04d2666fa8e49",
-  "capturedAt": "2026-11-14T11:27:10.064Z",
+  "contentSha256": "d515c999c4aafdda8e93b340be3c13cfa14a61287ac68ef6fa3058b292e6a765",
+  "capturedAt": "2026-11-14T21:27:34.348Z",
   "source": {
     "name": "Krillion",
     "url": "https://krillion.io/",
