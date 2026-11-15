@@ -87,6 +87,7 @@ label:has(input[type=file]:focus-visible) { outline: 3px solid var(--site-accent
 .player-dot { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--player-color); box-shadow: 0 0 0 1px var(--site-border) }
 .player.offline .player-dot { opacity: .45 }
 .player-status { display: block; font-size: 11px; color: var(--site-muted) }
+.player-ping { white-space: nowrap; font-variant-numeric: tabular-nums }
 .remove-player { flex: none; min-height: 28px; width: 26px; padding: 0; border-color: transparent; background: transparent }
 .rank-layout { display: grid; grid-template-columns: minmax(0,1fr); gap: 20px; align-items: start }
 .in-lobby .rank-layout { grid-template-columns: minmax(0,1fr) minmax(280px,360px); gap: 24px }

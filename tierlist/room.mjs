@@ -10,7 +10,7 @@ const readResume = () => { try { return JSON.parse(sessionStorage.getItem('tierl
 export const savedInvite = () => readResume()?.invite || '';
 export class TierRoom {
   constructor({onState, onStatus, onError, onEvents=()=>{}}) {
-    Object.assign(this,{onState,onStatus,onError,onEvents,peers:new Map(),players:new Map(),seats:new Map(),originalCache:new Map(),disposed:false,connected:false,retry:0,events:[],eventSerial:0});
+    Object.assign(this,{onState,onStatus,onError,onEvents,peers:new Map(),players:new Map(),seats:new Map(),originalCache:new Map(),disposed:false,connected:false,retry:0,events:[],eventSerial:0,latency:{}});
   }
   async open(name, album = null, invite = '', color = null) {
     this.color=color===null?null:cleanColour(color);this.name = cleanName(name); this.isHost = !invite;
@@ -33,8 +33,9 @@ export class TierRoom {
       if (this.isHost) {
         for (const [conn,p] of this.peers) {
           if (Date.now()-p.lastSeen>35000 || (!p.seat && Date.now()-p.created>12000)) this.transport.disconnect(conn);
-          else this.send(conn,{type:'ping'});
+          else this.ping(conn,p);
         }
+        this.publishLatency();
       } else if (this.connection) {
         if (Date.now()-this.lastSeen>35000) this.transport.disconnect(this.connection);
         else this.send(this.connection,{type:'ping'});
@@ -55,7 +56,7 @@ export class TierRoom {
   inviteCode() {return encodeInvite(this.ticket);}
   invite() { return `${location.origin}${location.pathname}#join=${this.inviteCode()}`; }
   emit() {
-    if (this.album && this.self && this.players.has(this.self)) this.onState({album:this.album,self:this.self,host:this.isHost,hostId:this.hostId,connected:this.connected,assets:this.originalTransfer?.state,players:[...this.players.values()]});
+    if (this.album && this.self && this.players.has(this.self)) this.onState({album:this.album,self:this.self,host:this.isHost,hostId:this.hostId,connected:this.connected,assets:this.originalTransfer?.state,latency:this.latency,players:[...this.players.values()]});
   }
   async dial() {
     if (this.disposed) return;
@@ -71,7 +72,7 @@ export class TierRoom {
   }
   reconnect() {
     if (this.disposed || this.retryTimer) return;
-    this.assets?.abort();this.originalTransfer?.stop();clearTimeout(this.joinTimer);this.connection=null; this.welcomed=false; this.connected=false; this.emit();
+    this.assets?.abort();this.originalTransfer?.stop();clearTimeout(this.joinTimer);this.connection=null; this.welcomed=false; this.connected=false; this.latency={}; this.emit();
     if (++this.retry>4) { this.onStatus('Disconnected · host unavailable'); this.onError('Host unavailable. Save or export your board to keep it.'); return; }
     this.onStatus(`Reconnecting (${this.retry}/4)…`);
     this.retryTimer=setTimeout(()=>{this.retryTimer=null;this.dial();},500*2**this.retry);
@@ -80,6 +81,23 @@ export class TierRoom {
     if (this.disposed) return;
     try { this.transport.send(conn,{app:'tierlist',v:PROTOCOL,room:this.ticket.room,...message}); }
     catch { this.transport.disconnect(conn); }
+  }
+  ping(conn,peer) {
+    if(!peer.seat){this.send(conn,{type:'ping'});return;}
+    if(peer.probe && performance.now()-peer.probe.start<30000)return;
+    peer.probe={nonce:token(),start:performance.now()};
+    this.send(conn,{type:'ping',nonce:peer.probe.nonce});
+  }
+  publishLatency() {
+    if(!this.isHost || !this.self)return;
+    const now=performance.now(),values=Object.fromEntries([...this.players.values()].map(player=>{
+      const peer=[...this.peers.values()].find(peer=>peer.seat===player.id);
+      const ms=player.id===this.self?0:player.online && peer && now-peer.measuredAt<35000?peer.rtt??null:null;
+      return [player.id,ms];
+    }));
+    if(JSON.stringify(values)===JSON.stringify(this.latency))return;
+    this.latency=values;this.emit();
+    for(const [conn,peer]of this.peers)if(peer.seat)this.send(conn,{type:'latency',values});
   }
   event(e) {
     if (this.disposed) return;
@@ -97,7 +115,7 @@ export class TierRoom {
         const p=this.peers.get(e.connection);this.peers.delete(e.connection);this.originalTransfer?.drop(e.connection);
         if (p?.seat && ![...this.peers.values()].some(q=>q.seat===p.seat)) {
           const player=this.players.get(p.seat);
-          if (player) { player.online=false;player.phase='offline';this.publishPresence(player);this.record(player,'activity',p.left?'Left the lobby':'Disconnected'); }
+          if (player) { player.online=false;player.phase='offline';this.publishLatency();this.publishPresence(player);this.record(player,'activity',p.left?'Left the lobby':'Disconnected'); }
         }
       } else if (e.connection===this.connection) this.reconnect();
     } else if (e.kind==='message') {
@@ -119,7 +137,13 @@ export class TierRoom {
     const original=m.type.startsWith('original-'),counter=original?'assetCount':'count';peer[counter]=(peer[counter]||0)+1;
     if (peer[counter]>(original?1024:160)) {this.transport.disconnect(conn);return;}
     if (m.type==='ping') {this.send(conn,{type:'pong'});return;}
-    if (m.type==='pong') return;
+    if (m.type==='pong') {
+      if(peer.seat && peer.probe && m.nonce===peer.probe.nonce){
+        const elapsed=performance.now()-peer.probe.start;peer.probe=null;
+        if(Number.isFinite(elapsed) && elapsed>=0 && elapsed<35000){peer.rtt=Math.min(34999,Math.round(elapsed));peer.measuredAt=performance.now();this.publishLatency();}
+      }
+      return;
+    }
     try {
       if (m.type==='join') {
         if (peer.seat || m.capability!==this.ticket.secret) throw new Error('Invalid lobby capability');
@@ -137,7 +161,7 @@ export class TierRoom {
         this.send(conn,{type:'welcome',self:player.id,hostId:this.self,resume:this.seats.get(player.id),length:this.code.length});
         this.broadcastRoster();
         this.publishPlayer(player,conn);
-        this.record(player,'activity',m.resume?'Reconnected':'Joined the lobby');return;
+        this.record(player,'activity',m.resume?'Reconnected':'Joined the lobby');this.publishLatency();this.ping(conn,peer);return;
       }
       if (!peer.seat) throw new Error('Join first');
       if (m.type==='chunk') {
@@ -180,12 +204,18 @@ export class TierRoom {
   }
   async guestMessage(m) {
     this.lastSeen=Date.now();
-    if (m.type==='ping') {this.send(this.connection,{type:'pong'});return;}
+    if (m.type==='ping') {this.send(this.connection,{type:'pong',...(typeof m.nonce==='string' && /^[a-f0-9]{32}$/.test(m.nonce)?{nonce:m.nonce}:{})});return;}
     if (m.type==='pong') return;
+    if (m.type==='latency') {
+      if(!m.values || typeof m.values!=='object' || Array.isArray(m.values) || Object.keys(m.values).length>MAX_PLAYERS)throw new Error('Invalid player latency');
+      const entries=Object.entries(m.values);
+      if(entries.some(([id,ms])=>!/^[a-f0-9]{32}$/.test(id) || !(ms===null || Number.isInteger(ms) && ms>=0 && ms<35000)))throw new Error('Invalid player latency');
+      this.latency=Object.fromEntries(entries);if(this.connected)this.emit();return;
+    }
     if (m.type==='welcome') {
       if (!/^[a-f0-9]{32}$/.test(m.hostId) || !/^[a-f0-9]{32}$/.test(m.self) || !/^[a-f0-9]{32}$/.test(m.resume) || !Number.isInteger(m.length) || m.length<10 || m.length>8*1024*1024) throw new Error('Invalid lobby welcome');
       this.self=m.self;this.hostId=m.hostId;this.resume=m.resume;this.welcomed=true;
-      this.players.clear();this.roster=null;this.syncIndex=0;this.events=[];this.onEvents(this.events);this.length=m.length;this.parts=[];this.received=0;this.nextChunk=0;
+      this.players.clear();this.latency={};this.roster=null;this.syncIndex=0;this.events=[];this.onEvents(this.events);this.length=m.length;this.parts=[];this.received=0;this.nextChunk=0;
       try { sessionStorage.setItem('tierlist-resume',JSON.stringify({room:this.ticket.room,secret:m.resume,invite:this.invite()})); } catch { /* In-memory resume still works. */ }
       this.send(this.connection,{type:'chunk',index:0});this.armTimeout();
     } else if (m.type==='roster') {
@@ -280,7 +310,7 @@ export class TierRoom {
       p.seat=null;this.send(conn,{type:'ended'});setTimeout(()=>this.transport?.disconnect(conn),200);
     }
     const player=this.players.get(playerId);if(player)this.record(this.players.get(this.self),'activity',`Removed ${player.name}`);
-    this.players.delete(playerId);this.seats.delete(playerId);this.broadcastRoster();this.emit();
+    this.players.delete(playerId);this.seats.delete(playerId);this.broadcastRoster();this.publishLatency();this.emit();
   }
   receiveEvent(value) {
     const event=validateEvent(value);
@@ -297,7 +327,7 @@ export class TierRoom {
   sendHistory(conn) {for(let index=0;index<this.events.length;index+=6)this.send(conn,{type:'history',events:this.events.slice(index,index+6)});}
   async stop() {
     if (this.disposed) return;
-    this.disposed=true;this.connected=false;this.assets?.abort();this.originalTransfer?.stop();clearInterval(this.heartbeat);
+    this.disposed=true;this.connected=false;this.latency={};this.emit();this.assets?.abort();this.originalTransfer?.stop();clearInterval(this.heartbeat);
     clearTimeout(this.joinTimer);clearTimeout(this.retryTimer);
     await this.transport?.close();
   }

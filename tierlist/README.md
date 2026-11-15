@@ -59,6 +59,8 @@ An open viewer upgrades automatically when its original is ready. Save-copy and 
 
 There are 16 seats including retained offline seats. Guests can resume within the session. Host reload ends a lobby. No host migration, chat, game server, discovery service or WebRTC fallback is used. Public relay connectivity, background throttling and mobile suspension remain external constraints.
 
+The Players sidebar shows each guest's measured round-trip ping to the host in milliseconds. The host measures nonce-matched iroh probes on join and with the eight-second heartbeat, then shares those values with every participant; this is not guest-to-guest latency. The local host shows 0 ms. Unmeasured, stale (35 seconds), offline or disconnected values show — ms rather than a fabricated zero. Ping updates preserve focused sidebar controls and do not add activity events. Older clients remain compatible but cannot return the new nonce, so their ping stays unavailable until refreshed.
+
 Each player ranks independently. Activity retains 80 bounded events, with timestamps including seconds and authenticated, clickable item/tier references. Everyone shows every player's own tiers, placements and Unranked. Chosen player colours are validated, duplicate colours are permitted, and the host controls removals.
 
 Browsing the library or editing a local tierlist does not leave the lobby. Return to lobby restores the live view, and incoming updates never replace typed local edits. Hosts see Disband lobby and guests see Leave lobby. Named copies use the immutable starting tierlist and authenticated host attribution, not another player's edited board.

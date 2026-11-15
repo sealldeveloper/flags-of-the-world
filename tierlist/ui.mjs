@@ -529,20 +529,31 @@ async function beginRoom(invite='') {
     if(room===current || !room){busy=false;lockLibrary();if(album){syncWorkspace();renderBoard();}$('#cancel-join').hidden=!room || !!lobbyState;$('#confirm-join').disabled=!!room;$('#join-name').readOnly=!!room;}
   }
 }
+function renderPlayerPings() {
+  for(const chip of $('#players').children){
+    const player=state.players.find(player=>player.id===chip.dataset.player),ping=chip.querySelector('.player-ping');
+    if(!player || !ping)continue;
+    const host=player.id===state.hostId,ms=state.connected && player.online?(host?0:state.latency?.[player.id]):null;
+    ping.textContent=` · ${Number.isInteger(ms)?ms:'—'} ms`;
+    ping.title=!state.connected || !player.online?'Ping unavailable while disconnected':host?'Host: local authority, no network hop':Number.isInteger(ms)?'Round-trip latency to the host over iroh':'Measuring round-trip latency to the host…';
+    ping.setAttribute('aria-label',Number.isInteger(ms)?`${ms} milliseconds round-trip to host`:'Ping unavailable');
+  }
+}
 function renderPlayers() {
   if(!state)return;
   const signature=JSON.stringify([state.host,state.players.map(player=>[player.id,player.name,player.color,player.online,player.phase,player.progress,player.originals])]);
-  if(signature===rosterSignature)return;rosterSignature=signature;
+  if(signature===rosterSignature){renderPlayerPings();return;}rosterSignature=signature;
   const container=$('#players');container.replaceChildren();
   for(const player of state.players) {
     const self=player.id===state.self,chip=el('div',`player${player.online?'':' offline'}`);
     chip.dataset.player=player.id;chip.style.setProperty('--player-color',player.color);
     const select=button('',()=>locateActivity({actor:player.id},{type:'board',id:'board',label:player.name}),'player-select'),name=el('span','player-name',player.name+(self?' (you)':''));
-    select.title=`Show ${player.name}’s tierlist`;name.append(el('small','player-status',playerStatus(player)));
+    select.title=`Show ${player.name}’s tierlist`;const metadata=el('small','player-status',playerStatus(player));metadata.append(el('span','player-ping'));name.append(metadata);
     select.append(el('span','player-dot'),name);chip.append(select);
     if(state.host && !self){const remove=button('✕',()=>{if(confirm(`Remove ${player.name} and their board?`))room.remove(player.id);},'remove-player danger');remove.setAttribute('aria-label',`Remove ${player.name}`);chip.append(remove);}
     container.append(chip);
   }
+  renderPlayerPings();
 }
 function openJoinPrompt(invite) {
   if(room){error('Leave the current lobby before opening another invite.');return;}
