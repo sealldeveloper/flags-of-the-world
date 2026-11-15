@@ -526,8 +526,41 @@ function lockLibrary() {
   for(const selector of ['#join','#resume','#player-color'])$(selector).disabled=!!room || busy;
   $('#join-color').disabled=!!room || busy;renderLobbyBar();
 }
+// One pending choice, owned by the current room; cancellation resolves old callbacks.
+let resolveRankingChoice=null;
+function clearRankingChoice() {
+  const resolve=resolveRankingChoice;resolveRankingChoice=null;
+  $('#offline-ranking-choice').hidden=true;$('#join-form').hidden=false;
+  $('#offline-ranking-candidates').replaceChildren();resolve?.(undefined);
+}
+function showRankingChoice(current,offer) {
+  if(room!==current)return;
+  clearRankingChoice();
+  if(!offer)return;
+  $('#join-name').value=$('#player-name').value;
+  $('#join-form').hidden=true;$('#offline-ranking-choice').hidden=false;
+  if(!$('#join-dialog').open)$('#join-dialog').showModal();
+  const take=$('#take-offline-ranking');take.disabled=true;
+  for(const [index,candidate] of offer.candidates.entries()){
+    const label=el('label','offline-ranking-candidate'),radio=el('input');radio.type='radio';radio.name='offline-ranking';radio.value=candidate.id;
+    const description=el('span');description.append(el('strong','',candidate.name),el('small','',`Seat ${index+1} · ${candidate.color} · ${candidate.ranked} ranked · revision ${candidate.seq} · ${candidate.id.slice(0,8)}`));
+    label.style.setProperty('--player-color',candidate.color);label.append(radio,description);$('#offline-ranking-candidates').append(label);
+    radio.addEventListener('change',()=>{take.disabled=false;});
+  }
+  $('#join-new-ranking').disabled=!offer.canJoinNew;
+  $('#offline-ranking-capacity').hidden=offer.canJoinNew;
+  const promise=new Promise(resolve=>{resolveRankingChoice=resolve;});
+  $('#offline-ranking-candidates input').focus();return promise;
+}
+function chooseRanking(target) {
+  const resolve=resolveRankingChoice;resolveRankingChoice=null;
+  for(const node of $('#offline-ranking-choice').querySelectorAll('button,input'))node.disabled=true;
+  resolve?.(target);
+}
+$('#take-offline-ranking').addEventListener('click',()=>{const selected=$('#offline-ranking-candidates input:checked');if(selected)chooseRanking(selected.value);});
+$('#join-new-ranking').addEventListener('click',()=>chooseRanking(null));
 async function beginRoom(invite='') {
-  if(room || busy)return;clearError();await persist();
+  if(room || busy)return;if(invite)joinInvite=invite;clearError();await persist();
   const name=$(invite?'#player-name':'#host-name').value.trim();
   if(!name){error('Enter your player name before connecting.');return;}
   const color=cleanColour($('#player-color').value);
@@ -549,9 +582,9 @@ async function beginRoom(invite='') {
     if(activeTab==='everyone')renderComparison();
     if(!$('#invite-fallback').open)$('#invite-output').value=current.invite();
   },onStatus:text=>{if(room!==current)return;lobbyStatus=text;$('#connection').textContent=text;renderLobbyBar();if(viewingLobby && !lobbyState){if($('#creating-dialog').open)$('#creating-status').textContent=text;else status(text);}},onError:problem=>{
-    if(room!==current)return;error(problem);
+    if(room!==current)return;clearRankingChoice();error(problem);
     if(!lobbyState){room=null;viewingLobby=false;busy=false;current.stop().catch(()=>{});$('#creating-dialog').close();status('');lockLibrary();$('#confirm-join').disabled=false;$('#join-name').readOnly=false;$('#cancel-join').hidden=true;if(album){syncWorkspace();renderBoard();}}
-  },onEvents:events=>{if(room===current)activity.setEvents(events);}});
+  },onJoinOffer:offer=>showRankingChoice(current,offer),onEvents:events=>{if(room===current)activity.setEvents(events);}});
   room=current;
   try {await current.open(name,invite?null:presentAlbum(),invite,color);}
   catch(problem) {
@@ -589,16 +622,16 @@ function renderPlayers() {
 }
 function openJoinPrompt(invite) {
   if(room){error('Leave the current lobby before opening another invite.');return;}
-  clearError();joinInvite=invite;importController?.abort();
+  clearRankingChoice();clearError();joinInvite=invite;importController?.abort();
   for(const selector of ['#code-dialog','#host-dialog','#image-dialog'])if($(selector).open)$(selector).close();
   if(!$('#join-dialog').open){$('#join-name').value=$('#player-name').value;$('#join-status').textContent='';$('#confirm-join').disabled=false;$('#join-name').readOnly=false;$('#join-dialog').showModal();}
   $('#join-name').focus();
 }
 async function cancelJoin() {
   if(lobbyState)return;
-  const current=room;room=null;viewingLobby=false;busy=false;if(current)await current.stop();
+  clearRankingChoice();const current=room;room=null;viewingLobby=false;busy=false;const stopping=current?.stop();
   joinInvite='';lockLibrary();if(album){syncWorkspace();renderBoard();}$('#cancel-join').hidden=true;$('#confirm-join').disabled=false;$('#join-name').readOnly=false;$('#join-dialog').close();$('#creating-dialog').close();
-  if(location.hash)history.replaceState(null,'',location.pathname+location.search);status('');
+  if(location.hash)history.replaceState(null,'',location.pathname+location.search);status('');await stopping;
 }
 $('#join-form').addEventListener('submit',attempt(async event=>{event.preventDefault();$('#player-name').value=$('#join-name').value;$('#confirm-join').disabled=true;await beginRoom(joinInvite);}));
 $('#cancel-join-dialog').addEventListener('click',attempt(cancelJoin));

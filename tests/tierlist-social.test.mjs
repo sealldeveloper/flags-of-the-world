@@ -82,8 +82,11 @@ test('all 16 seats sync individually, reject overflow, retain offline seats and 
  assert.equal(room.players.size,16);assert.equal(new Set([...room.players.values()].map(player=>player.color)).size,16);
  room.peers.set('extra',{lastSeen:Date.now(),window:Date.now(),count:0});room.hostMessage('extra',{type:'join',name:'Overflow',capability:room.ticket.secret});assert.match(messages.at(-1).message,/full/);
  const seat=room.peers.get('peer1').seat,secret=room.seats.get(seat);room.remove(seat);assert(!room.seats.has(seat));
- room.hostMessage('extra',{type:'join',name:'Removed',capability:room.ticket.secret,resume:secret});assert.match(messages.at(-1).message,/no longer available/);
- room.hostMessage('extra',{type:'join',name:'Replacement',capability:room.ticket.secret});assert.equal(room.players.size,16);
+ // Rejections close pending connections; each subsequent attempt is a fresh peer.
+ room.peers.set('removed',{lastSeen:Date.now(),window:Date.now(),count:0});
+ room.hostMessage('removed',{type:'join',name:'Removed',capability:room.ticket.secret,resume:secret});assert.match(messages.at(-1).message,/no longer available/);
+ room.peers.set('replacement',{lastSeen:Date.now(),window:Date.now(),count:0});
+ room.hostMessage('replacement',{type:'join',name:'Replacement',capability:room.ticket.secret});assert.equal(room.players.size,16);
 });
 test('chosen colours are validated, applied to authenticated seats and can be reselected on resume',t=>{
  const pending=[];t.mock.method(globalThis,'setTimeout',fn=>{pending.push(fn);return pending.length;});

@@ -318,3 +318,16 @@ dialog .section-heading>button { flex: none }
 #originals-status { margin: 8px 0 16px; overflow-wrap: anywhere }
 #image-load-status { position: absolute; z-index: 2; top: 16px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 32px); padding: 8px 12px; margin: 0; background: #182133; color: #fff; pointer-events: none; border-radius: 4px }
 #image-load-status:empty { display: none }
+
+/* Join-only recovery choice; inherits shared dialog surfaces, controls and focus. */
+#offline-ranking-choice h3 { margin: 0 0 12px; font-size: 17px }
+#offline-ranking-choice p { font-size: 14px; overflow-wrap: anywhere }
+#offline-ranking-choice .offline-ranking-note { color: var(--site-text); font-size: 13px }
+#offline-ranking-candidates { display: grid; gap: 8px; min-width: 0; margin: 16px 0; padding: 0; border: 0 }
+.offline-ranking-candidate { display: flex; align-items: center; gap: 12px; min-width: 0; margin: 0; padding: 12px; border: 1px solid var(--site-border); border-left: 4px solid var(--player-color); border-radius: 4px; cursor: pointer }
+.offline-ranking-candidate input { width: 18px; height: 18px; flex: none; margin: 0 }
+.offline-ranking-candidate span { min-width: 0; overflow-wrap: anywhere }
+.offline-ranking-candidate strong,.offline-ranking-candidate small { display: block }
+.offline-ranking-candidate small { margin-top: 4px; font-size: 12px }
+.offline-ranking-actions { display: grid; gap: 8px }
+.offline-ranking-actions button { white-space: normal; min-height: 44px }

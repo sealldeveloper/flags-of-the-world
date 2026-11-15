@@ -6,12 +6,15 @@ import {encodeAlbum, decodeAlbum, verifyImages, previewAlbum} from './codec.mjs'
 import {OriginalTransfer} from './progressive.mjs';
 import {randomColour,cleanColour,validateEvent,boardChange,MAX_EVENTS} from './social.mjs';
 const PROTOCOL=6;
-const CHUNK = 24000, MAX_PLAYERS = 16;
+const CHUNK = 24000, MAX_PLAYERS = 16, OFFER_MS = 90000;
+const capabilityId = value => typeof value==='string' && /^[a-f0-9]{32}$/.test(value);
+// Case-sensitive, trimmed NFC equivalence only; colour never participates in matching.
+const reclaimName = value => cleanName(value).normalize('NFC');
 const readResume = () => { try { return JSON.parse(sessionStorage.getItem('tierlist-resume') || 'null'); } catch { return null; } };
 export const savedInvite = () => readResume()?.invite || '';
 export class TierRoom {
-  constructor({onState, onStatus, onError, onEvents=()=>{}}) {
-    Object.assign(this,{onState,onStatus,onError,onEvents,peers:new Map(),players:new Map(),seats:new Map(),originalCache:new Map(),disposed:false,connected:false,retry:0,events:[],eventSerial:0,latency:{},protocol:PROTOCOL});
+  constructor({onState, onStatus, onError, onEvents=()=>{}, onJoinOffer=null}) {
+    Object.assign(this,{onState,onStatus,onError,onEvents,onJoinOffer,peers:new Map(),players:new Map(),seats:new Map(),originalCache:new Map(),disposed:false,connected:false,retry:0,events:[],eventSerial:0,latency:{},protocol:PROTOCOL});
   }
   async open(name, album = null, invite = '', color = null) {
     this.color=color===null?null:cleanColour(color);this.name = cleanName(name); this.isHost = !invite;
@@ -35,7 +38,7 @@ export class TierRoom {
     this.heartbeat = setInterval(()=>{
       if (this.isHost) {
         for (const [conn,p] of this.peers) {
-          if (Date.now()-p.lastSeen>35000 || (!p.seat && Date.now()-p.created>12000)) this.transport.disconnect(conn);
+          if (Date.now()-p.lastSeen>35000 || (!p.seat && Date.now()>(p.offer?.expires ?? p.created+12000))) this.transport.disconnect(conn);
           else this.ping(conn,p);
         }
         this.publishLatency();
@@ -83,9 +86,12 @@ export class TierRoom {
     clearTimeout(this.joinTimer);
     this.joinTimer = setTimeout(()=>{ if (this.connection) this.transport.disconnect(this.connection); else this.reconnect(); },25000);
   }
+  clearJoinOffer() {
+    this.joinOffer=null;this.onJoinOffer?.(null);
+  }
   reconnect() {
     if (this.disposed || this.retryTimer) return;
-    this.assets?.abort();this.originalTransfer?.stop();clearTimeout(this.joinTimer);this.connection=null; this.welcomed=false; this.connected=false; this.latency={}; this.emit();
+    this.clearJoinOffer();this.assets?.abort();this.originalTransfer?.stop();clearTimeout(this.joinTimer);this.connection=null; this.welcomed=false; this.connected=false; this.latency={}; this.emit();
     // Established/saved seats must recover after a suspended tab or temporary outage.
     if (++this.retry>4 && !this.wasConnected && !this.resume) { this.onStatus('Disconnected · host unavailable'); this.onError('Host unavailable. Save or export your board to keep it.'); return; }
     this.onStatus(`Reconnecting (attempt ${this.retry})…`);
@@ -121,9 +127,12 @@ export class TierRoom {
       if (this.isHost) this.peers.set(e.connection,{created:Date.now(),lastSeen:Date.now(),window:Date.now(),count:0,assetCount:0});
       else {
         if (e.peer!==this.ticket.host) { this.transport.disconnect(e.connection); return; }
-        if (this.connection && this.connection!==e.connection) this.transport.disconnect(this.connection);
-        this.connection=e.connection;this.lastSeen=Date.now();this.armTimeout();
-        this.send(e.connection,{type:'join',name:this.name,color:this.color,capability:this.ticket.secret,resume:this.resume});
+        const previous=this.connection;
+        if(previous!==e.connection)this.clearJoinOffer();
+        this.connection=e.connection;
+        if(previous && previous!==e.connection)this.transport.disconnect(previous);
+        this.lastSeen=Date.now();this.armTimeout();
+        this.send(e.connection,{type:'join',name:this.name,color:this.color,capability:this.ticket.secret,resume:this.resume,...(this.onJoinOffer?{offlineRanking:true}:{})});
       }
     } else if (e.kind==='closed') {
       if (this.isHost) {
@@ -146,7 +155,7 @@ export class TierRoom {
     }
   }
   hostMessage(conn,m) {
-    const peer=this.peers.get(conn);if (!peer) return;
+    const peer=this.peers.get(conn);if (!peer || peer.rejected) return;
     peer.lastSeen=Date.now();
     if (Date.now()-peer.window>1000) {peer.window=Date.now();peer.count=0;peer.assetCount=0;}
     const original=m.type.startsWith('original-'),counter=original?'assetCount':'count';peer[counter]=(peer[counter]||0)+1;
@@ -161,27 +170,41 @@ export class TierRoom {
     }
     try {
       if (m.type==='join') {
-        if (peer.seat || m.capability!==this.ticket.secret) throw new Error('Invalid lobby capability');
-        const name=cleanName(m.name),color=m.color==null?null:cleanColour(m.color);let player;
-        if (m.resume) {
-          const seat=[...this.seats.entries()].find(([,secret])=>secret===m.resume)?.[0];
-          player=this.players.get(seat);if (!player) throw new Error('That saved seat is no longer available');
-          // A resume is a takeover, not a second reusable owner of the same seat.
+        if (peer.seat || peer.offer || m.capability!==this.ticket.secret) throw new Error('Invalid lobby capability');
+        const name=cleanName(m.name),color=m.color==null?null:cleanColour(m.color);
+        const seat=capabilityId(m.resume)?[...this.seats.entries()].find(([,secret])=>secret===m.resume)?.[0]:null;
+        const player=this.players.get(seat);
+        if(player) {
+          // Rotate before welcome so displaced tabs cannot repeatedly reclaim it.
           this.seats.set(seat,token());
           for (const [old,p] of this.peers) if (p.seat===seat) {
             p.seat=null;this.send(old,{type:'seat-replaced'});
             setTimeout(()=>this.transport?.disconnect(old),200);
           }
-        } else {
-          if (this.players.size>=MAX_PLAYERS) throw new Error('Lobby is full (16 players, including offline seats)');
-          player={id:token(),name,color:color || randomColour([...this.players.values()].map(player=>player.color)),online:true,phase:'loading',progress:0,seq:0,board:copy(this.album.board)};
-          this.players.set(player.id,player);this.seats.set(player.id,token());
+          this.admit(conn,peer,player,name,color,'Reconnected');return;
         }
-        peer.seat=player.id;player.online=true;player.phase='loading';player.progress=0;player.originals=0;player.name=name;player.color=color || player.color;peer.nextChunk=0;peer.historySent=false;peer.syncIndex=0;peer.syncIds=null;
-        this.send(conn,{type:'welcome',self:player.id,hostId:this.self,resume:this.seats.get(player.id),length:this.code.length});
-        this.broadcastRoster();
-        this.publishPlayer(player,conn);
-        this.record(player,'activity',m.resume?'Reconnected':'Joined the lobby');this.publishLatency();this.ping(conn,peer);return;
+        if(m.offlineRanking===true){
+          const candidates=[...this.players.values()].filter(player=>this.reclaimable(player,name));
+          if(candidates.length){
+            if([...this.peers.values()].filter(p=>p.offer).length>=MAX_PLAYERS)throw new Error('Too many pending choices. Try again shortly.');
+            peer.offer={nonce:token(),expires:Date.now()+OFFER_MS,name,color,ids:new Set(candidates.map(player=>player.id))};
+            this.send(conn,{type:'offline-ranking-offer',nonce:peer.offer.nonce,expiresIn:OFFER_MS,canJoinNew:this.players.size<MAX_PLAYERS,candidates:candidates.map(player=>({id:player.id,name:player.name,color:player.color,seq:player.seq,ranked:player.board.tiers.reduce((sum,tier)=>sum+tier.items.length,0)}))});return;
+          }
+        }else if(m.resume)throw new Error('That saved seat is no longer available');
+        this.admit(conn,peer,null,name,color,'Joined the lobby');return;
+      }
+      if(m.type==='offline-ranking-choice'){
+        const offer=peer.offer;
+        if(peer.seat || !offer || Date.now()>offer.expires || !capabilityId(m.nonce) || m.nonce!==offer.nonce || !(m.target===null || capabilityId(m.target)))throw new Error('Invalid or expired offline ranking choice');
+        let player=null;
+        if(m.target!==null){
+          player=this.players.get(m.target);
+          if(!offer.ids.has(m.target) || !this.reclaimable(player,offer.name))throw new Error('That ranking is no longer offline or available. Join again to choose another seat.');
+          // Synchronous host authority: the first valid claim occupies the seat and
+          // rotates its capability before any other message can claim or resume it.
+          this.seats.set(player.id,token());
+        }
+        this.admit(conn,peer,player,offer.name,offer.color,player?'Took over the offline ranking':'Joined the lobby');return;
       }
       if (!peer.seat) throw new Error('Join first');
       if (m.type==='chunk') {
@@ -219,8 +242,22 @@ export class TierRoom {
       throw new Error('Unsupported lobby message');
     } catch (error) {
       this.send(conn,{type:'rejected',message:error.message});
-      if (!peer.seat) setTimeout(()=>this.transport?.disconnect(conn),200);
+      if (!peer.seat) {peer.rejected=true;peer.offer=null;setTimeout(()=>this.transport?.disconnect(conn),200);}
     }
+  }
+  reclaimable(player,name) {
+    return !!player && player.id!==this.self && player.id!==this.hostId && player.online===false && player.phase==='offline' && reclaimName(player.name)===reclaimName(name) && ![...this.peers.values()].some(peer=>peer.seat===player.id);
+  }
+  admit(conn,peer,player,name,color,activity) {
+    if(!player){
+      if(this.players.size>=MAX_PLAYERS)throw new Error('Lobby is full (16 players, including offline seats)');
+      player={id:token(),name,color:color || randomColour([...this.players.values()].map(player=>player.color)),online:true,phase:'loading',progress:0,seq:0,board:copy(this.album.board)};
+      this.players.set(player.id,player);this.seats.set(player.id,token());
+    }
+    peer.offer=null;peer.seat=player.id;player.online=true;player.phase='loading';player.progress=0;player.originals=0;player.name=name;player.color=color || player.color;peer.nextChunk=0;peer.historySent=false;peer.syncIndex=0;peer.syncIds=null;
+    this.send(conn,{type:'welcome',self:player.id,hostId:this.self,resume:this.seats.get(player.id),length:this.code.length});
+    this.broadcastRoster();this.publishPlayer(player,conn);
+    this.record(player,'activity',activity);this.publishLatency();this.ping(conn,peer);
   }
   async guestMessage(m) {
     this.lastSeen=Date.now();
@@ -232,7 +269,25 @@ export class TierRoom {
       if(entries.some(([id,ms])=>!/^[a-f0-9]{32}$/.test(id) || !(ms===null || Number.isInteger(ms) && ms>=0 && ms<35000)))throw new Error('Invalid player latency');
       this.latency=Object.fromEntries(entries);if(this.connected)this.emit();return;
     }
+    if(m.type==='offline-ranking-offer'){
+      if(!this.onJoinOffer || this.welcomed || this.joinOffer || !capabilityId(m.nonce) || m.expiresIn!==OFFER_MS || typeof m.canJoinNew!=='boolean' || !Array.isArray(m.candidates) || !m.candidates.length || m.candidates.length>=MAX_PLAYERS)throw new Error('Invalid offline ranking offer');
+      const ids=new Set();
+      const candidates=m.candidates.map(p=>{
+        if(!p || !capabilityId(p.id) || ids.has(p.id) || !Number.isSafeInteger(p.seq) || p.seq<0 || !Number.isSafeInteger(p.ranked) || p.ranked<0 || p.ranked>100000)throw new Error('Invalid offline ranking candidate');
+        ids.add(p.id);return {id:p.id,name:cleanName(p.name),color:cleanColour(p.color),seq:p.seq,ranked:p.ranked};
+      });
+      const connection=this.connection,offer=this.joinOffer={nonce:m.nonce};
+      clearTimeout(this.joinTimer);this.joinTimer=setTimeout(()=>{if(this.connection===connection)this.transport.disconnect(connection);},OFFER_MS+5000);
+      this.onStatus('Choose an offline ranking · expires in 90 seconds');
+      const target=await this.onJoinOffer({candidates,canJoinNew:m.canJoinNew});
+      if(this.disposed || this.connection!==connection || this.joinOffer!==offer)return;
+      this.clearJoinOffer();
+      if(target===undefined){await this.stop();return;}
+      if(!(target===null && m.canJoinNew) && !ids.has(target))throw new Error('Invalid offline ranking choice');
+      this.onStatus('Joining selected ranking…');this.send(connection,{type:'offline-ranking-choice',nonce:m.nonce,target});this.armTimeout();return;
+    }
     if (m.type==='welcome') {
+      this.clearJoinOffer();
       if (!/^[a-f0-9]{32}$/.test(m.hostId) || !/^[a-f0-9]{32}$/.test(m.self) || !/^[a-f0-9]{32}$/.test(m.resume) || !Number.isInteger(m.length) || m.length<10 || m.length>8*1024*1024) throw new Error('Invalid lobby welcome');
       this.self=m.self;this.hostId=m.hostId;this.resume=m.resume;this.welcomed=true;
       this.players.clear();this.latency={};this.roster=null;this.syncIndex=0;this.events=[];this.onEvents(this.events);this.length=m.length;this.parts=[];this.received=0;this.nextChunk=0;
@@ -351,7 +406,7 @@ export class TierRoom {
   sendHistory(conn) {for(let index=0;index<this.events.length;index+=6)this.send(conn,{type:'history',events:this.events.slice(index,index+6)});}
   async stop() {
     if (this.disposed) return;
-    this.disposed=true;this.connected=false;this.latency={};this.emit();this.assets?.abort();this.originalTransfer?.stop();clearInterval(this.heartbeat);
+    this.clearJoinOffer();this.disposed=true;this.connected=false;this.latency={};this.emit();this.assets?.abort();this.originalTransfer?.stop();clearInterval(this.heartbeat);
     clearTimeout(this.joinTimer);clearTimeout(this.retryTimer);
     globalThis.removeEventListener?.('online',this.onConnectionAvailable);
     globalThis.document?.removeEventListener('visibilitychange',this.onVisible);
