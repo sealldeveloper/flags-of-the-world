@@ -29,6 +29,9 @@ const clearError = () => {$('#error').hidden=true;$('#error').textContent='';$('
 const attempt = action => async(...args) => {try {await action(...args);} catch(e){error(e);}};
 function currentBoard() {return state ? state.players.find(p=>p.id===state.self)?.board : album?.board;}
 const canEdit = () => !!album && !busy && (!state || (state.connected && !room?.disposed));
+function renderInteractionHint(){
+  $('#controls-hint').textContent=activeTab==='rank'?(state&&!state.connected?(room?.disposed?'Disconnected · Your ranking remains available':'Reconnecting to host · Your ranking is preserved'):'Drag to rank · Double-click to zoom'):activeTab==='images'?'Drag to reorder · Double-click to zoom':'Read-only comparison · Double-click to zoom';
+}
 function presentAlbum() {return validateAlbum({...album,board:currentBoard()});}
 async function refreshLibrary() {
   try {let unsupported=0;libraryRecords=[];for(const saved of await listAlbums())try{libraryRecords.push(validateAlbum(saved));}catch{unsupported++;}renderLibrary();if(unsupported)error(`${unsupported} older tierlist${unsupported===1?' uses':'s use'} unsupported image data. Stored records have not been deleted.`);}
@@ -62,7 +65,7 @@ function syncWorkspace() {
   $('#album-title').textContent=album.name;$('#album-title').hidden=!state;$('#album-summary').textContent=`${album.images.length} image${album.images.length===1?'':'s'}`;
   $('#album-name').value=album.name;$('#copy-attribution').hidden=!album.copiedFrom;$('#copy-attribution').textContent=album.copiedFrom?`Copied from ${album.copiedFrom}`:'';
   if(!$('#host-name').value)$('#host-name').value=$('#player-name').value;
-  $('#workspace').classList.toggle('in-lobby',!!state);
+  $('#workspace').classList.toggle('in-lobby',!!state);renderInteractionHint();
   $('#album-fields').hidden=!!state;$('#host').hidden=!!room;$('#back').hidden=false;
   $('#lobby-details').hidden=!state;$('#tab-images').hidden=!!state;$('#tab-everyone').hidden=!state;$('#save-copy').hidden=!state;$('#group-export').hidden=!state;
   $('#activity-panel').hidden=!state;renderLobbyBar();renderCover();
@@ -256,7 +259,7 @@ function locateActivity(event,reference) {
 function setTab(tab) {
   clearTimeout(clickTimer);activeTab=tab;
   for (const name of ['rank','images','everyone']) {$('#'+name+'-view').hidden=name!==tab;$(`[data-tab="${name}"]`).setAttribute('aria-pressed',String(name===tab));}
-  $('#controls-hint').textContent=tab==='rank'?'Drag to rank · Double-click to zoom':tab==='images'?'Drag to reorder · Double-click to zoom':'Double-click to zoom';
+  renderInteractionHint();
   if (tab==='everyone')renderComparison();if(tab==='images')renderImages();if(tab==='rank'){renderBoard();activity.render();}
 }
 function editTier(value) {

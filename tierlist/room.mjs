@@ -53,6 +53,13 @@ export class TierRoom {
       this.onStatus('Hosting'); this.emit();
     } else {
       const saved = readResume(); this.resume = saved?.room === this.ticket.room ? saved.secret : null;
+      this.onConnectionAvailable=()=>{
+        if(this.disposed || this.connected || this.connection || this.dialing)return;
+        clearTimeout(this.retryTimer);this.retryTimer=null;this.retry=0;this.dial();
+      };
+      this.onVisible=()=>{if(globalThis.document?.visibilityState==='visible')this.onConnectionAvailable();};
+      globalThis.addEventListener?.('online',this.onConnectionAvailable);
+      globalThis.document?.addEventListener('visibilitychange',this.onVisible);
       await this.dial();
     }
   }
@@ -64,12 +71,13 @@ export class TierRoom {
     if (this.album && this.self && this.players.has(this.self)) this.onState({album:this.album,self:this.self,host:this.isHost,hostId:this.hostId,connected:this.connected,protocol:this.protocol,assets:this.originalTransfer?.state,latency:this.latency,players:[...this.players.values()]});
   }
   async dial() {
-    if (this.disposed) return;
-    this.onStatus(this.retry ? `Reconnecting (${this.retry}/4)…` : 'Connecting to host…');
+    if (this.disposed || this.dialing) return;
+    this.dialing=true;this.onStatus(this.retry ? `Reconnecting (attempt ${this.retry})…` : 'Connecting to host…');
     try {
       await this.transport.connect(this.ticket);
       if (!this.disposed && !this.welcomed) this.armTimeout();
     } catch { this.reconnect(); }
+    finally {this.dialing=false;}
   }
   armTimeout() {
     clearTimeout(this.joinTimer);
@@ -78,10 +86,12 @@ export class TierRoom {
   reconnect() {
     if (this.disposed || this.retryTimer) return;
     this.assets?.abort();this.originalTransfer?.stop();clearTimeout(this.joinTimer);this.connection=null; this.welcomed=false; this.connected=false; this.latency={}; this.emit();
-    if (++this.retry>4) { this.onStatus('Disconnected · host unavailable'); this.onError('Host unavailable. Save or export your board to keep it.'); return; }
-    this.onStatus(`Reconnecting (${this.retry}/4)…`);
-    this.retryTimer=setTimeout(()=>{this.retryTimer=null;this.dial();},500*2**this.retry);
+    // Established/saved seats must recover after a suspended tab or temporary outage.
+    if (++this.retry>4 && !this.wasConnected && !this.resume) { this.onStatus('Disconnected · host unavailable'); this.onError('Host unavailable. Save or export your board to keep it.'); return; }
+    this.onStatus(`Reconnecting (attempt ${this.retry})…`);
+    this.retryTimer=setTimeout(()=>{this.retryTimer=null;this.dial();},this.retryDelay());
   }
+  retryDelay() {return Math.min(30000,500*2**Math.min(this.retry,6));}
   send(conn, message) {
     if (this.disposed) return;
     try { this.transport.send(conn,{app:'tierlist',v:this.protocol,room:this.ticket.room,...message}); }
@@ -240,7 +250,7 @@ export class TierRoom {
       else {
         if(!this.players.has(this.self) || !this.players.has(this.hostId))throw new Error('Missing a lobby board');
         for(const p of this.players.values())p.board=validateBoard(p.board,this.album.images.map(i=>i.id));
-        clearTimeout(this.joinTimer);this.syncing=false;this.connected=true;this.retry=0;
+        clearTimeout(this.joinTimer);this.syncing=false;this.connected=true;this.wasConnected=true;this.retry=0;
         Object.assign(this.players.get(this.self),{phase:'ready',progress:100});
         this.send(this.connection,{type:'ready'});this.onStatus('Connected');this.emit();this.send(this.connection,{type:'timeline'});this.originalTransfer?.start();
       }
@@ -334,6 +344,8 @@ export class TierRoom {
     if (this.disposed) return;
     this.disposed=true;this.connected=false;this.latency={};this.emit();this.assets?.abort();this.originalTransfer?.stop();clearInterval(this.heartbeat);
     clearTimeout(this.joinTimer);clearTimeout(this.retryTimer);
+    globalThis.removeEventListener?.('online',this.onConnectionAvailable);
+    globalThis.document?.removeEventListener('visibilitychange',this.onVisible);
     await this.transport?.close();
   }
   async leave() {
