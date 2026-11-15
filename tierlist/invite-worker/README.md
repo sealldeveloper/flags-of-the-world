@@ -1,10 +1,12 @@
-# Discord Tier List invite preview (deployment pending)
+# Discord Tier List invite preview
 
 GitHub Pages cannot render dynamic Open Graph tags from the private `#join` fragment. This **separate, stateless** Cloudflare Worker renders a metadata landing page at:
 
 ```
 https://puzzle-invites.my-account-306.workers.dev/tierlist?owner=PUBLIC_NAME&title=PUBLIC_TITLE#join=PRIVATE_CODE
 ```
+
+The dedicated Worker was deployed on 2026-11-15 (version `f2b0acc7-36c1-4ef0-97a8-4b89b5c0cbb7`). A live Discordbot-UA fetch verified HTTP 200, the exact synthetic title, no redirect, and the byte-identical bundled PNG in 0.18 seconds combined. Frontend integration also passed a real iroh clipboard/landing/resume flow with 169 HTTP URLs checked and no fragment leakage. This is not proof of Discord's actual rendered card or title-click fragment retention.
 
 Discord is the first supported preview consumer. Its HTTP crawler receives escaped server-rendered `og:title` **Join OWNER in voting on TITLE**, description, site name, type, canonical public URL and a fixed PNG. Bots are never HTTP-redirected. Browsers use a CSP-hashed, fixed script to preserve a structurally valid invite fragment and `location.replace` **only** to `https://puzzle.seall.dev/tierlist/#join=…`. The app decodes and checks the actual invite/protocol. Missing/invalid fragments stay on an accessible page with a fixed-site link; without JavaScript users can paste the complete invite into the app.
 

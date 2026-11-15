@@ -34,6 +34,7 @@ test('TierRoom uses actual host, source album title, and safe direct fallback du
     assert.equal(url.searchParams.get('owner'),'Actual host');assert.equal(url.searchParams.get('title'),'Source album');
     room.isHost=true;room.name='Unrelated local value';
     assert.equal(new URL(room.invite()).searchParams.get('owner'),'Actual host');
+    for(const protocol of [5,6]){room.protocol=protocol;const shared=new URL(room.invite());assert(shared.hash.startsWith(`#join=TL${protocol}.`));assert.equal(decodeInvite(shared.href).protocol,protocol);}
   } finally { if(oldLocation===undefined)delete globalThis.location;else globalThis.location=oldLocation; }
 });
 
