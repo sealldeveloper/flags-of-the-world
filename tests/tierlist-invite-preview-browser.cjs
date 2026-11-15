@@ -35,6 +35,13 @@ const site='https://puzzle.seall.dev',out=process.env.EVIDENCE_DIR || '/tmp/tier
   await host.locator('#copy-invite').click();const invite=await host.evaluate(()=>navigator.clipboard.readText()),parsed=new URL(invite),code=parsed.hash.slice(6);
   assert.equal(parsed.origin,previewOrigin);assert.equal(parsed.searchParams.get('owner'),owner);assert.equal(parsed.searchParams.get('title'),title);
   const secrets=await host.evaluate(()=>[window.testRoom.ticket.host,window.testRoom.ticket.room,window.testRoom.ticket.secret]);
+  // Existing host tabs can convert a direct link without restarting the lobby.
+  const maker=await hostCtx.newPage();await maker.goto(previewOrigin+'/make');
+  await maker.locator('#owner').fill(owner);await maker.locator('#title').fill(title);await maker.locator('#invite').fill(site+'/tierlist/#join='+code);await maker.locator('#generate').click();
+  assert((await maker.locator('#output').inputValue())===invite,'builder preserves complete invite');await maker.locator('#copy').click();await maker.getByRole('button',{name:'Copied',exact:true}).waitFor();assert((await maker.evaluate(()=>navigator.clipboard.readText()))===invite,'builder copies the same fragment-only link');assert(await host.evaluate(()=>window.testRoom.connected));
+  // Redact private fields only for UI captures; never persist real capability screenshots.
+  await maker.locator('#invite').fill('');await maker.locator('#output').evaluate(node=>node.type='password');
+  for(const [width,height]of [[1440,900],[1024,768],[390,844]]){await maker.setViewportSize({width,height});assert(await maker.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));const capture=`${out}/builder-${width}-redacted.png`;await maker.screenshot({path:capture});snapshots.push(capture);}await maker.close();
   // Crawler-like browser: scripts disabled, exact HTML metadata available without a redirect.
   const botCtx=await context({javaScriptEnabled:false,userAgent:'Discordbot/2.0'}),bot=await botCtx.newPage();
   const response=await bot.goto(invite);assert.equal(response.status(),200);assert.equal(new URL(bot.url()).origin,previewOrigin);
@@ -46,6 +53,7 @@ const site='https://puzzle.seall.dev',out=process.env.EVIDENCE_DIR || '/tmp/tier
   assert.equal(imageResponse.status(),200);assert.equal(imageResponse.headers()['content-type'],'image/png');
   assert.deepEqual(await imageResponse.body(),fs.readFileSync(path.join(__dirname,'../assets/app-icon-512.png')));await imagePage.close();
   assert(!(await response.text()).includes(code));
+  const directBot=await botCtx.newPage();await directBot.goto(site+'/tierlist/#join='+code);assert.equal(await directBot.locator('meta[property="og:title"]').getAttribute('content'),'Join a Tier List lobby');await directBot.close();
   for(const [width,height]of [[1440,900],[1024,768],[390,844]]){
    await bot.setViewportSize({width,height});await bot.locator('#continue').focus();
    assert(await bot.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));

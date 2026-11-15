@@ -1,5 +1,6 @@
 import {INVITE_PREVIEW, previewText} from '../invite-preview.mjs';
 import {ICON} from './icon.mjs';
+import {BUILDER_SCRIPT,BUILDER_BODY} from './builder.mjs';
 
 const SITE = 'https://puzzle.seall.dev/tierlist/';
 const IMAGE = new URL('/icon.png', INVITE_PREVIEW).href;
@@ -30,7 +31,8 @@ function metadata(url) {
 export default {
   async fetch(request) {
     const url = new URL(request.url);
-    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(LANDING_SCRIPT));
+    const builder=url.pathname==='/make' && !url.search;
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(builder?BUILDER_SCRIPT:LANDING_SCRIPT));
     const hash = btoa(String.fromCharCode(...new Uint8Array(digest)));
     const headers = {
       'Content-Type':'text/html; charset=utf-8',
@@ -46,6 +48,13 @@ export default {
     }
     let status = 200, data = null;
     if (!['GET','HEAD'].includes(request.method)) { status = 405; headers.Allow = 'GET, HEAD'; }
+    else if (url.pathname === '/make') {
+      if(url.search)status=400;
+      else {
+        const html=`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Make a Discord lobby invite</title><style>:root{font-family:system-ui,sans-serif;color:#182133;background:#f5f7fb}*{box-sizing:border-box}body{max-width:42rem;margin:2rem auto;padding:0 1.25rem;line-height:1.5}h1{font-size:1.5rem}label{display:block;font-weight:600;margin:1rem 0 .35rem}input,textarea{display:block;width:100%;font:inherit;padding:.65rem;border:1px solid #bcc8d8;border-radius:4px;background:#fff;color:#182133}button{font:inherit;min-height:40px;margin-top:1rem;padding:.5rem .8rem;border:1px solid #1769aa;border-radius:4px;background:#1769aa;color:#fff;cursor:pointer}a{color:#1769aa}button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #1769aa;outline-offset:3px}#error{color:#b42318}p{overflow-wrap:anywhere}[hidden]{display:none!important}</style></head><body>${BUILDER_BODY}<script>${BUILDER_SCRIPT}</script></body></html>`;
+        return new Response(request.method==='HEAD'?null:html,{headers});
+      }
+    }
     else if (url.pathname === '/icon.png') status = 400;
     else if (url.pathname !== '/tierlist') status = 404;
     else { data = metadata(url); if (!data) status = 400; }
@@ -71,6 +80,7 @@ ${og}
 </head><body><main><h1>${heading}</h1>
 <p>Use the complete invite link shared by the host to join their lobby. If you are not taken there automatically, ask the host for a new link.</p>
 <p><a id="continue" href="${SITE}" rel="noreferrer">Open Tier List</a></p>
+<p><a href="/make" rel="noreferrer">Make a Discord preview from an existing invite</a></p>
 <noscript><p>JavaScript is needed to join the lobby. Open Tier List and paste the complete invite link into Join lobby.</p></noscript>
 </main>${data ? `<script>${LANDING_SCRIPT}</script>` : ''}</body></html>`;
     return new Response(request.method === 'HEAD' ? null : html, {status, headers});
