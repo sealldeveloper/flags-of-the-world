@@ -1,0 +1,9 @@
+name = "puzzle-invites"
+main = "worker.mjs"
+compatibility_date = "2025-10-01"
+account_id = "3064f4beee4be0f87ffeb180f2a3dd23"
+workers_dev = true
+preview_urls = false
+
+[observability]
+enabled = false

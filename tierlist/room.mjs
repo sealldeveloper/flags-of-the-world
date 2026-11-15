@@ -1,5 +1,6 @@
 import {Transport, token} from '../uno/transport.mjs';
 import {encodeInvite, decodeInvite} from './invite.mjs';
+import {inviteLink} from './invite-preview.mjs';
 import {validateAlbum, validateBoard, cleanName, copy, MAX_BOARD} from './model.mjs';
 import {encodeAlbum, decodeAlbum, verifyImages, previewAlbum} from './codec.mjs';
 import {OriginalTransfer} from './progressive.mjs';
@@ -56,7 +57,9 @@ export class TierRoom {
     }
   }
   inviteCode() {return encodeInvite({...this.ticket,protocol:this.protocol});}
-  invite() { return `${location.origin}${location.pathname}#join=${this.inviteCode()}`; }
+  invite() {
+    return inviteLink({code:this.inviteCode(),owner:this.players.get(this.hostId)?.name,title:this.album?.name,direct:`${location.origin}${location.pathname}`});
+  }
   emit() {
     if (this.album && this.self && this.players.has(this.self)) this.onState({album:this.album,self:this.self,host:this.isHost,hostId:this.hostId,connected:this.connected,protocol:this.protocol,assets:this.originalTransfer?.state,latency:this.latency,players:[...this.players.values()]});
   }
