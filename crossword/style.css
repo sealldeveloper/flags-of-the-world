@@ -492,6 +492,14 @@ select, input { font-family: inherit; }
 .xw-cell.selected .cell-letter { color: #fff; }
 .xw-cell.selected .cell-num { color: rgba(255,255,255,0.85); }
 
+/* The board keeps keyboard focus; show it at the active cell, not its perimeter.
+   Touch keyboards focus the native letter input instead of the grid. */
+#crossword-grid:focus-visible .xw-cell.selected,
+body:has(#xw-mobile-input:focus-visible) #crossword-grid .xw-cell.selected {
+  outline: 2px solid #fff;
+  outline-offset: -3px;
+}
+
 .xw-cell.word-highlight {
   background: var(--word-highlight);
 }
@@ -775,7 +783,6 @@ select, input { font-family: inherit; }
    RESPONSIVE / MOBILE
    ============================================================ */
 #xw-clue-nav, #xw-tools-toggle { display: none; }
-#crossword-grid:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 @media (max-width: 768px) {
   /* Make the page scrollable on mobile so grid + clues both fit */
