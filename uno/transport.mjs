@@ -16,7 +16,10 @@ export const token = () => [...crypto.getRandomValues(new Uint8Array(16))].map(x
 export class Transport {
   static async create(onEvent) {
     let module;
-    try { module = await import('./wasm/transport.js'); await module.default(); }
+    try {
+      module = await import('./wasm/transport.js?v=relay-hosts-20261115');
+      await module.default({module_or_path:new URL('./wasm/transport_bg.wasm?v=relay-hosts-20261115',import.meta.url)});
+    }
     catch { throw new Error('iroh WASM could not load. Build it with scripts/build-uno.sh and serve this page over HTTP(S).'); }
     const transport = new Transport();
     transport.node = await module.GameTransport.create();

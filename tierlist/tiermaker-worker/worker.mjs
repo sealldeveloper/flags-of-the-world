@@ -16,11 +16,14 @@ async function bytes(response,limit,signal,asBlob=false){
  if(asBlob)return new Blob(chunks);
  const data=new Uint8Array(size);let offset=0;for(const chunk of chunks){data.set(chunk,offset);offset+=chunk.byteLength;}return data;
 }
-export async function fetchTiermaker(value,kind,signal){
+export async function fetchTiermaker(value,kind,signal,templateSlug){
  let url=tiermakerPublicUrl(value,kind);
+ // TierMaker's public templates-v2 endpoint expects a first-party template referrer.
+ // Derive it solely from the parsed and validated page, never from the caller.
+ const referer=kind==='api'?tiermakerPublicUrl(`https://tiermaker.com/create/${templateSlug}`):null;
  for(let hop=0;hop<4;hop++){
   signal.throwIfAborted();let upstream;
-  try{upstream=await fetch(url,{method:'GET',redirect:'manual',signal,headers:{Accept:kind==='image'?'image/png,image/jpeg,image/webp,image/gif,image/avif,image/bmp':kind==='page'?'text/html':'application/json,text/plain','User-Agent':'tierlist-import/1.0 (+https://puzzle.seall.dev/tierlist/)'}});}
+  try{upstream=await fetch(url,{method:'GET',redirect:'manual',signal,headers:{Accept:kind==='image'?'image/png,image/jpeg,image/webp,image/gif,image/avif,image/bmp':kind==='page'?'text/html':'application/json,text/plain','User-Agent':'tierlist-import/1.0 (+https://puzzle.seall.dev/tierlist/)',...(referer?{Referer:referer}:{})}});}
   catch{throw new ReadError(502,'TierMaker could not be reached. Try again.');}
   if(upstream.status>=300&&upstream.status<400){
    await upstream.body?.cancel().catch(()=>{});const location=upstream.headers.get('Location');if(!location)throw new ReadError(502,'TierMaker returned an invalid redirect.');
@@ -38,7 +41,7 @@ export async function loadTiermakerManifest(value,signal){
  const source=tiermakerPublicUrl(value),parts=new URL(source).pathname.split('/').filter(Boolean),pageUrl=parts.length===3&&parts[0]==='categories'?'https://tiermaker.com/create/'+parts[2]:source;
  const document=await fetchTiermaker(pageUrl,'page',signal),page=parseTiermakerPage(new TextDecoder().decode(document.data),source);
  const query=new URLSearchParams({type:'templates-v2',id:page.slug,lastEdited:page.edited,variation:page.variation});
- const result=await fetchTiermaker('https://tiermaker.com/api/?'+query,'api',signal);let data;
+ const result=await fetchTiermaker('https://tiermaker.com/api/?'+query,'api',signal,page.slug);let data;
  try{data=JSON.parse(new TextDecoder().decode(result.data));}catch{throw new ReadError(502,'TierMaker did not return an image list.');}
  return tiermakerManifest(page,data);
 }
