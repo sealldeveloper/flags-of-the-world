@@ -222,6 +222,13 @@ dialog .section-heading>button { flex: none }
 #join-error { color: var(--site-danger); font-size: 13px; overflow-wrap: anywhere }
 #invite-output { overflow-wrap: anywhere; font: 12px/1.5 ui-monospace,monospace }
 .event-feed { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain }
+@media (forced-colors: none) {
+  #activity-feed { scrollbar-width: thin; scrollbar-color: var(--site-muted) var(--site-inset) }
+  #activity-feed::-webkit-scrollbar { width: 10px; height: 10px }
+  #activity-feed::-webkit-scrollbar-track { background: var(--site-inset) }
+  #activity-feed::-webkit-scrollbar-thumb { background: var(--site-muted); border: 2px solid var(--site-inset); border-radius: 6px }
+  #activity-feed::-webkit-scrollbar-thumb:hover { background: var(--site-text) }
+}
 .feed-empty { font-size: 13px; padding-block: 12px }
 .feed-event { margin-bottom: 16px }
 .event-heading { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-bottom: 4px }
