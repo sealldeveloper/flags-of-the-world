@@ -128,6 +128,7 @@ function buildBoard(board, editable=false) {
       mark.setAttribute('aria-hidden','true');edit.append(el('span','tier-name-text',row.name),mark);
       edit.title=`Edit ${row.name}`;edit.setAttribute('aria-label',`Edit tier ${row.name}`);label.append(edit);
     } else label.append(el('strong','',row.name));
+    if (row.excludeFromRatings) label.append(el('small','tier-ratings-note','Excluded from group ratings'));
     if (editable && selected) label.append(button('Place here',()=>changeBoard(moveImage(currentBoard(),selected,row.id)),'place-here'));
     const tiles=el('div','tiles');tiles.dataset.dropTier=row.id;
     for (const imageId of row.items) {
@@ -261,13 +262,13 @@ function setTab(tab) {
 function editTier(value) {
   if(!canEdit())return;tierId=value;
   const board=currentBoard(),row=board.tiers.find(t=>t.id===value);
-  if(!row)return;$('#tier-name').value=row.name;$('#tier-color').value=row.color;
+  if(!row)return;$('#tier-name').value=row.name;$('#tier-color').value=row.color;$('#tier-exclude-ratings').checked=!!row.excludeFromRatings;
   $('#tier-delete').disabled=board.tiers.length===1;
   $('#tier-dialog').showModal();
 }
 $('#tier-form').addEventListener('submit',event=>{
   event.preventDefault();const board=copy(currentBoard()),row=board.tiers.find(t=>t.id===tierId);
-  row.name=$('#tier-name').value.trim();row.color=$('#tier-color').value;
+  row.name=$('#tier-name').value.trim();row.color=$('#tier-color').value;row.excludeFromRatings=$('#tier-exclude-ratings').checked;
   if(!row.name)return;changeBoard(board);$('#tier-dialog').close();
 });
 function moveTier(value,delta) {

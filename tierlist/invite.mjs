@@ -13,6 +13,7 @@ function base32(bytes) {
   for(const byte of bytes){value=(value<<8)|byte;bits+=8;while(bits>=5){bits-=5;result+=alphabet[(value>>>bits)&31];}}
   if(bits)result+=alphabet[(value<<(5-bits))&31];return result;
 }
+// Shared transport tickets remain v5; the TL invite prefix versions Tier List only.
 const checked = ticket => ({...decodeTicket(encodeTicket({...ticket,v:5})),app:'tierlist'});
 // Pack endpoint bytes, relay index and capabilities instead of a JSON invite.
 // Normal endpoint IDs produce a 91-character code. No lookup service is involved.
@@ -23,7 +24,7 @@ export function encodeInvite(input) {
   else if(/^[a-z2-7]{52}$/.test(ticket.host) && base32(unbase32(ticket.host))===ticket.host){kind=1;host=unbase32(ticket.host);}
   else {kind=2;host=new TextEncoder().encode(ticket.host);}
   const bytes=Uint8Array.from([(relay<<2)|kind,...(kind===2?[host.length]:[]),...host,...unhex(ticket.room),...unhex(ticket.secret)]);
-  return 'TL5.'+btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
+  return 'TL6.'+btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
 }
 export function decodeInvite(input) {
   if(typeof input!=='string' || input.length>5000)throw new Error('Invalid lobby invite');
@@ -34,7 +35,7 @@ export function decodeInvite(input) {
     if(original.app!=='tierlist')throw new Error('Wrong lobby application');
     return {...ticket,app:'tierlist',protocol:1};
   }
-  if(!/^TL[2345]\./.test(code) || !/^[A-Za-z0-9_-]+$/.test(code.slice(4)))throw new Error('Paste a Tier List invite link or code');
+  if(!/^TL[23456]\./.test(code) || !/^[A-Za-z0-9_-]+$/.test(code.slice(4)))throw new Error('Paste a Tier List invite link or code');
   let bytes;
   try {bytes=Uint8Array.from(atob(code.slice(4).replaceAll('-','+').replaceAll('_','/')),char=>char.charCodeAt(0));}
   catch {throw new Error('Invalid lobby code');}

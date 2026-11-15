@@ -29,7 +29,7 @@ export function layoutGroupImage(ctx,snapshot){
     font(ctx,20,700);const name=wrapLines(ctx,player.name,BOARD-24),status=player.phase==='ready'?'':player.phase==='offline'?'Offline':'Loading assets';
     const heading=name.length*26+(status?20:0)+16;
     const rows=[...player.board.tiers,{id:'unranked',name:'Unranked',items:player.board.unranked}].map(row=>{
-      font(ctx,14,700);const lines=wrapLines(ctx,row.name,LABEL-16),perLine=Math.max(1,Math.floor((BOARD-LABEL-12)/(TILE+4)));
+      font(ctx,14,700);const lines=wrapLines(ctx,row.name+(row.excludeFromRatings?'\nExcluded from group ratings':''),LABEL-16),perLine=Math.max(1,Math.floor((BOARD-LABEL-12)/(TILE+4)));
       return {...row,lines,perLine,height:Math.max(64,lines.length*19+16,Math.ceil(row.items.length/perLine)*(TILE+4)+12)};
     });
     const height=heading+rows.reduce((sum,row)=>sum+row.height,0);players.push({player,x:PAD+(index%columns)*(BOARD+GAP),y,name,status,heading,rows,height});rowHeight=Math.max(rowHeight,height);
@@ -93,7 +93,7 @@ async function paint(snapshot,layout,palette,art,icon,signal){
       if(index%4===3)await new Promise(resolve=>setTimeout(resolve,0));
     }
     const y=layout.footerY;ctx.fillStyle=palette.text;font(ctx,22,700);ctx.fillText('Group ratings',PAD,y);
-    ctx.fillStyle=palette.muted;font(ctx,13);ctx.fillText('Unranked and loading players are excluded. Ties are shared.',PAD,y+30);
+    ctx.fillStyle=palette.muted;font(ctx,13);ctx.fillText('Unranked, excluded tiers and loading players do not vote. Ties are shared.',PAD,y+30);
     for(const method of layout.methods){
       ctx.fillStyle=palette.text;font(ctx,17,700);ctx.fillText(method.mode==='tiers'?'Tiers only':'Tiers + left-to-right',method.x,y+60);
       method.sides.forEach((side,index)=>{

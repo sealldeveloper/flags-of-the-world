@@ -19,17 +19,18 @@ test('16 seat colours remain distinct and category text contrasts against its ba
  for(const value of ['red','url(https://example.com)'])assert.throws(()=>cleanColour(value));
  assert.equal(contrastInk('#ffffff'),'#000000');assert.equal(contrastInk('#000000'),'#ffffff');
 });
-test('compact v4 invites roundtrip every relay, identify older protocols and reject malformed data',async()=>{
+test('compact v6 invites roundtrip every relay, identify older protocols and reject malformed data',async()=>{
  for(const region of ['use1-1','usw1-1','euc1-1','aps1-1']){
   const ticket={host:'0123456789abcdef'.repeat(4),relay:`https://${region}.relay.n0.iroh.link./`,room:a,secret:b};
-  const code=encodeInvite(ticket),decoded=decodeInvite(code);assert.equal(code.length,91);assert.equal(decoded.protocol,5);
+  const code=encodeInvite(ticket),decoded=decodeInvite(code);assert.equal(code.length,91);assert.equal(decoded.protocol,6);assert.equal(decoded.v,5);
   for(const key of ['host','relay','room','secret'])assert.equal(decoded[key],ticket[key]);
   assert.equal(decodeInvite('https://example.test/tierlist/#join='+code).secret,b);
-  const old=code.replace('TL5.','TL2.');assert.equal(decodeInvite(old).protocol,2);
-  await assert.rejects(new TierRoom({onState:()=>{},onStatus:()=>{},onError:()=>{}}).open('Name',null,old),/older version/);
+  for(const version of [2,3,4,5]){const old=code.replace('TL6.',`TL${version}.`);assert.equal(decodeInvite(old).protocol,version);
+   await assert.rejects(new TierRoom({onState:()=>{},onStatus:()=>{},onError:()=>{}}).open('Name',null,old),/Everyone must refresh.*create a new lobby/);}
   const legacy='TLOBBY1.'+encodeTicket({...ticket,v:5,app:'tierlist'});assert.equal(decodeInvite(legacy).protocol,1);
+  await assert.rejects(new TierRoom({onState:()=>{},onStatus:()=>{},onError:()=>{}}).open('Name',null,legacy),/Everyone must refresh.*create a new lobby/);
  }
- for(const code of ['TL5.','TL5.AAAA','TL5.!!!'])assert.throws(()=>decodeInvite(code));
+ for(const code of ['TL6.','TL6.AAAA','TL6.!!!'])assert.throws(()=>decodeInvite(code));
 });
 test('structured activity includes full maximum-length item/tier names and safe identifiers',()=>{
  const {room}=host(),old=copy(room.album.board);old.tiers[0].name='中'.repeat(100);room.album.images[0].label='界'.repeat(160);

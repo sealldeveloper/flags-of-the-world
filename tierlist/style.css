@@ -111,6 +111,9 @@ label:has(input[type=file]:focus-visible) { outline: 3px solid var(--site-accent
 .tier-label { display: flex; flex-direction: column; align-items: stretch; justify-content: center; padding: 8px; min-width: 0; background: var(--tier-bg,var(--site-inset)); color: var(--tier-ink,var(--site-text)) }
 .tier-label strong,.tier-name { font-size: 16px; font-weight: 700; text-align: center; overflow-wrap: anywhere; white-space: normal }
 .tier-name { position: relative; border: 0; color: inherit; background: transparent; padding: 12px 4px; min-height: 48px }
+.tier-ratings-note { font-size: 11px; line-height: 1.35; text-align: center; overflow-wrap: anywhere }
+.tier-rating-option { display: flex; align-items: center; gap: 8px; min-height: 38px }
+.tier-rating-option input { flex: none; width: 18px; height: 18px; min-height: 18px; padding: 0; margin: 0 }
 .tier-edit-mark { position: absolute; top: -2px; right: 0; font-size: 12px; font-weight: 400 }
 .tier-name:hover { background: rgba(0,0,0,.12); color: inherit; border: 0 }
 .place-here { font-size: 11px; min-height: 30px; padding: 3px 6px; margin-top: 4px; color: #182133; background: #fff; border-color: #667085 }

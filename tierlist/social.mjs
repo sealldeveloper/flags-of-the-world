@@ -39,6 +39,7 @@ export function boardChange(before,after,images) {
   const added=after.tiers.filter(row=>!previous.has(row.id)),removed=before.tiers.filter(row=>!next.has(row.id));
   if(added.length)return change(words('Added tier '),tierRef(added[0]));
   if(removed.length)return change(words('Deleted tier '),tierRef(removed[0]),...(removed[0].items.length?[words(' and moved its images to '),tierRef({id:'unranked',name:'Unranked'})]:[]));
+  for(const row of after.tiers){const old=previous.get(row.id);if(!!row.excludeFromRatings!==!!old.excludeFromRatings)return change(words(row.excludeFromRatings?'Excluded tier ':'Included tier '),tierRef(row),words(row.excludeFromRatings?' from group ratings':' in group ratings'));}
   for(const row of after.tiers){const old=previous.get(row.id);if(row.name!==old.name)return change(words('Renamed '),tierRef(old),words(' to '),tierRef(row));if(row.color!==old.color)return change(words('Changed the colour of '),tierRef(row));}
   if(before.tiers.map(row=>row.id).join()!==after.tiers.map(row=>row.id).join())return change(words('Reordered '),boardRef());
   const positions=board=>new Map([...board.tiers,{id:'unranked',name:'Unranked',items:board.unranked}].flatMap(row=>row.items.map(id=>[id,row])));

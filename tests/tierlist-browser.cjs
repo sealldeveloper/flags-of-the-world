@@ -74,7 +74,7 @@ fs.mkdirSync(out,{recursive:true});
   console.log('Local creation, compression, ranking, persistence, import, export and file roundtrip passed');
   await host.locator('#tab-images').click();await host.locator('#host').click();await host.locator('#host-name').fill('Host');await capture(host,'host-dialog');await host.locator('#host-form button[type=submit]').click();await host.locator('#lobby-details').waitFor({state:'visible',timeout:60000});
   assert(await host.locator('#images-view').isHidden(),'hosting from Images must switch to the ranking view');
-  const invite=await host.locator('#invite-output').inputValue();assert(invite.includes('#join=TL5.'));
+  const invite=await host.locator('#invite-output').inputValue();assert(invite.includes('#join=TL6.'));
   await guest.locator('#invite-input').fill(invite);await guest.locator('#join').click();await guest.locator('#lobby-details').waitFor({state:'visible',timeout:90000});
   await host.waitForFunction(()=>document.querySelectorAll('#players .player').length===2);
   await guest.locator('#board .tier-row').last().locator('.tile').first().click();await guest.locator('#board .place-here').nth(2).click();

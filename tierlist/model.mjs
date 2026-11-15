@@ -34,7 +34,8 @@ export function validateBoard(value, imageIds) {
     if (!t || rows.has(t.id) || t.id === 'unranked') fail('Duplicate or reserved tier identifier');
     rows.add(key(t.id));
     if (!/^#[0-9a-fA-F]{6}$/.test(t.color)) fail('Invalid tier colour');
-    return {id:t.id, name:text(t.name, 100, 'tier name'), color:t.color.toLowerCase(), items:items(t.items)};
+    if ('excludeFromRatings' in t && typeof t.excludeFromRatings !== 'boolean') fail('Invalid tier ratings exclusion');
+    return {id:t.id, name:text(t.name, 100, 'tier name'), color:t.color.toLowerCase(), items:items(t.items), ...('excludeFromRatings' in t ? {excludeFromRatings:t.excludeFromRatings} : {})};
   });
   const unranked = items(value.unranked);
   if (placed.size !== known.size) fail('The board is missing images');

@@ -4,7 +4,7 @@ import {validateAlbum, validateBoard, cleanName, copy, MAX_BOARD} from './model.
 import {encodeAlbum, decodeAlbum, verifyImages, previewAlbum} from './codec.mjs';
 import {OriginalTransfer} from './progressive.mjs';
 import {randomColour,cleanColour,validateEvent,boardChange,MAX_EVENTS} from './social.mjs';
-const PROTOCOL=5;
+const PROTOCOL=6;
 const CHUNK = 24000, MAX_PLAYERS = 16;
 const readResume = () => { try { return JSON.parse(sessionStorage.getItem('tierlist-resume') || 'null'); } catch { return null; } };
 export const savedInvite = () => readResume()?.invite || '';
@@ -23,7 +23,7 @@ export class TierRoom {
       this.originalTransfer=new OriginalTransfer(this.album,{host:true,send:(conn,message)=>this.send(conn,message),onPeerProgress:(conn,loaded)=>{const seat=this.peers.get(conn)?.seat,player=this.players.get(seat);if(player){player.originals=loaded;this.publishPresence(player);}}});
     } else {
       this.ticket=decodeInvite(invite);
-      if(this.ticket.protocol!==PROTOCOL)throw new Error('This lobby uses an older version. Ask the host to refresh and share a new invite.');
+      if(this.ticket.protocol!==PROTOCOL)throw new Error('This lobby uses an older version. Everyone must refresh and the host must create a new lobby and invite.');
     }
     if (this.disposed) return;
     this.onStatus('Connecting…');
