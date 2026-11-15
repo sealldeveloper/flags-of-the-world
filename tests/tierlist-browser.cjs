@@ -85,11 +85,13 @@ fs.mkdirSync(out,{recursive:true});
   await guest.reload();await guest.locator('#resume').click();await guest.locator('#confirm-join').click();await guest.locator('#lobby-details').waitFor({state:'visible',timeout:90000});
   assert.equal(await guest.getByRole('button',{name:'Edit tier Guest only',exact:true}).count(),1);
   assert.equal(await host.locator('#players .player').count(),3);
+  // Rejoining starts a fresh bounded originals transfer; previews become ready first.
+  await guest.waitForFunction(()=>!document.querySelector('#save-copy').disabled,null,{timeout:180000});
   await guest.locator('#save-copy').click();await guest.locator('#copy-name').fill('My saved ranking');await guest.locator('#confirm-copy').click();await guest.locator('#copy-dialog').waitFor({state:'hidden'});
   await host.locator('#leave').click();await guest.waitForFunction(()=>document.querySelector('#connection').textContent.startsWith('Lobby ended'));
   await capture(guest,'host-ended');assert(await guest.locator('#add-tier').isDisabled());
   await guest.locator('#leave').click();await guest.locator('#library').waitFor({state:'visible'});assert.equal(await guest.locator('.album-card').count(),2);
-  assert(sockets.length>=4);assert(sockets.every(url=>new URL(url).hostname.endsWith('.relay.n0.iroh.link.')));
+  assert(sockets.length>=4);assert(sockets.every(url=>/^wss:\/\/(use1-1|usw1-1|euc1-1|aps1-1)\.relay\.n0\.iroh\.link\/relay$/.test(url)));
   assert.deepEqual(errors,[]);console.log(`PASS: real iroh host, multi-chunk album transfer, three peers, independent tiers, live ranking, late join, resume and host close. ${sockets.length} relay sockets.`);
   await browser.close();
 })().catch(e=>{console.error(e);process.exit(1);});
