@@ -2,9 +2,11 @@
 
 A standalone player for public daily dives preserved from [Krillion](https://krillion.io/). The first capture is 2026-11-02, dive #110: seven prompts and 122,994 canonical answers with their published tiers, scores and optional quips.
 
-## Daily preservation
+## Manual preservation maintenance
 
-`.github/workflows/archive-krillion.yml` runs at 04:15, 05:15, 09:15 and 17:15 UTC. The first two times cover midnight New York in either DST offset. Later runs retry transient failures and capture public corrections. GitHub schedules can be delayed and are not a guarantee of uninterrupted capture.
+Krillion is no longer listed in the home games library, and daily automatic archiving is stopped. Existing dates, answer banks, artwork and the direct `/krillion/` player remain available.
+
+`.github/workflows/archive-krillion.yml` is manual-only (`workflow_dispatch`); its former daily schedule and retries have been removed. Maintainers can explicitly capture the current public daily or a correction when needed. The separate `fetch-puzzles.yml` daily schedule continues unchanged for the other games and does not invoke Krillion.
 
 The workflow uses only these anonymous public endpoints:
 
@@ -22,7 +24,7 @@ node --test tests/krillion.test.mjs
 node krillion/archive.mjs
 ```
 
-`--fixture-dir DIR` reads `today.json` and `reveal.json` from an explicit local fixture/capture directory for reproducible maintenance tests. It is not used by scheduled production captures.
+`--fixture-dir DIR` reads `today.json` and `reveal.json` from an explicit local fixture/capture directory for reproducible maintenance tests. It is not used by manual workflow captures.
 
 ## Playback
 

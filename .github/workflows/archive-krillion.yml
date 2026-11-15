@@ -1,9 +1,7 @@
-name: Archive public Krillion daily
+name: Archive public Krillion (manual maintenance)
 
+# Daily automatic archiving is retired. Keep explicit maintenance runs available.
 on:
-  schedule:
-    # Just after midnight New York in both DST offsets, with later retries.
-    - cron: '15 4,5,9,17 * * *'
   workflow_dispatch:
 
 permissions:

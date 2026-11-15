@@ -31,6 +31,7 @@ All use disposable browser profiles and local archives, not production progress.
 
 ## Installable app and daily library
 
+- `node --test tests/krillion-retirement.test.mjs`: Krillion is absent from the home/shared daily catalogue, all other listings remain, archival automation is manual-only, other games retain their daily fetch schedule, and historical Krillion routes/data/assets remain available.
 - `TZ=Australia/Sydney node --test tests/daily.test.mjs` (also run with `TZ=America/Los_Angeles`): local-calendar boundaries, every archived daily payload, exact-date validation, old/new progress, Connections continuation/reveal outcomes, download fallback, cancellation, quota failures, overlay retries, and cache-update isolation.
 - `node tests/app-browser.cjs`: same browser environment and port **18764** as above. Uses a temporary **persistent Chromium profile**, real service workers and Cache Storage, and Chromium installability diagnostics. Checks unplayed downloads, native crossword saves, Connections standard→easy outcomes, old saves, cross-tab changes, history filters, offline navigation and a cold browser restart, blocked storage, install help, responsive light/dark layouts, focus and hover. Screenshots default to `/tmp/puzzle-app`. The profile is removed after the test; existing user profiles are not used.
 

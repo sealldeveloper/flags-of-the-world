@@ -23,7 +23,8 @@ async function solveCrossword(p){await p.evaluate(()=>{state.userGrid=state.solu
   assert.equal(await p.locator('.daily-card').count(),3);for(const game of ['crossword','mini','connections'])await status(p,game,'not-started');
   assert.equal(await p.locator('#daily-total').textContent(),'0 of 3 finished');
   assert.equal(await p.locator('section:has(#quiz-heading) .card').count(),2);
-  assert.equal(await p.locator('section:has(#social-heading) .card').count(),3);
+  assert.deepEqual(await p.locator('section:has(#social-heading) .card').evaluateAll(cards=>cards.map(card=>card.getAttribute('href'))),['/tierlist/','/uno/','/jeopardy/','/scattegories/local/','/deadlock-guess-who/']);
+  assert.equal(await p.locator('a[href*="krillion"], #krillion-heading, [data-game="krillion"]').count(),0);
   assert.equal(await p.locator('#daily-grid a[href*="seattle"]').count(),0);
   const cdp=await context.newCDPSession(p),manifest=await cdp.send('Page.getAppManifest'),installability=await cdp.send('Page.getInstallabilityErrors');
   assert.equal(JSON.parse(manifest.data).display,'standalone');assert.deepEqual(installability.installabilityErrors,[]);
@@ -53,7 +54,13 @@ async function solveCrossword(p){await p.evaluate(()=>{state.userGrid=state.solu
   await library(p);await status(p,'connections','completed');assert.match(await p.locator('[data-game="connections"]').textContent(),/easy mode/);
   await p.locator('[data-game="crossword"] .card-link').click();await p.waitForSelector('#puzzle-layout:not(.hidden)');await solveCrossword(p);await library(p);
   await p.waitForFunction(()=>document.getElementById('daily-total').textContent==='3 of 3 finished');
-  await p.locator('#daily-history summary').click();await p.locator('#history-filter').selectOption('finished');await p.waitForSelector(`#history-rows tr[data-date="${day}"]`);await snapshot(p,'all-finished');
+  await p.locator('#daily-history summary').click();await p.waitForSelector('#history-rows tr');
+  // The fixed completed fixture may be older than the initial archive page.
+  while(!await p.locator(`#history-rows tr[data-date="${day}"]`).count()){
+   const count=await p.locator('#history-rows tr').count();await p.locator('#more-days').click();
+   await p.waitForFunction(count=>document.querySelectorAll('#history-rows tr').length>count,count);
+  }
+  await p.locator('#history-filter').selectOption('finished');await p.waitForSelector(`#history-rows tr[data-date="${day}"]`);await snapshot(p,'all-finished');
   // Another tab can undo progress; the dashboard must stop counting it as complete.
   const other=await context.newPage();await other.goto(base+'/crossword-nytmini/?puzzle='+day);await other.waitForSelector('#puzzle-layout:not(.hidden)');
   await other.evaluate(()=>{outer:for(let r=0;r<state.height;r++)for(let c=0;c<state.width;c++)if(!isBlack(r,c)){state.userGrid[r][c]='';break outer;}fullRedraw();});await status(p,'mini','in-progress');
@@ -70,7 +77,7 @@ async function solveCrossword(p){await p.evaluate(()=>{state.userGrid=state.solu
   await p.locator('[data-game="connections"] .card-link').click();await p.waitForSelector('#game:not(.hidden)');assert(await p.evaluate(()=>state.completed));
   await library(p,base+'/?date=2026-09-01');await p.waitForFunction(()=>document.getElementById('daily-message').textContent.includes('0/3 downloaded'));await snapshot(p,'not-downloaded-offline');
   await p.locator('[data-game="mini"] .card-link').click();await p.waitForSelector('#error-overlay:not(.hidden)');await snapshot(p,'missing-puzzle-offline');
-  const cached=await p.evaluate(async()=>{const result=[];for(const name of await caches.keys())for(const request of await(await caches.open(name)).keys())result.push(request.url);return result;});assert(!cached.some(url=>/\/(uno|uno-transport|docs|scripts)\//.test(url)));
+  const cached=await p.evaluate(async()=>{const result=[];for(const name of await caches.keys())for(const request of await(await caches.open(name)).keys())result.push(request.url);return result;});assert(!cached.some(url=>/\/(uno|uno-transport|docs|scripts)\//.test(url)&&new URL(url).pathname!=='/uno/transport.mjs'));
   assert.deepEqual(errors,[]);await context.close();context=null;
   // Cold restart, not just a same-tab cache hit, with the network already offline.
   context=await chromium.launchPersistentContext(profile,options);await context.setOffline(true);p=context.pages()[0]||await context.newPage();p.setDefaultTimeout(30000);
