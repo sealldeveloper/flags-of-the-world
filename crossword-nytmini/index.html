@@ -266,6 +266,12 @@
 
   window.XW_SOURCE = {
     storagePrefix: 'nyt-mini-xw',
+    currentDate: localPuzzleDate,
+    loadLatestPuzzle: async function(id) {
+      var daily = await import('/assets/daily.mjs');
+      var result = await daily.loadLatestPuzzle('mini', id, {api:NYT_API});
+      return parseNYTPuzzle(result.puzzle, result.date);
+    },
 
     formatPuzzleId: function(id) {
       // id = "YYYY-MM-DD"

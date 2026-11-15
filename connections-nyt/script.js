@@ -282,8 +282,18 @@ function showError(message) {
   dom.game.classList.add('hidden');
 }
 
-async function loadPuzzle(dateId, updateUrl = true) {
+let followsDaily=false, requestedDailyDate='',lastDailyCheck=0,checkingDaily=false;
+function dailyNotice(message='',action=null,label='Check for newer puzzle') {
+  let notice=document.getElementById('daily-availability');
+  if(!notice){notice=document.createElement('p');notice.id='daily-availability';notice.setAttribute('role','status');document.getElementById('app-header').after(notice);}
+  notice.replaceChildren();notice.hidden=!message;
+  if(message)notice.append(document.createTextNode(message+' '));
+  if(action){const button=document.createElement('button');button.type='button';button.textContent=label;button.addEventListener('click',action);notice.append(button);}
+}
+async function loadPuzzle(dateId, updateUrl = true, {latest=false} = {}) {
   if (!isDateId(dateId)) return;
+  followsDaily=latest;if(latest){dateId=localDateId();lastDailyCheck=Date.now();}requestedDailyDate=dateId;
+  if(state.puzzle)saveProgress();
   const requestSequence = ++state.requestSequence;
   if (state.requestController) state.requestController.abort();
   state.requestController = new AbortController();
@@ -292,11 +302,9 @@ async function loadPuzzle(dateId, updateUrl = true) {
 
   try {
     const daily = await import('/assets/daily.mjs');
-    const puzzleData = await daily.loadPuzzle('connections', dateId, {
-      signal: requestController.signal, api: CONNECTIONS_API,
-    });
-
-    const puzzle = parsePuzzle(puzzleData, dateId);
+    const options={signal:requestController.signal,api:CONNECTIONS_API};
+    const result=latest?await daily.loadLatestPuzzle('connections',dateId,options):{date:dateId,puzzle:await daily.loadPuzzle('connections',dateId,options)};
+    const puzzle = parsePuzzle(result.puzzle, result.date);
     if (requestSequence !== state.requestSequence) return;
 
     state.puzzle = puzzle;
@@ -308,10 +316,12 @@ async function loadPuzzle(dateId, updateUrl = true) {
     dom.loading.classList.add('hidden');
     dom.error.classList.add('hidden');
     dom.game.classList.remove('hidden');
-    if (updateUrl) updatePuzzleUrl();
+    if (updateUrl || latest) updatePuzzleUrl();
+    dailyNotice(latest && puzzle.date!==dateId?`${dateId} is not available yet. Showing latest available: ${puzzle.date}.`:'',latest && puzzle.date!==dateId?()=>loadPuzzle(localDateId(),true,{latest:true}):null);
+    lastDailyCheck=Date.now();
     if (state.lost && !state.answersRevealed) showResult();
   } catch (error) {
-    if (error.name === 'AbortError') return;
+    if (error.name === 'AbortError' || requestSequence!==state.requestSequence) return;
     showError(error.message || 'The puzzle service did not respond.');
   }
 }
@@ -841,6 +851,7 @@ function puzzleUrl(origin = 'https://puzzle.seall.dev') {
 
 function updatePuzzleUrl() {
   const url = puzzleUrl(location.origin);
+  if(followsDaily)url.searchParams.set('daily','1');
   history.replaceState(null, '', url.pathname + url.search);
 }
 
@@ -897,7 +908,7 @@ dom.puzzleSelect.addEventListener('change', () => loadPuzzle(dom.puzzleSelect.va
 dom.puzzleDate.addEventListener('change', () => {
   if (dom.puzzleDate.value) loadPuzzle(dom.puzzleDate.value);
 });
-dom.retry.addEventListener('click', () => loadPuzzle(state.date || dom.puzzleDate.value || localDateId(), false));
+dom.retry.addEventListener('click', () => loadPuzzle(requestedDailyDate || state.date || dom.puzzleDate.value || localDateId(), true,{latest:followsDaily}));
 dom.shuffle.addEventListener('click', shuffleWords);
 dom.deselect.addEventListener('click', deselectAll);
 dom.submit.addEventListener('click', submitGuess);
@@ -958,7 +969,21 @@ async function boot() {
   const initialDate = isDateId(requested) && requested <= today ? requested : today;
   state.date = initialDate;
   dom.puzzleDate.value = initialDate;
-  loadPuzzle(initialDate, false);
+  loadPuzzle(initialDate, false,{latest:!requested || initialDate===today || new URLSearchParams(location.search).get('daily')==='1'});
 }
+async function checkLatestDaily(){
+  if(!followsDaily || checkingDaily || document.hidden || Date.now()-lastDailyCheck<60000)return;
+  checkingDaily=true;lastDailyCheck=Date.now();const sequence=state.requestSequence;
+  try{
+    const date=localDateId();dom.puzzleDate.max=date;
+    if(!state.puzzle || !dom.error.classList.contains('hidden')){await loadPuzzle(date,true,{latest:true});return;}
+    const daily=await import('/assets/daily.mjs'),result=await daily.loadLatestPuzzle('connections',date,{api:CONNECTIONS_API});
+    if(sequence===state.requestSequence && followsDaily && result.date>state.date)dailyNotice(`A newer daily puzzle is available: ${result.date}. Your current progress is saved.`,()=>loadPuzzle(date,true,{latest:true}),'Open new puzzle');
+  }catch(_){/* Keep the current game playable during a temporary outage. */}
+  finally{checkingDaily=false;}
+}
+for(const kind of ['focus','pageshow','online'])window.addEventListener(kind,checkLatestDaily);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkLatestDaily();});
+setInterval(checkLatestDaily,60000);
 
 boot();

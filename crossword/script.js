@@ -499,8 +499,18 @@ function buildClues(acrossCluesRaw, downCluesRaw, acrossStarts, downStarts) {
 // ============================================================
 // LOAD & INITIALIZE PUZZLE
 // ============================================================
-let puzzleLoadSequence = 0;
-async function loadPuzzle(id) {
+let puzzleLoadSequence = 0, followLatestDaily = false, requestedPuzzle = null, lastDailyCheck = 0, checkingDaily = false;
+function dailyNotice(message='',action=null,label='Check for newer puzzle') {
+  let notice=$('daily-availability');
+  if(!notice){notice=document.createElement('div');notice.id='daily-availability';notice.className='puzzle-author';notice.setAttribute('role','status');$('app-header').after(notice);}
+  notice.replaceChildren();notice.hidden=!message;
+  if(message)notice.append(document.createTextNode(message+' '));
+  if(action){const button=document.createElement('button');button.type='button';button.className='btn-sm';button.textContent=label;button.addEventListener('click',action);notice.append(button);}
+}
+async function loadPuzzle(id, {latest=false} = {}) {
+  followLatestDaily=latest && !!SRC?.loadLatestPuzzle;
+  if(followLatestDaily){id=SRC.currentDate();lastDailyCheck=Date.now();}
+  requestedPuzzle=id;saveProgressToStorage();
   const sequence = ++puzzleLoadSequence;
   showLoading(`Loading puzzle ${formatPuzzleId(id)}...`);
   stopTimer();
@@ -508,7 +518,9 @@ async function loadPuzzle(id) {
 
   try {
     let data;
-    if (SRC?.loadPuzzle) {
+    if (followLatestDaily) {
+      data = await SRC.loadLatestPuzzle(id);
+    } else if (SRC?.loadPuzzle) {
       data = await SRC.loadPuzzle(id);
     } else {
       let raw;
@@ -526,10 +538,13 @@ async function loadPuzzle(id) {
     // so export/import and progress storage use the same ID the proxy expects.
     // Preserve original NYT date for cross-linking.
     data.nytDate = data.puzzleId;
-    data.puzzleId = String(id);
+    data.puzzleId = String(latest && SRC?.loadLatestPuzzle ? data.puzzleId : id);
     if (sequence !== puzzleLoadSequence) return;
+    if(!state.puzzleList.includes(data.puzzleId)){state.puzzleList.push(data.puzzleId);state.puzzleList.sort((a,b)=>b.localeCompare(a));populatePuzzleSelector(state.puzzleList);}
     const saved = loadProgressFromStorage(data.puzzleId);
     initPuzzleFromData(data, saved);
+    dailyNotice(followLatestDaily && data.puzzleId!==id ? `${formatPuzzleId(id)} is not available yet. Showing latest available: ${formatPuzzleId(data.puzzleId)}.` : '',followLatestDaily && data.puzzleId!==id?()=>loadPuzzle(SRC.currentDate(),{latest:true}):null);
+    lastDailyCheck=Date.now();
   } catch (err) {
     if (sequence !== puzzleLoadSequence) return;
     console.error(err);
@@ -631,6 +646,7 @@ function initPuzzleFromData(data, savedProgress = null) {
   // Persist puzzle ID in URL query param (preserve any existing hash)
   const url = new URL(window.location);
   url.searchParams.set('puzzle', puzzleId);
+  if(followLatestDaily)url.searchParams.set('daily','1');else url.searchParams.delete('daily');
   history.replaceState(null, '', url);
   saveProgressToStorage(); // Backfill daily completion metadata for existing saves.
 }
@@ -1920,8 +1936,9 @@ async function boot() {
     // Load puzzle specified by ?puzzle= query param, else most recent
     const params = new URLSearchParams(window.location.search);
     const requested = params.get('puzzle');
-    const target = (requested && ids.includes(requested)) ? requested : ids[0];
-    await loadPuzzle(target);
+    const target = requested && (ids.includes(requested) || SRC?.currentDate && /^\d{4}-\d{2}-\d{2}$/.test(requested)) ? requested : ids[0];
+    const latest=!!SRC?.loadLatestPuzzle && (!requested || params.get('daily')==='1' || target===SRC.currentDate());
+    await loadPuzzle(target,{latest});
   } catch (err) {
     console.error(err);
     showError(`Failed to initialize: ${err.message}`);
@@ -2081,10 +2098,27 @@ dom.winOverlay.addEventListener('click', e => {
 
 // Retry
 dom.btnRetry.addEventListener('click', () => {
-  const id = dom.puzzleSelect.value || (state.puzzleList[0] ?? null);
-  if (id) loadPuzzle(id);
+  const id = requestedPuzzle || dom.puzzleSelect.value || (state.puzzleList[0] ?? null);
+  if (id) loadPuzzle(id,{latest:followLatestDaily});
   else boot();
 });
+
+// A returning daily tab rechecks publication without replacing an in-progress board.
+async function checkLatestDaily() {
+  if(!followLatestDaily || checkingDaily || document.hidden || Date.now()-lastDailyCheck<60000)return;
+  checkingDaily=true;lastDailyCheck=Date.now();const sequence=puzzleLoadSequence;
+  try{
+    const date=SRC.currentDate(),picker=$('puzzle-date');if(picker)picker.max=date;
+    if(!state.puzzleId || !dom.errorOverlay.classList.contains('hidden')){await loadPuzzle(date,{latest:true});return;}
+    const next=await SRC.loadLatestPuzzle(date);
+    if(sequence!==puzzleLoadSequence || !followLatestDaily)return;
+    if(next.puzzleId>state.puzzleId)dailyNotice(`A newer daily puzzle is available: ${formatPuzzleId(next.puzzleId)}. Your current progress is saved.`,()=>loadPuzzle(date,{latest:true}),'Open new puzzle');
+  }catch(_){/* Keep the current puzzle and progress usable during an outage. */}
+  finally{checkingDaily=false;}
+}
+for(const kind of ['focus','pageshow','online'])window.addEventListener(kind,checkLatestDaily);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkLatestDaily();});
+setInterval(checkLatestDaily,60000);
 
 // ============================================================
 // APPEARANCE AND SETTINGS

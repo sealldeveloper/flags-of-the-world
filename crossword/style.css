@@ -219,6 +219,10 @@ select, input { font-family: inherit; }
 /* ============================================================
    TOOLBAR
    ============================================================ */
+/* Publication status stays visible even when the compact header hides its title. */
+#daily-availability { flex: 0 0 auto; margin: 0; padding: 6px 12px; background: var(--card); color: var(--text-muted); border-bottom: 1px solid var(--border); font-size: .875rem; overflow-wrap: anywhere; }
+#daily-availability button { margin-inline-start: 6px; min-height: 36px; }
+
 #toolbar {
   position: sticky;
   top: var(--header-h);

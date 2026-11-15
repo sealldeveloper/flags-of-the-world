@@ -22,7 +22,7 @@ test('Krillion archive workflow is manual-only; other games retain their daily f
   assert.doesNotMatch(archive, /^\s*(schedule|cron|workflow_call|workflow_run|push):/m);
   assert.match(archive, /run: node krillion\/archive\.mjs/);
   const fetch = read('.github/workflows/fetch-puzzles.yml');
-  assert.match(fetch, /schedule:\n\s+- cron: '0 9 \* \* \*'/);
+  assert.match(fetch, /schedule:\n\s+- cron: '17 \* \* \* \*'/);
   assert.doesNotMatch(fetch, /krillion/i);
   for (const game of ['Seattle Times', 'NYT Daily', 'NYT Mini', 'NYT Connections']) {
     assert(fetch.includes(`- name: Fetch ${game} puzzles`));

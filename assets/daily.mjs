@@ -23,8 +23,9 @@ export function puzzlePath(game, date) {
   if (!validDate(date)) throw new Error('Invalid puzzle date.');
   return `${game.path}puzzles/${date.slice(0,4)}/${date.slice(5,7)}/${date}.json`;
 }
-export function playUrl(game, date, mode = 'standard') {
+export function playUrl(game, date, mode = 'standard', latest = false) {
   const query = new URLSearchParams(game.id==='connections'?{date,mode}:{puzzle:date});
+  if(latest)query.set('daily','1');
   return game.path + '?' + query;
 }
 export function validatePuzzle(game, date, data) {
@@ -79,13 +80,13 @@ async function storeAssets(game,data,signal) {
   }
   if(signal?.aborted)throw new DOMException('Aborted','AbortError');
 }
-export async function loadManifest(game) {
+export async function loadManifest(game, {signal} = {}) {
   const path=`${game.path}puzzles/manifest.json`;
   try {
-    const data=await fetchJSON(path);
+    const data=await fetchJSON(path,signal);
     if (!Array.isArray(data)) throw new Error('Invalid archive list.');
     const dates=data.filter(validDate); await storeJSON(path,dates); return dates;
-  } catch (_) { const data=await cachedJSON(path); return Array.isArray(data)?data.filter(validDate):[]; }
+  } catch (error) { if(signal?.aborted)throw error;const data=await cachedJSON(path); return Array.isArray(data)?data.filter(validDate):[]; }
 }
 export async function cachedPuzzle(game, date) {
   const data=await cachedJSON(puzzlePath(game,date)); return validatePuzzle(game,date,data)?data:null;
@@ -112,6 +113,18 @@ export async function loadPuzzle(id, date, {signal, api, refresh=false} = {}) {
   await storeJSON(path,data);
   await storeAssets(game,data,signal);
   return data;
+}
+// Only daily entry points may fall back; explicit archive loads stay exact-date.
+export async function loadLatestPuzzle(id, date = today(), options = {}) {
+  const game=gameFor(id);puzzlePath(game,date);let error;
+  try{return {date,puzzle:await loadPuzzle(id,date,options)};}catch(err){error=err;if(options.signal?.aborted)throw err;}
+  const archived=await loadManifest(game,{signal:options.signal});
+  const known=archived.filter(value=>value<date).sort().reverse()[0];
+  for(const candidate of [...new Set([shiftDate(date,-1),known].filter(Boolean))]){
+    if(options.signal?.aborted)throw new DOMException('Aborted','AbortError');
+    try{return {date:candidate,puzzle:await loadPuzzle(id,candidate,{...options,refresh:false})};}catch(err){if(options.signal?.aborted)throw err;}
+  }
+  throw error;
 }
 export async function offlineReady(game,date) {
   const data=await cachedPuzzle(game,date); if(!data)return false;

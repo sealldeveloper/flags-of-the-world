@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import {GAMES,today,validDate,shiftDate,gameFor,puzzlePath,playUrl,validatePuzzle,crosswordSummary,crosswordStatus,connectionsStatus,readSaved,savedDates,loadPuzzle,loadManifest,offlineReady,DATA_CACHE} from '../assets/daily.mjs';
+import {GAMES,today,validDate,shiftDate,gameFor,puzzlePath,playUrl,validatePuzzle,crosswordSummary,crosswordStatus,connectionsStatus,readSaved,savedDates,loadPuzzle,loadLatestPuzzle,loadManifest,offlineReady,DATA_CACHE} from '../assets/daily.mjs';
 const fixture=path=>JSON.parse(fs.readFileSync(new URL(path,import.meta.url),'utf8'));
 const mini=fixture('../crossword-nytmini/puzzles/2026/10/2026-10-02.json');
 const connections=fixture('../connections-nyt/puzzles/2026/10/2026-10-02.json');
@@ -15,6 +15,9 @@ function cacheHarness(t){
  globalThis.caches={open:async name=>{assert.equal(name,DATA_CACHE);return cache;}};globalThis.location=new URL('http://localhost/');
  t.after(()=>Object.assign(globalThis,old));return {entries,cache};
 }
+test('all three archive imports prefetch tomorrow hourly and validate exact requested publication dates',()=>{
+ const workflow=fs.readFileSync(new URL('../.github/workflows/fetch-puzzles.yml',import.meta.url),'utf8');assert.match(workflow,/cron: '17 \* \* \* \*'/);assert.equal((workflow.match(/seq -1 6/g)||[]).length,3);assert.equal((workflow.match(/\.publicationDate == \$date/g)||[]).length,2);assert.match(workflow,/\.print_date == \$date/);assert.match(workflow,/git pull --rebase origin main/);
+});
 test('local calendar dates, leap years and day stepping',()=>{
  assert.equal(today(new Date(2026,9,2,23,59)),date);assert(validDate('2024-02-29'));assert(!validDate('2026-02-29'));
  for(const invalid of ['2026-13-01','2026-02-30','foo','2026-1-01','0001-01-01',null])assert(!validDate(invalid));
@@ -82,6 +85,22 @@ test('archive miss falls back to API and persists the response at the canonical 
  assert.deepEqual(await loadPuzzle('mini',date),mini);assert.equal(requests.length,2);
  assert(entries.has(puzzlePath(gameFor('mini'),date)));assert(await offlineReady(gameFor('mini'),date));
  globalThis.fetch=async()=>{throw new Error('offline');};assert.deepEqual(await loadPuzzle('mini',date),mini);
+});
+test('latest daily fallback keeps actual dates and retries the requested day after publication',async t=>{
+ const {cache,entries}=cacheHarness(t),requested='2026-10-03',calls=[];await cache.put(puzzlePath(gameFor('mini'),date),Response.json(mini));
+ let published=false;
+ globalThis.fetch=async url=>{calls.push(String(url));if(String(url).endsWith('manifest.json'))return Response.json([date]);if(published&&String(url).includes(requested))return Response.json({...mini,publicationDate:requested});return new Response('missing',{status:404});};
+ const fallback=await loadLatestPuzzle('mini',requested);assert.equal(fallback.date,date);assert.equal(fallback.puzzle.publicationDate,date);assert(!entries.has(puzzlePath(gameFor('mini'),requested)));
+ published=true;const current=await loadLatestPuzzle('mini',requested);assert.equal(current.date,requested);assert.equal(current.puzzle.publicationDate,requested);assert.equal((await(await cache.match(puzzlePath(gameFor('mini'),date))).json()).publicationDate,date);assert(calls.filter(url=>url.includes(requested)).length>=3);
+});
+test('explicit archive loading never substitutes an older daily',async t=>{
+ const {cache}=cacheHarness(t);await cache.put(puzzlePath(gameFor('mini'),date),Response.json(mini));globalThis.fetch=async()=>new Response('missing',{status:404});await assert.rejects(loadPuzzle('mini','2026-10-03'),/not available yet/);
+ assert.equal(new URL(playUrl(gameFor('mini'),date,'standard',true),'https://example.invalid').searchParams.get('daily'),'1');assert(!playUrl(gameFor('mini'),date).includes('daily='));
+});
+test('latest lookup is bounded, abortable and rejects mismatched publication dates',async t=>{
+ const {entries}=cacheHarness(t);let requests=0;globalThis.fetch=async url=>{requests++;return String(url).endsWith('manifest.json')?Response.json(['2026-10-01']):Response.json({...mini,publicationDate:'2026-10-09'});};
+ await assert.rejects(loadLatestPuzzle('mini','2026-10-03'),/different date/);assert(requests<=7);assert.equal(entries.size,1,'only the valid manifest may be stored');
+ const before=requests,controller=new AbortController();controller.abort();await assert.rejects(loadLatestPuzzle('mini',date,{signal:controller.signal}),{name:'AbortError'});assert.equal(requests,before);
 });
 test('malformed cached puzzles can recover from a valid network response',async t=>{
  const {cache}=cacheHarness(t);await cache.put(puzzlePath(gameFor('connections'),date),Response.json({...connections,categories:{}}));

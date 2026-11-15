@@ -2,8 +2,12 @@ name: Fetch Puzzle Archives
 
 on:
   schedule:
-    - cron: '0 9 * * *'  # 9am UTC = 4am ET, after midnight puzzle drop
+    - cron: '17 * * * *'  # Hourly, off the congested hour boundary; sources publish at different times.
   workflow_dispatch:
+
+concurrency:
+  group: puzzle-archives
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -11,6 +15,7 @@ permissions:
 jobs:
   fetch-puzzles:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -21,9 +26,9 @@ jobs:
           WORKER="https://nyt-crossword-proxy.my-account-306.workers.dev"
           PUZZLE_DIR="crossword-seattle/puzzles"
 
-          PUZZLES=$(curl -sf "${WORKER}?date=list&get=archivecurrent") || {
-            echo "Failed to fetch puzzle list"
-            exit 1
+          PUZZLES=$(curl -sf --connect-timeout 10 --max-time 45 "${WORKER}?date=list&get=archivecurrent") || {
+            echo "::warning::Seattle list unavailable; continuing other daily games"
+            PUZZLES=""
           }
 
           NEW=0
@@ -35,7 +40,7 @@ jobs:
             file="${dir}/${id}.txt"
             if [ ! -f "$file" ]; then
               mkdir -p "$dir"
-              curl -sf "${WORKER}?date=${id}" -o "$file" && echo "Downloaded Seattle $id" || echo "Failed Seattle $id"
+              curl -sf --connect-timeout 10 --max-time 45 "${WORKER}?date=${id}" -o "$file" && echo "Downloaded Seattle $id" || echo "Failed Seattle $id"
               NEW=$((NEW + 1))
             fi
           done <<< "$PUZZLES"
@@ -68,16 +73,20 @@ jobs:
           PUZZLE_DIR="crossword-nyt/puzzles"
           NEW=0
 
-          # Fetch last 7 days to catch any gaps
-          for i in $(seq 0 6); do
-            DATE=$(date -u -d "$i days ago" +%Y-%m-%d 2>/dev/null || date -u -v-${i}d +%Y-%m-%d)
+          # Include tomorrow for readers ahead of UTC and retry publication gaps.
+          for i in $(seq -1 6); do
+            if [ "$i" -eq -1 ]; then
+              DATE=$(date -u -d "tomorrow" +%Y-%m-%d 2>/dev/null || date -u -v+1d +%Y-%m-%d)
+            else
+              DATE=$(date -u -d "$i days ago" +%Y-%m-%d 2>/dev/null || date -u -v-${i}d +%Y-%m-%d)
+            fi
             YYYY="${DATE:0:4}"
             MM="${DATE:5:2}"
             dir="${PUZZLE_DIR}/${YYYY}/${MM}"
             file="${dir}/${DATE}.json"
             if [ ! -f "$file" ]; then
               mkdir -p "$dir"
-              if curl -sf "${WORKER}/nyt/daily/${DATE}" -o "$file"; then
+              if curl -sf --retry 2 --connect-timeout 10 --max-time 45 "${WORKER}/nyt/daily/${DATE}" -o "$file" && jq -e --arg date "$DATE" '.publicationDate == $date and (.body[0].cells | type == "array") and (.body[0].dimensions.width * .body[0].dimensions.height == (.body[0].cells | length))' "$file" >/dev/null; then
                 echo "Downloaded NYT Daily $DATE"
                 NEW=$((NEW + 1))
                 # Download overlay assets and rewrite URIs to local paths
@@ -146,16 +155,20 @@ jobs:
           PUZZLE_DIR="crossword-nytmini/puzzles"
           NEW=0
 
-          # Fetch last 7 days to catch any gaps
-          for i in $(seq 0 6); do
-            DATE=$(date -u -d "$i days ago" +%Y-%m-%d 2>/dev/null || date -u -v-${i}d +%Y-%m-%d)
+          # Include tomorrow for readers ahead of UTC and retry publication gaps.
+          for i in $(seq -1 6); do
+            if [ "$i" -eq -1 ]; then
+              DATE=$(date -u -d "tomorrow" +%Y-%m-%d 2>/dev/null || date -u -v+1d +%Y-%m-%d)
+            else
+              DATE=$(date -u -d "$i days ago" +%Y-%m-%d 2>/dev/null || date -u -v-${i}d +%Y-%m-%d)
+            fi
             YYYY="${DATE:0:4}"
             MM="${DATE:5:2}"
             dir="${PUZZLE_DIR}/${YYYY}/${MM}"
             file="${dir}/${DATE}.json"
             if [ ! -f "$file" ]; then
               mkdir -p "$dir"
-              if curl -sf "${WORKER}/nyt/mini/${DATE}" -o "$file"; then
+              if curl -sf --retry 2 --connect-timeout 10 --max-time 45 "${WORKER}/nyt/mini/${DATE}" -o "$file" && jq -e --arg date "$DATE" '.publicationDate == $date and (.body[0].cells | type == "array") and (.body[0].dimensions.width * .body[0].dimensions.height == (.body[0].cells | length))' "$file" >/dev/null; then
                 echo "Downloaded NYT Mini $DATE"
                 NEW=$((NEW + 1))
                 # Download overlay assets and rewrite URIs to local paths
@@ -240,10 +253,10 @@ jobs:
 
             if [ ! -f "$file" ]; then
               mkdir -p "$dir"
-              if curl --fail --silent --show-error --location --retry 3 \
+              if curl --fail --silent --show-error --location --retry 3 --connect-timeout 10 --max-time 45 \
                 --user-agent "Mozilla/5.0" \
                 "${UPSTREAM}/${DATE}.json" -o "$tmp" \
-                && jq -e '.status == "OK"
+                && jq -e --arg date "$DATE" '.status == "OK" and .print_date == $date
                   and (.categories | length == 4)
                   and ([.categories[].cards[]] | length == 16)' "$tmp" >/dev/null; then
                 mv "$tmp" "$file"
@@ -288,4 +301,5 @@ jobs:
           git add crossword-seattle/puzzles/ crossword-nyt/puzzles/ crossword-nytmini/puzzles/ connections-nyt/puzzles/
           git diff --cached --quiet && echo "Nothing to commit" && exit 0
           git commit -m "feat(puzzles): archive daily puzzles $(date +%Y-%m-%d)"
+          git pull --rebase origin main
           git push

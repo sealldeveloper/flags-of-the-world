@@ -1,10 +1,11 @@
-import {GAMES,today,validDate,shiftDate,playUrl,loadManifest,loadPuzzle,progress,offlineReady,downloadedDates,savedDates} from './daily.mjs';
+import {GAMES,today,validDate,shiftDate,playUrl,loadManifest,loadPuzzle,loadLatestPuzzle,progress,offlineReady,downloadedDates,savedDates} from './daily.mjs';
 const $=id=>document.getElementById(id);
 const node=(tag,text,className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
 let storage;try{storage=localStorage;storage.getItem('puzzle-theme-v2');}catch(_){$('storage-message').textContent='Progress storage is blocked in this browser. Your game progress may not survive closing it.';}
 let currentToday=today(), selected=new URLSearchParams(location.search).get('date');
 let followsToday=!validDate(selected)||selected>currentToday,dates=[],shown=14,generation=0,historyGeneration=0;
 if(followsToday)selected=currentToday;
+const availableDates=new Map();let lastAvailabilityCheck=0;
 function controls(){ $('daily-date').value=selected;$('daily-date').max=currentToday;$('next-day').disabled=selected>=currentToday; }
 function dateLabel(date){return new Date(`${date}T12:00:00`).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});}
 async function refreshDates(){
@@ -19,8 +20,10 @@ function makeCard(item,date){
   const card=node('article',undefined,'card daily-card');card.dataset.game=item.game.id;card.dataset.status=item.status;
   const top=node('span',item.game.icon,'card-icon');top.setAttribute('aria-hidden','true');
   const title=node('h3',item.game.name),badge=node('span',item.label,`status-badge ${item.status}`),detail=node('p',item.detail,'card-details');
-  const link=node('a',item.done?'View puzzle →':item.status==='in-progress'?'Continue →':'Play →','card-link');link.href=playUrl(item.game,date,item.mode);
-  const offline=node('small',item.offline?'Downloaded for offline play':navigator.onLine?'Not downloaded':'Not downloaded — connect to play','offline-label');
+  const available=availableDates.get(item.game.id+':'+date),pending=available && available<date;
+  const link=node('a',pending?`Play latest (${available}) →`:item.done?'View puzzle →':item.status==='in-progress'?'Continue →':'Play →','card-link');link.href=playUrl(item.game,date,item.mode,date===currentToday);
+  if(pending){badge.textContent='Not available yet';detail.textContent=`${date} is not available for this game yet.`;}
+  const offline=node('small',pending?`Latest available: ${available}`:item.offline?'Downloaded for offline play':navigator.onLine?'Not downloaded':'Not downloaded — connect to play','offline-label');
   const heading=node('div',undefined,'daily-card-heading'),actions=node('div',undefined,'daily-card-actions');
   heading.append(top,title);actions.append(link,offline);card.append(heading,badge,detail,actions);return card;
 }
@@ -29,7 +32,11 @@ async function renderDay(download=false,refresh=false){
   if(download){$('save-day').disabled=true;$('daily-message').textContent='Saving available puzzles for this day…';}
   let failures=[];
   if(download){
-    await Promise.all(GAMES.map(async game=>{try{await loadPuzzle(game.id,date,{refresh});}catch(_){failures.push(game.name);}}));
+    if(date===currentToday)lastAvailabilityCheck=Date.now();
+    await Promise.all(GAMES.map(async game=>{try{
+      if(date===currentToday){const result=await loadLatestPuzzle(game.id,date,{refresh}),key=game.id+':'+date;if(!availableDates.has(key)||availableDates.get(key)<result.date)availableDates.set(key,result.date);}
+      else await loadPuzzle(game.id,date,{refresh});
+    }catch(_){failures.push(game.name);}}));
   }
   const items=await Promise.all(GAMES.map(game=>statusFor(game,date)));
   if(run!==generation){if(download&&date===selected)renderDay(false).catch(showError);return;}
@@ -55,7 +62,7 @@ async function renderHistory(){
     const row=node('tr');row.dataset.date=date;
     const day=node('td'),link=node('a',dateLabel(date));link.href='/?date='+date;
     link.addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();chooseDate(date);$('daily-heading').scrollIntoView({block:'start'});});day.append(link);row.append(day);
-    for(const item of states){const cell=node('td'),play=node('a',item.label);play.href=playUrl(item.game,date,item.mode);play.title=item.detail;play.dataset.status=item.status;cell.append(play);row.append(cell);}
+    for(const item of states){const cell=node('td'),play=node('a',item.label);play.href=playUrl(item.game,date,item.mode,date===currentToday);play.title=item.detail;play.dataset.status=item.status;cell.append(play);row.append(cell);}
     row.append(node('td',`${saved}/3 saved`));rows.push(row);
   }
   const focusedHref=document.activeElement?.closest('#history-rows a')?.href;
@@ -74,7 +81,8 @@ function showError(error){$('daily-message').textContent=`Could not update the d
 async function refreshActive(){
   const next=today(),changed=next!==currentToday;
   if(changed){currentToday=next;if(followsToday)selected=next;await refreshDates();}
-  await renderDay(changed&&followsToday&&navigator.onLine);
+  const recheck=navigator.onLine && selected===currentToday && Date.now()-lastAvailabilityCheck>60000;
+  await renderDay((changed&&followsToday&&navigator.onLine)||recheck);
 }
 $('daily-date').addEventListener('change',()=>{if(validDate($('daily-date').value)&&$('daily-date').value<=today())chooseDate($('daily-date').value);else controls();});
 $('previous-day').addEventListener('click',()=>chooseDate(shiftDate(selected,-1)));
@@ -91,7 +99,7 @@ addEventListener('storage',event=>{if(event.key===null||GAMES.some(game=>event.k
 addEventListener('online',()=>{refreshDates().then(()=>renderDay(true)).catch(showError);});
 addEventListener('offline',()=>renderDay(false).catch(showError));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshActive().catch(showError);});
-setInterval(()=>{if(!document.hidden&&today()!==currentToday)refreshActive().catch(showError);},60000);
+setInterval(()=>{if(!document.hidden&&(today()!==currentToday || selected===currentToday&&Date.now()-lastAvailabilityCheck>300000))refreshActive().catch(showError);},60000);
 controls();
 await refreshDates();
 await renderDay(navigator.onLine).catch(showError);
