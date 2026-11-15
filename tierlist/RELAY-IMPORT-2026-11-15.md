@@ -8,7 +8,7 @@ Evidence:
 
 - Original transport works on the current network, but deliberately blocking dotted relay hosts reproduces `Could not reach an iroh relay. Check your connection and retry.`
 - Rebuilt transport passes that same filtered-host regression in **Chromium and Firefox**: real authenticated peer connection, compact invite, message delivery, no dotted network requests, no discovery requests, arbitrary destinations rejected.
-- Locked release WASM build and all **207 Node regression tests** passed.
+- Locked release WASM build and all **211 final combined Node regression tests** passed.
 - Full Tier List browser flow passed: local editing/persistence/import/export, real three-peer lobby, multi-chunk album transfer, independent rankings, late join, resume, copy after full originals transfer, and host closure (four canonical relay sockets). The initial legacy harness only allowed 30 seconds for resumed originals; it now explicitly waits for transfer completion and asserts canonical socket URLs.
 - Service-worker update regression passed, including explicit update activation, preserved saves/themes/data, offline Tier List authoring and actual offline lossless WASM encoding. The first attempt lacked an installed default Playwright Chromium; rerunning with the existing system Chromium passed.
 - `tests/relay-browser.cjs` is the executable network regression. `uno-transport/README.md` documents the reproducible build.
