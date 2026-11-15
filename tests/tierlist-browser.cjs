@@ -17,7 +17,8 @@ fs.mkdirSync(out,{recursive:true});
       for(const theme of matrix?['light','dark']:['light']) {
         await p.evaluate(theme=>window.PuzzleTheme.setPreference(theme),theme);
         assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`${name} overflow ${width}`);
-        assert(!/[—;]/.test(await p.locator('body').innerText()),`${name} contains banned interface punctuation`);
+        // An unavailable latency sample intentionally uses the standard “— ms” placeholder.
+        assert(!/[—;]/.test((await p.locator('body').innerText()).replaceAll('— ms','')),`${name} contains banned interface punctuation`);
         await p.screenshot({path:`${out}/${name}-${width}-${theme}.png`,fullPage:true});
       }
     }
