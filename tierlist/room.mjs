@@ -166,7 +166,12 @@ export class TierRoom {
         if (m.resume) {
           const seat=[...this.seats.entries()].find(([,secret])=>secret===m.resume)?.[0];
           player=this.players.get(seat);if (!player) throw new Error('That saved seat is no longer available');
-          for (const [old,p] of this.peers) if (p.seat===seat) {p.seat=null;this.transport.disconnect(old);}
+          // A resume is a takeover, not a second reusable owner of the same seat.
+          this.seats.set(seat,token());
+          for (const [old,p] of this.peers) if (p.seat===seat) {
+            p.seat=null;this.send(old,{type:'seat-replaced'});
+            setTimeout(()=>this.transport?.disconnect(old),200);
+          }
         } else {
           if (this.players.size>=MAX_PLAYERS) throw new Error('Lobby is full (16 players, including offline seats)');
           player={id:token(),name,color:color || randomColour([...this.players.values()].map(player=>player.color)),online:true,phase:'loading',progress:0,seq:0,board:copy(this.album.board)};
@@ -279,6 +284,10 @@ export class TierRoom {
     else if (m.type==='rejected') {
       this.onError(typeof m.message==='string'?m.message.slice(0,200):'Host rejected the request');
       this.connected=false;this.emit();await this.stop();this.onStatus('Disconnected · leave to try again');
+    } else if (m.type==='seat-replaced') {
+      this.connected=false;this.emit();
+      this.onError('Your ranking is open in another tab. This tab has stopped reconnecting; your ranking is still available to save or export.');
+      await this.stop();this.onStatus('Disconnected · ranking open in another tab');
     } else if (m.type==='ended') {
       this.connected=false;this.emit();this.onStatus('Lobby ended');
       try {sessionStorage.removeItem('tierlist-resume');} catch {}

@@ -85,12 +85,14 @@ test('all 16 seats sync individually, reject overflow, retain offline seats and 
  room.hostMessage('extra',{type:'join',name:'Removed',capability:room.ticket.secret,resume:secret});assert.match(messages.at(-1).message,/no longer available/);
  room.hostMessage('extra',{type:'join',name:'Replacement',capability:room.ticket.secret});assert.equal(room.players.size,16);
 });
-test('chosen colours are validated, applied to authenticated seats and can be reselected on resume',()=>{
+test('chosen colours are validated, applied to authenticated seats and can be reselected on resume',t=>{
+ const pending=[];t.mock.method(globalThis,'setTimeout',fn=>{pending.push(fn);return pending.length;});
  const {room,messages,disconnected}=host();room.players.delete(b);room.peers.clear();
  room.peers.set('chosen',{lastSeen:Date.now(),window:Date.now(),count:0});room.hostMessage('chosen',{type:'join',name:'Chosen',color:'#AA00FF',capability:room.ticket.secret});
  const seat=room.peers.get('chosen').seat,secret=room.seats.get(seat);assert.equal(room.players.get(seat).color,'#aa00ff');assert(messages.some(message=>message.type==='welcome' && message.hostId===a));
  room.peers.set('resume',{lastSeen:Date.now(),window:Date.now(),count:0});room.hostMessage('resume',{type:'join',name:'Chosen',color:'#001122',capability:room.ticket.secret,resume:secret});
- assert.equal(room.peers.get('resume').seat,seat);assert.equal(room.players.get(seat).color,'#001122');assert(disconnected.includes('chosen'));
+ assert.equal(room.peers.get('resume').seat,seat);assert.equal(room.players.get(seat).color,'#001122');assert.equal(room.peers.get('chosen').seat,null);
+ assert(messages.some(message=>message.type==='seat-replaced'));pending.splice(0).forEach(fn=>fn());assert(disconnected.includes('chosen'));
  room.peers.set('invalid',{lastSeen:Date.now(),window:Date.now(),count:0});room.hostMessage('invalid',{type:'join',name:'Bad',color:'url(x)',capability:room.ticket.secret});assert.equal(messages.at(-1).type,'rejected');assert.equal(room.players.size,2);
 });
 test('stale snapshots never roll back newer boards and invalid presence is rejected',()=>{

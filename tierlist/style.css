@@ -117,16 +117,15 @@ label:has(input[type=file]:focus-visible) { outline: 3px solid var(--site-accent
 .tier-edit-mark { position: absolute; top: -2px; right: 0; font-size: 12px; font-weight: 400 }
 .tier-name:hover { background: rgba(0,0,0,.12); color: inherit; border: 0 }
 .place-here { font-size: 11px; min-height: 30px; padding: 3px 6px; margin-top: 4px; color: #182133; background: #fff; border-color: #667085 }
-.tiles { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 4px; padding: 8px; min-width: 0; min-height: 88px }
+.tiles { position: relative; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 4px; padding: 8px; min-width: 0; min-height: 88px }
 .tile { width: 72px; height: 72px; padding: 0; flex: none; border: 1px solid transparent; border-radius: 3px; background: var(--site-bg); position: relative; touch-action: none; user-select: none }
 .tile img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; display: block; border-radius: 2px }
 .tile:hover { border-color: var(--site-accent); background: var(--site-hover) }
 .tile[aria-pressed=true] { outline: 3px solid var(--site-accent); outline-offset: 0 }
 .tile[draggable=true] { cursor: grab }
 .tile[draggable=false] { cursor: default }
-.sort-origin { position: absolute; width: 0; height: 0; padding: 0; border: 0; opacity: 0; pointer-events: none }
-.sort-slot { border: 2px dashed var(--site-accent); background: var(--site-inset); pointer-events: none }
-.sort-slot img { opacity: .35 }
+.sort-origin { opacity: .35 }
+.sort-slot { position: absolute; width: 4px; border-radius: 2px; background: var(--site-accent); pointer-events: none; z-index: 1 }
 #selection-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding: 8px 12px; background: var(--site-inset); border-radius: 5px; font-size: 13px }
 #selection-text { overflow-wrap: anywhere }
 .image-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap: 16px }

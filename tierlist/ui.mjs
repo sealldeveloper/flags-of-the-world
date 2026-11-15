@@ -14,6 +14,8 @@ import {tierlistFilename} from './files.mjs';
 import {GroupExport} from './group-export.mjs';
 import {setImageSource} from './images.mjs';
 const $ = selector => document.querySelector(selector);
+// Native HTML5/OLE dragging remains available for comparison; pointer input is the default.
+const nativeBoardDrag = new URLSearchParams(location.search).get('drag')==='native';
 const el = (tag, className='', text='') => {const node=document.createElement(tag);node.className=className;node.textContent=text;return node;};
 const button = (text, action, className='') => {const node=el('button',className,text);node.type='button';node.addEventListener('click',action);return node;};
 const imageElement = image => {const node=new Image();setImageSource(node,image);node.alt=image.label;node.width=image.width;node.height=image.height;return node;};
@@ -53,7 +55,7 @@ function renderLibrary() {
     body.append(actions);card.append(body);list.append(card);
   }
 }
-function rememberLobby() {if(viewingLobby && lobbyState){lobbyTab=activeTab;lobbyScroll=scrollY;lobbySelected=selected;}viewingLobby=false;clearTouch();clearSort();}
+function rememberLobby() {if(viewingLobby && lobbyState){lobbyTab=activeTab;lobbyScroll=scrollY;lobbySelected=selected;}viewingLobby=false;clearPointerDrag();clearSort();}
 async function openAlbum(value) {
   if(busy)return;const next=validateAlbum(value);await persist();rememberLobby();
   generation++;album=next;state=null;selected=null;dirty=false;activeTab='rank';clearError();$('#cover-status').textContent='';
@@ -153,9 +155,9 @@ function buildBoard(board, editable=false) {
       tile.draggable=editable;tile.setAttribute('aria-pressed',String(selected===imageId && editable));tile.append(imageElement(image));
       if (!editable) tile.tabIndex=-1;
       if (editable) {
-        tile.addEventListener('dragstart',event=>{clearTimeout(clickTimer);event.dataTransfer.setData('text/x-tier-image',imageId);event.dataTransfer.effectAllowed='move';startSort(imageId,tile);});
+        tile.addEventListener('dragstart',event=>{if(!nativeBoardDrag){event.preventDefault();return;}clearTimeout(clickTimer);event.dataTransfer.setData('text/x-tier-image',imageId);event.dataTransfer.effectAllowed='move';startSort(imageId,tile);});
         tile.addEventListener('dragend',clearSort);
-        tile.addEventListener('pointerdown',event=>touchStart(event,imageId));
+        tile.addEventListener('pointerdown',event=>startPointerDrag(event,imageId));
       }
       tiles.append(tile);
     }
@@ -180,7 +182,7 @@ function buildBoard(board, editable=false) {
   return node;
 }
 function renderBoard() {
-  clearTimeout(clickTimer);clearSort();
+  clearTimeout(clickTimer);clearPointerDrag();clearSort();
   if (!album || !currentBoard()) return;
   const editable=canEdit();
   $('#board').replaceChildren(buildBoard(currentBoard(),editable));
@@ -198,15 +200,17 @@ function renderSelection() {
   }
 }
 function startSort(image,source) {
-  clearSort();selected=null;renderSelection();
-  const slot=el('div','tile sort-slot');slot.setAttribute('aria-hidden','true');slot.append(imageElement(album.images.find(i=>i.id===image)));
+  clearSort();selected=null;
+  // Hiding selection controls here moves the source during native dragstart,
+  // which can cancel the gesture before its first dragover. Clean up at sort end.
+  const slot=el('div','sort-slot');slot.setAttribute('aria-hidden','true');
   sort={image,source,slot,zone:null,before:null};
 }
 function clearSlot() {
   if(!sort)return;
   sort.slot.remove();sort.source.classList.remove('sort-origin');sort.zone=null;
 }
-function clearSort() {clearSlot();sort=null;}
+function clearSort() {if(!sort)return;clearSlot();sort=null;renderSelection();}
 function previewSort(zone,x,y) {
   if(!sort || !zone || !canEdit())return;
   if(sort.zone===zone) {
@@ -216,7 +220,14 @@ function previewSort(zone,x,y) {
   const tiles=[...zone.querySelectorAll('[data-image]')].filter(tile=>tile!==sort.source);
   const items=tiles.map(tile=>({id:tile.dataset.image,...rectOf(tile)}));
   const before=insertionBefore(items,x,y),target=tiles.find(tile=>tile.dataset.image===before) || null;
-  sort.slot.remove();sort.source.classList.add('sort-origin');zone.insertBefore(sort.slot,target);
+  // A native drag's accepted target must stay under the pointer: neither the
+  // source nor its insertion marker may change tier heights during preview.
+  const zoneRect=zone.getBoundingClientRect(),reference=(target || tiles.at(-1))?.getBoundingClientRect();
+  const padding=getComputedStyle(zone);
+  sort.slot.style.left=(reference?(target?reference.left:reference.right)-zoneRect.left-2:parseFloat(padding.paddingLeft))+'px';
+  sort.slot.style.top=(reference?reference.top-zoneRect.top:parseFloat(padding.paddingTop))+'px';
+  sort.slot.style.height=(reference?.height || sort.source.getBoundingClientRect().height)+'px';
+  sort.source.classList.add('sort-origin');zone.append(sort.slot);
   sort.zone=zone;sort.before=before;sort.slot.dataset.before=before || '';
 }
 function rectOf(node) {const {left,top,width,height}=node.getBoundingClientRect();return {left,top,width,height};}
@@ -289,35 +300,46 @@ $('#tier-delete').addEventListener('click',()=>{changeBoard(removeTier(currentBo
 $('#add-tier').addEventListener('click',()=>{const board=copy(currentBoard()),row={id:id(),name:'New tier',color:'#b5c7eb',items:[]};board.tiers.push(row);if(changeBoard(board))editTier(row.id);});
 $('#reset').addEventListener('click',()=>{if(confirm('Unrank all images?'))changeBoard(freshBoard({...album,board:currentBoard()}));});
 $('#cancel-selection').addEventListener('click',()=>{selected=null;renderBoard();});
-let touch=null;
-function clearTouch() {
-  if(!touch)return;
-  touch.ghost?.remove();clearSort();touch=null;
+let pointerDrag=null;
+function clearPointerDrag(cancelled=true) {
+  if(!pointerDrag)return;
+  const drag=pointerDrag;pointerDrag=null;
+  if(cancelled || drag.ghost)suppressClickUntil=performance.now()+500;
+  drag.ghost?.remove();drag.target.draggable=drag.draggable;
+  if(drag.target.hasPointerCapture(drag.pointer))drag.target.releasePointerCapture(drag.pointer);
+  clearSort();
 }
-function touchStart(event,image) {
-  if (event.pointerType!=='touch' || !canEdit())return;
-  touch={image,x:event.clientX,y:event.clientY,pointer:event.pointerId,target:event.currentTarget};event.currentTarget.setPointerCapture(event.pointerId);
+function startPointerDrag(event,image) {
+  if(!event.isPrimary || event.button!==0 || !canEdit() || (nativeBoardDrag && event.pointerType!=='touch'))return;
+  clearPointerDrag();
+  pointerDrag={image,x:event.clientX,y:event.clientY,pointer:event.pointerId,target:event.currentTarget,draggable:event.currentTarget.draggable};
+  // Do not enter the platform's native drag loop, even on touch-capable desktops.
+  event.currentTarget.draggable=false;event.currentTarget.setPointerCapture(event.pointerId);
 }
 document.addEventListener('pointermove',event=>{
-  if(!touch || touch.pointer!==event.pointerId)return;
-  if(!touch.ghost && Math.hypot(event.clientX-touch.x,event.clientY-touch.y)<8)return;
+  if(!pointerDrag || pointerDrag.pointer!==event.pointerId)return;
+  if(!pointerDrag.target.isConnected || !canEdit()){clearPointerDrag();return;}
+  if(!pointerDrag.ghost && Math.hypot(event.clientX-pointerDrag.x,event.clientY-pointerDrag.y)<8)return;
   event.preventDefault();
-  if(!touch.ghost) {clearTimeout(clickTimer);startSort(touch.image,touch.target);touch.ghost=imageElement(album.images.find(i=>i.id===touch.image));touch.ghost.className='touch-ghost';document.body.append(touch.ghost);}
-  touch.ghost.style.left=event.clientX+'px';touch.ghost.style.top=event.clientY+'px';
-  const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-drop-tier]');
+  if(!pointerDrag.ghost) {clearTimeout(clickTimer);startSort(pointerDrag.image,pointerDrag.target);pointerDrag.ghost=imageElement(album.images.find(i=>i.id===pointerDrag.image));pointerDrag.ghost.className='touch-ghost';document.body.append(pointerDrag.ghost);}
+  pointerDrag.ghost.style.left=event.clientX+'px';pointerDrag.ghost.style.top=event.clientY+'px';
+  const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('#board [data-drop-tier]');
   if(target)previewSort(target,event.clientX,event.clientY);else clearSlot();
   if(event.clientY<60)scrollBy(0,-12);else if(event.clientY>innerHeight-60)scrollBy(0,12);
 },{passive:false});
 document.addEventListener('pointerup',event=>{
-  if(!touch || touch.pointer!==event.pointerId)return;
-  if(touch.ghost) {
+  if(!pointerDrag || pointerDrag.pointer!==event.pointerId)return;
+  if(pointerDrag.ghost && pointerDrag.target.isConnected && canEdit()) {
     const zone=document.elementFromPoint(event.clientX,event.clientY)?.closest('#board [data-drop-tier]');
     suppressClickUntil=performance.now()+500;
     if(zone){previewSort(zone,event.clientX,event.clientY);commitSort();}
   }
-  clearTouch();
+  clearPointerDrag(false);
 });
-document.addEventListener('pointercancel',clearTouch);
+for(const kind of ['pointercancel','lostpointercapture'])document.addEventListener(kind,event=>{if(pointerDrag?.pointer===event.pointerId)clearPointerDrag();});
+document.addEventListener('keydown',event=>{if(event.key==='Escape' && pointerDrag){event.preventDefault();clearPointerDrag();}},true);
+window.addEventListener('blur',clearPointerDrag);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')clearPointerDrag();});
 function reorderImages(imageId,beforeId) {
   if(state || busy)return;
   const index=album.images.findIndex(i=>i.id===imageId);if(index<0 || imageId===beforeId)return;

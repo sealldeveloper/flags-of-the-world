@@ -4,7 +4,7 @@ const base=process.env.BASE_URL || 'http://127.0.0.1:18764',out=process.env.SCRE
 (async()=>{
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || '/usr/bin/chromium-browser',headless:true});
  const p=await browser.newPage({viewport:{width:1280,height:900},hasTouch:true}),errors=[];p.setDefaultTimeout(20000);p.on('pageerror',e=>errors.push(e.message));
- await p.goto(base+'/tierlist/');
+ await p.goto(base+'/tierlist/?drag=native');
  await p.evaluate(async()=>{
   const {emptyAlbum}=await import('./model.mjs'),{compressImage}=await import('./codec.mjs'),{saveAlbum}=await import('./storage.mjs');
   const album=emptyAlbum();album.name='Sorting and zoom';

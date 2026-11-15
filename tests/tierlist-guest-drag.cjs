@@ -12,7 +12,7 @@ const evidence={scenario,snapshots:[],drags:[],errors:[]};
   async function page(){
    const p=await browser.newPage({viewport:{width:1280,height:1100},reducedMotion:'reduce',hasTouch:true,serviceWorkers:'block'});
    p.setDefaultTimeout(90000);p.on('pageerror',error=>evidence.errors.push(error.message));
-   await p.goto(base+'/tierlist/');
+   await p.goto(base+'/tierlist/?drag=native');
    await p.evaluate(async()=>{
     const {TierRoom}=await import('./room.mjs'),emit=TierRoom.prototype.emit;
     window.emissions=[];window.dragTrace=[];
