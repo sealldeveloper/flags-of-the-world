@@ -10,7 +10,7 @@ const readResume = () => { try { return JSON.parse(sessionStorage.getItem('tierl
 export const savedInvite = () => readResume()?.invite || '';
 export class TierRoom {
   constructor({onState, onStatus, onError, onEvents=()=>{}}) {
-    Object.assign(this,{onState,onStatus,onError,onEvents,peers:new Map(),players:new Map(),seats:new Map(),originalCache:new Map(),disposed:false,connected:false,retry:0,events:[],eventSerial:0,latency:{}});
+    Object.assign(this,{onState,onStatus,onError,onEvents,peers:new Map(),players:new Map(),seats:new Map(),originalCache:new Map(),disposed:false,connected:false,retry:0,events:[],eventSerial:0,latency:{},protocol:PROTOCOL});
   }
   async open(name, album = null, invite = '', color = null) {
     this.color=color===null?null:cleanColour(color);this.name = cleanName(name); this.isHost = !invite;
@@ -23,7 +23,9 @@ export class TierRoom {
       this.originalTransfer=new OriginalTransfer(this.album,{host:true,send:(conn,message)=>this.send(conn,message),onPeerProgress:(conn,loaded)=>{const seat=this.peers.get(conn)?.seat,player=this.players.get(seat);if(player){player.originals=loaded;this.publishPresence(player);}}});
     } else {
       this.ticket=decodeInvite(invite);
-      if(this.ticket.protocol!==PROTOCOL)throw new Error('This lobby uses an older version. Everyone must refresh and the host must create a new lobby and invite.');
+      if(![5,6].includes(this.ticket.protocol))throw new Error('This lobby uses an unsupported legacy protocol.');
+      // A running host owns the wire version; a refreshed guest must adapt to it.
+      this.protocol=this.ticket.protocol;
     }
     if (this.disposed) return;
     this.onStatus('Connecting…');
@@ -53,10 +55,10 @@ export class TierRoom {
       await this.dial();
     }
   }
-  inviteCode() {return encodeInvite(this.ticket);}
+  inviteCode() {return encodeInvite({...this.ticket,protocol:this.protocol});}
   invite() { return `${location.origin}${location.pathname}#join=${this.inviteCode()}`; }
   emit() {
-    if (this.album && this.self && this.players.has(this.self)) this.onState({album:this.album,self:this.self,host:this.isHost,hostId:this.hostId,connected:this.connected,assets:this.originalTransfer?.state,latency:this.latency,players:[...this.players.values()]});
+    if (this.album && this.self && this.players.has(this.self)) this.onState({album:this.album,self:this.self,host:this.isHost,hostId:this.hostId,connected:this.connected,protocol:this.protocol,assets:this.originalTransfer?.state,latency:this.latency,players:[...this.players.values()]});
   }
   async dial() {
     if (this.disposed) return;
@@ -79,7 +81,7 @@ export class TierRoom {
   }
   send(conn, message) {
     if (this.disposed) return;
-    try { this.transport.send(conn,{app:'tierlist',v:PROTOCOL,room:this.ticket.room,...message}); }
+    try { this.transport.send(conn,{app:'tierlist',v:this.protocol,room:this.ticket.room,...message}); }
     catch { this.transport.disconnect(conn); }
   }
   ping(conn,peer) {
@@ -120,7 +122,7 @@ export class TierRoom {
       } else if (e.connection===this.connection) this.reconnect();
     } else if (e.kind==='message') {
       let message;
-      try { message=JSON.parse(e.data); if (message?.app!=='tierlist' || message.v!==PROTOCOL || message.room!==this.ticket.room || typeof message.type!=='string') throw new Error(); }
+      try { message=JSON.parse(e.data); if (message?.app!=='tierlist' || message.v!==this.protocol || message.room!==this.ticket.room || typeof message.type!=='string') throw new Error(); }
       catch { this.transport.disconnect(e.connection);return; }
       if (this.isHost) this.hostMessage(e.connection,message);
       else if (e.connection===this.connection) {

@@ -25,10 +25,11 @@ test('compact v6 invites roundtrip every relay, identify older protocols and rej
   const code=encodeInvite(ticket),decoded=decodeInvite(code);assert.equal(code.length,91);assert.equal(decoded.protocol,6);assert.equal(decoded.v,5);
   for(const key of ['host','relay','room','secret'])assert.equal(decoded[key],ticket[key]);
   assert.equal(decodeInvite('https://example.test/tierlist/#join='+code).secret,b);
-  for(const version of [2,3,4,5]){const old=code.replace('TL6.',`TL${version}.`);assert.equal(decodeInvite(old).protocol,version);
-   await assert.rejects(new TierRoom({onState:()=>{},onStatus:()=>{},onError:()=>{}}).open('Name',null,old),/Everyone must refresh.*create a new lobby/);}
+  assert.equal(encodeInvite({...ticket,protocol:5}),code.replace('TL6.','TL5.'));
+  for(const version of [2,3,4]){const old=code.replace('TL6.',`TL${version}.`);assert.equal(decodeInvite(old).protocol,version);
+   await assert.rejects(new TierRoom({onState:()=>{},onStatus:()=>{},onError:()=>{}}).open('Name',null,old),/unsupported legacy protocol/);}
   const legacy='TLOBBY1.'+encodeTicket({...ticket,v:5,app:'tierlist'});assert.equal(decodeInvite(legacy).protocol,1);
-  await assert.rejects(new TierRoom({onState:()=>{},onStatus:()=>{},onError:()=>{}}).open('Name',null,legacy),/Everyone must refresh.*create a new lobby/);
+  await assert.rejects(new TierRoom({onState:()=>{},onStatus:()=>{},onError:()=>{}}).open('Name',null,legacy),/unsupported legacy protocol/);
  }
  for(const code of ['TL6.','TL6.AAAA','TL6.!!!'])assert.throws(()=>decodeInvite(code));
 });

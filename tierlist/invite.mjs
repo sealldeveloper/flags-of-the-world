@@ -18,13 +18,14 @@ const checked = ticket => ({...decodeTicket(encodeTicket({...ticket,v:5})),app:'
 // Pack endpoint bytes, relay index and capabilities instead of a JSON invite.
 // Normal endpoint IDs produce a 91-character code. No lookup service is involved.
 export function encodeInvite(input) {
-  const ticket=checked(input),relay=RELAYS.indexOf(ticket.relay);
+  const ticket=checked(input),relay=RELAYS.indexOf(ticket.relay),protocol=input.protocol===undefined?6:input.protocol;
+  if(![5,6].includes(protocol))throw new Error('Unsupported lobby protocol');
   let kind,host;
   if(/^[a-f0-9]{64}$/.test(ticket.host)){kind=0;host=unhex(ticket.host);}
   else if(/^[a-z2-7]{52}$/.test(ticket.host) && base32(unbase32(ticket.host))===ticket.host){kind=1;host=unbase32(ticket.host);}
   else {kind=2;host=new TextEncoder().encode(ticket.host);}
   const bytes=Uint8Array.from([(relay<<2)|kind,...(kind===2?[host.length]:[]),...host,...unhex(ticket.room),...unhex(ticket.secret)]);
-  return 'TL6.'+btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
+  return `TL${protocol}.`+btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
 }
 export function decodeInvite(input) {
   if(typeof input!=='string' || input.length>5000)throw new Error('Invalid lobby invite');

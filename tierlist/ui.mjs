@@ -263,12 +263,14 @@ function editTier(value) {
   if(!canEdit())return;tierId=value;
   const board=currentBoard(),row=board.tiers.find(t=>t.id===value);
   if(!row)return;$('#tier-name').value=row.name;$('#tier-color').value=row.color;$('#tier-exclude-ratings').checked=!!row.excludeFromRatings;
+  const legacy=state?.protocol===5;$('#tier-exclude-ratings').disabled=legacy;
+  $('#tier-ratings-help').textContent=legacy?'This running lobby uses the older ratings rules. You can keep ranking and reconnecting; tier exclusions are unavailable here.':'Images in this tier stay visible but do not vote in either rating summary.';
   $('#tier-delete').disabled=board.tiers.length===1;
   $('#tier-dialog').showModal();
 }
 $('#tier-form').addEventListener('submit',event=>{
   event.preventDefault();const board=copy(currentBoard()),row=board.tiers.find(t=>t.id===tierId);
-  row.name=$('#tier-name').value.trim();row.color=$('#tier-color').value;row.excludeFromRatings=$('#tier-exclude-ratings').checked;
+  row.name=$('#tier-name').value.trim();row.color=$('#tier-color').value;if(state?.protocol!==5)row.excludeFromRatings=$('#tier-exclude-ratings').checked;
   if(!row.name)return;changeBoard(board);$('#tier-dialog').close();
 });
 function moveTier(value,delta) {

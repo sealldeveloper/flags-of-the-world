@@ -49,7 +49,7 @@ Choose cover imports a file, Use an existing image selects an image from the tie
 
 ## Preview-first multiplayer
 
-`TL6.` invitations use protocol 6 and normally remain 91 characters. Older invites require a refreshed host and a new invite. The shared UNO transport, relay allowlist, authenticated connections and 64 KiB frame bound are unchanged.
+New `TL6.` invitations use protocol 6 and normally remain 91 characters. Running `TL5.` lobbies remain joinable and resumable after app updates: guests adapt to their host’s protocol and retain the same invite, seat and rankings. No lobby reset is required. The shared UNO transport, relay allowlist, authenticated connections and 64 KiB frame bound are unchanged.
 
 The host first sends a bounded self-contained preview tierlist. The guest decodes previews, syncs player boards and becomes Ready before original transfers start. Joining therefore does not wait for every full-resolution image. Boards, activity and other players remain live while originals arrive passively.
 
@@ -67,7 +67,7 @@ Browsing the library or editing a local tierlist does not leave the lobby. Retur
 
 ## Ratings and group images
 
-Tier dialogs offer **Exclude from group ratings** (off by default). Excluded tiers remain visible, editable and in place, but their images abstain in both rating methods; normalization counts only included tiers on each participant’s board. Boards and group images label excluded tiers without changing their colours. The optional boolean `excludeFromRatings` survives files, copies, storage and lobby snapshots. Album files remain `TIER1`/v1; missing flags mean included. TL6 lobbies require all participants to refresh and create a new lobby: older live invites fail clearly rather than silently losing exclusion flags. UNO transport tickets remain v5.
+Tier dialogs offer **Exclude from group ratings** (off by default). Excluded tiers remain visible, editable and in place, but their images abstain in both rating methods; normalization counts only included tiers on each participant’s board. Boards and group images label excluded tiers without changing their colours. The optional boolean `excludeFromRatings` survives files, copies, storage and lobby snapshots. Album files remain `TIER1`/v1; missing flags mean included. Tier exclusions are available in TL6 lobbies. Refreshed guests can still join and resume existing TL5 lobbies, where this new checkbox is disabled so every participant keeps using the host’s original ratings rules. UNO transport tickets remain v5.
 
 Unranked abstains. Each eligible ready or completed-offline player contributes equally. With `T` included tiers and zero-based included-tier index `t`, tier-only score is `1 - t/(T-1)`, or `0.5` for one tier. Including left-to-right order uses `1 - (t + (i+0.5)/n)/T`. Ties within a small tolerance are explicit, with vote counts and expandable tied results.
 
