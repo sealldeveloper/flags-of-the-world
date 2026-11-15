@@ -17,7 +17,7 @@ The affected users' exact network/browser configurations and branded Microsoft E
 
 The deployed read Worker is already version `5952abf6-947f-4e37-a8f9-1652057fe269` (confirmed with Wrangler). It includes the first-party template referrer fix. This change brings that previously uncommitted fix and its tests/documentation into the repository, rather than redeploying an unchanged working Worker.
 
-All seven supplied URLs were freshly read through the real production Worker. Every manifest, all **78 images**, and all seven covers returned successfully. Chromium also decoded and embedded the real images, saved seven independent albums, and reopened the complete library after reload with no page errors or cover warnings. Candidate static files were mirrored at the production origin for that library-level check; Worker CORS and upstream reads were real.
+All seven supplied URLs were freshly read through the real production Worker. Every manifest, all **78 images**, and all six published covers returned successfully (POSITION supplies no importable cover). Chromium also decoded and embedded the real images, saved seven independent albums, and reopened the complete library after reload with no page errors or cover warnings. Candidate static files were mirrored at the production origin for that library-level check; Worker CORS and upstream reads were real.
 
 | Template slug | Images |
 | --- | ---: |
@@ -29,4 +29,4 @@ All seven supplied URLs were freshly read through the real production Worker. Ev
 | red-sails-16783767 | 12 |
 | persona-non-grata---superbird-in-sterillo-18347937 | 5 |
 
-`tests/tiermaker-batch-live.cjs` exercises the actual multiline import dialog on the production site (optionally with `MIRROR_URL` for candidate static assets), checks those exact counts and embedded image data, then reloads and checks persistence. One initial harness assertion raced the asynchronous library refresh after the import button re-enabled; it now waits for the dialog to close. This was a test synchronization correction, not a product change.
+`tests/tiermaker-batch-live.cjs` exercises the actual multiline import dialog on the production site (optionally with `MIRROR_URL` for candidate static assets), checks those exact counts and embedded image data, then reloads and checks persistence. One initial harness assertion raced the asynchronous library refresh after the import button re-enabled; it now waits for the dialog to close. This was a test synchronization correction, not a product change. The next run completed all imports but exposed an incorrect test assumption that POSITION publishes a cover; its manifest has no cover field, so the test now requires only the six covers actually supplied.
