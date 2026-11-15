@@ -26,8 +26,9 @@ fs.mkdirSync(out, {recursive:true});
     }); }
     const letters = () => p.evaluate(()=>getCurrentWordCells().map(({r,c})=>state.userGrid[r][c]));
     await reset(); await p.keyboard.insertText('ab'); assert.deepEqual((await letters()).slice(0,3),['A','B','']);
-    // Normal hardware keydown + browser input must insert once, even capital C.
-    await p.keyboard.press('Shift+C'); assert.deepEqual((await letters()).slice(0,4),['A','B','C','']);
+    // Normal hardware keydown + browser input must insert once, even capital D.
+    // Shift+C/W/P are gameplay shortcuts, not printable letters.
+    await p.keyboard.press('Shift+D'); assert.deepEqual((await letters()).slice(0,4),['A','B','D','']);
     await p.keyboard.press('Backspace'); assert.deepEqual((await letters()).slice(0,4),['A','B','','']);
     // Mobile keyboards can send beforeinput without a useful keydown.
     assert(await p.evaluate(()=>!document.getElementById('xw-mobile-input').dispatchEvent(new InputEvent('beforeinput',{bubbles:true,cancelable:true,inputType:'deleteContentBackward'}))));

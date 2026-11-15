@@ -1028,55 +1028,61 @@ function onKeyDown(e) {
     return;
   }
 
-  const tag = document.activeElement?.tagName;
-  const isMobileInput = document.activeElement?.id === 'xw-mobile-input';
-  if (!isMobileInput && (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || tag === 'BUTTON' || tag === 'A')) return;
+  const active = document.activeElement;
+  const tag = active?.tagName;
+  const isMobileInput = active?.id === 'xw-mobile-input';
+  if (!isMobileInput && (active?.isContentEditable || tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || tag === 'BUTTON' || tag === 'A')) return;
 
   const { selRow: r, selCol: c, direction } = state;
+  const key = e.key.toLowerCase();
 
-  // Ctrl+Z: undo, Ctrl+Shift+Z: redo
-  if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+  // Ctrl+Z: undo, Ctrl+Shift+Z: redo (Shift/Caps Lock can change key casing).
+  if (!e.altKey && (e.ctrlKey || e.metaKey) && key === 'z') {
     e.preventDefault();
     if (e.shiftKey) doRedo(); else doUndo();
     return;
   }
 
-  // Insert: toggle rebus mode
-  if (e.key === 'Insert') {
-    e.preventDefault();
-    toggleRebusMode();
-    return;
-  }
-
   // Ctrl+Backspace: clear word (excluding shared/intersection cells)
   // Ctrl+Shift+Backspace: clear word (including shared cells)
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Backspace') {
+  if (!e.altKey && (e.ctrlKey || e.metaKey) && e.key === 'Backspace') {
     e.preventDefault();
     clearCurrentWord(/* includeShared */ e.shiftKey);
     return;
   }
 
-  // A native input owns printable text (including mobile auto-capitalisation).
-  // Its input/composition events insert letters once, not both here and there.
-  if (isMobileInput && /^[a-zA-Z]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) return;
+  // Leave other browser/OS chords (including AltGr) to their native owners.
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-  // Shift shortcuts are for grid focus, not a capital letter from the keyboard.
-  if (!isMobileInput && e.shiftKey && !e.ctrlKey && !e.metaKey) {
-    switch (e.key) {
-      case 'C':
+  // Insert: toggle rebus mode; Shift+Insert remains native paste.
+  if (e.key === 'Insert' && !e.shiftKey) {
+    e.preventDefault();
+    toggleRebusMode();
+    return;
+  }
+
+  // Both grid and native gameplay input use current event modifiers. Handle
+  // shortcuts before delegating printable text, or the native input types W/C/P.
+  if (e.shiftKey) {
+    switch (key) {
+      case 'c':
         e.preventDefault();
         doCheck('all');
         return;
-      case 'W':
+      case 'w':
         e.preventDefault();
         doCheck('word');
         return;
-      case 'P':
+      case 'p':
         e.preventDefault();
         doPartialCheck('word');
         return;
     }
   }
+
+  // Native input/composition events own other printable letters, including
+  // uppercase text without a physical Shift modifier, and insert them once.
+  if (isMobileInput && /^[a-zA-Z]$/.test(e.key)) return;
 
   switch (e.key) {
     case 'ArrowRight':
