@@ -1,6 +1,7 @@
 import {contrastInk} from './social.mjs';
 import {groupRatings} from './ratings.mjs';
 import {imageDimensions,MAX_THUMB_EDGE} from './model.mjs';
+export const GROUP_IMAGE_SCALE=3,MAX_GROUP_PIXELS=64000000,MAX_GROUP_EDGE=30000;
 const FONT='system-ui, sans-serif',PAD=32,GAP=24,BOARD=640,LABEL=130,TILE=52;
 export const IMAGE_PALETTES={
   light:{bg:'#f5f7fb',surface:'#ffffff',inset:'#e6ebf2',text:'#182133',muted:'#556173',border:'#bcc8d8'},
@@ -44,26 +45,32 @@ export function layoutGroupImage(ctx,snapshot){
     const height=Math.max(...sides.map(side=>side.height));footerHeight=Math.max(footerHeight,height);
     methods.push({mode,x:PAD+index*(methodWidth+GAP),width:methodWidth,itemWidth,sides});
   }
-  const height=footerY+100+footerHeight+90,scale=Math.min(1,30000/height,30000/width,Math.sqrt(24000000/(width*height)));
-  if(!Number.isFinite(scale) || scale<.25)throw new Error('This lobby is too large for a readable single image. Try fewer items.');
-  return {width,height,scale,title,players,footerY,methods};
+  const height=footerY+100+footerHeight+90,scale=Math.min(GROUP_IMAGE_SCALE,MAX_GROUP_EDGE/height,MAX_GROUP_EDGE/width,Math.sqrt(MAX_GROUP_PIXELS/(width*height)));
+  // Never shrink below the logical layout: that makes individual rankings unreadable.
+  if(!Number.isFinite(scale) || scale<1)throw new Error('This lobby is too large for a readable single image. Try fewer items.');
+  const pixelWidth=Math.floor(width*scale),pixelHeight=Math.floor(height*scale);
+  return {width,height,scale,pixelWidth,pixelHeight,title,players,footerY,methods};
 }
 function textLines(ctx,lines,x,y,lineHeight){for(const line of lines){ctx.fillText(line,x,y);y+=lineHeight;}}
 function contain(ctx,image,x,y,width,height){
   if(!image)return;const ratio=Math.min(width/image.width,height/image.height);ctx.drawImage(image,x+(width-image.width*ratio)/2,y+(height-image.height*ratio)/2,image.width*ratio,image.height*ratio);
 }
-async function thumbnails(images,signal){
+async function thumbnails(images,scale,signal){
   const map=new Map();
   try{
     for(const image of images){
-      signal?.throwIfAborted();const data=image.thumb || image.data;imageDimensions(data,image.thumb?MAX_THUMB_EDGE:undefined);const blob=await(await fetch(data,{signal})).blob(),ratio=Math.min(1,56/Math.max(image.width,image.height));
-      const bitmap=await createImageBitmap(blob,{resizeWidth:Math.max(1,Math.round(image.width*ratio)),resizeHeight:Math.max(1,Math.round(image.height*ratio)),resizeQuality:'high'});map.set(image.id,bitmap);
+      signal?.throwIfAborted();
+      // Decode originals at the actual output density, not the old 56px previews.
+      // Guests can still export while originals load, with an explicit preview notice.
+      const data=image.originalPending?(image.thumb || image.data):image.data;
+      const dimensions=imageDimensions(data,image.originalPending?MAX_THUMB_EDGE:undefined),blob=await(await fetch(data,{signal})).blob(),ratio=Math.min(1,Math.ceil(Math.max(TILE,40)*scale)/Math.max(dimensions.width,dimensions.height));
+      const bitmap=await createImageBitmap(blob,{resizeWidth:Math.max(1,Math.round(dimensions.width*ratio)),resizeHeight:Math.max(1,Math.round(dimensions.height*ratio)),resizeQuality:'high'});map.set(image.id,bitmap);
     }
     return map;
   }catch(error){for(const bitmap of map.values())bitmap.close();throw error;}
 }
 async function paint(snapshot,layout,palette,art,icon,signal){
-  const canvas=document.createElement('canvas');canvas.width=Math.ceil(layout.width*layout.scale);canvas.height=Math.ceil(layout.height*layout.scale);
+  const canvas=document.createElement('canvas');canvas.width=layout.pixelWidth;canvas.height=layout.pixelHeight;
   try{
     const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Could not create the group image.');ctx.scale(layout.scale,layout.scale);ctx.textBaseline='top';ctx.imageSmoothingQuality='high';
     ctx.fillStyle=palette.bg;ctx.fillRect(0,0,layout.width,layout.height);ctx.drawImage(icon,PAD,PAD,40,40);
@@ -100,14 +107,14 @@ async function paint(snapshot,layout,palette,art,icon,signal){
     }
     ctx.drawImage(icon,PAD,layout.height-48,24,24);ctx.fillStyle=palette.muted;font(ctx,17,500);ctx.fillText('Tier List on puzzle.seall.dev',PAD+34,layout.height-45);
     signal?.throwIfAborted();const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw new Error('The group image could not be encoded.');signal?.throwIfAborted();
-    return {blob,width:canvas.width,height:canvas.height};
+    return {blob,width:canvas.width,height:canvas.height,scale:layout.scale,previews:snapshot.images.filter(image=>image.originalPending).length};
   }finally{canvas.width=canvas.height=1;}
 }
 export async function renderGroupImages(snapshot,{signal,onProgress=()=>{},first='light'}={}){
   if(!snapshot.players.length)throw new Error('There are no player boards to export.');
   const metrics=document.createElement('canvas').getContext('2d'),layout=layoutGroupImage(metrics,snapshot);let art;
   try{
-    onProgress('Preparing images…');art=await thumbnails(snapshot.images,signal);const icon=new Image();icon.src=new URL('./icon.svg',import.meta.url).href;await icon.decode();signal?.throwIfAborted();
+    onProgress('Preparing high-resolution images…');art=await thumbnails(snapshot.images,layout.scale,signal);const icon=new Image();icon.src=new URL('./icon.svg',import.meta.url).href;await icon.decode();signal?.throwIfAborted();
     const result={};for(const theme of[first,first==='light'?'dark':'light']){onProgress(`Generating ${theme} image…`);result[theme]=await paint(snapshot,layout,IMAGE_PALETTES[theme],art,icon,signal);}return result;
   }finally{if(art)for(const bitmap of art.values())bitmap.close();}
 }

@@ -13,7 +13,7 @@ export class GroupExport {
   }
   async open(){
     const value=this.getSnapshot();if(!value)return;this.reset();const run=this.run,snapshot=structuredClone(value),controller=new AbortController();this.controller=controller;this.name=snapshot.name;this.base=tierlistFilename(snapshot.name).replace(/\.tierlist$/,'');
-    const first=document.documentElement.dataset.theme==='dark'?'dark':'light';this.theme=first;$('#group-error').textContent='';$('#group-progress').textContent='Preparing images…';$('#group-options').hidden=true;$('#group-preview').hidden=true;
+    const first=document.documentElement.dataset.theme==='dark'?'dark':'light';this.theme=first;$('#group-error').textContent='';$('#group-progress').textContent='Preparing images…';$('#group-options').hidden=true;$('#group-resolution').hidden=true;$('#group-preview').hidden=true;
     $('#group-dialog').showModal();
     try{
       const images=await renderGroupImages(snapshot,{signal:controller.signal,first,onProgress:text=>{if(run===this.run)$('#group-progress').textContent=text;}});
@@ -24,7 +24,10 @@ export class GroupExport {
   select(theme){
     if(!this.urls[theme])return;this.theme=theme;
     for(const value of['light','dark'])$('#group-'+value).setAttribute('aria-pressed',String(value===theme));
+    const image=this.images[theme],density=Number(image.scale.toFixed(2));
+    $('#group-resolution').textContent=`${image.width.toLocaleString()} × ${image.height.toLocaleString()} px · ${density}× detail. Download the PNG and zoom in to read individual rankings.${image.previews?' Some originals are still loading; those items use previews.':''}${image.scale<3?' Large lobby: output is limited to 64 megapixels or 30,000 pixels per edge.':''}`;
+    $('#group-resolution').hidden=false;
     const preview=$('#group-preview-image');preview.src=this.urls[theme];preview.alt=`Everyone’s tierlists in the ${theme} theme`;preview.dataset.theme=theme;
   }
-  reset(){this.run++;this.controller?.abort();for(const url of Object.values(this.urls))URL.revokeObjectURL(url);this.urls={};this.images=null;$('#group-preview-image').removeAttribute('src');}
+  reset(){this.run++;this.controller?.abort();for(const url of Object.values(this.urls))URL.revokeObjectURL(url);this.urls={};this.images=null;$('#group-resolution').hidden=true;$('#group-resolution').textContent='';$('#group-preview-image').removeAttribute('src');}
 }

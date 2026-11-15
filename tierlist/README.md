@@ -69,7 +69,9 @@ Browsing the library or editing a local tierlist does not leave the lobby. Retur
 
 Unranked abstains. Each eligible ready or completed-offline player contributes equally. With `T` tiers and zero-based tier `t`, tier-only score is `1 - t/(T-1)`, or `0.5` for one tier. Including left-to-right order uses `1 - (t + (i+0.5)/n)/T`. Ties within a small tolerance are explicit, with vote counts and expandable tied results.
 
-Group image freezes the current lobby and creates both light/dark PNGs locally. It includes all players, categories, exact placements, Unranked, both summaries and app branding. No screenshot or upload service is used. Output is bounded to 24 million pixels, 30,000 pixels per edge and at most 4x downscaling, failing clearly rather than dropping content. Filenames include UTC time and theme. Object URLs and image resources are cleaned up after use.
+Group image freezes the current lobby and creates both light/dark PNGs locally at 3× density (nine times the previous pixel count for ordinary lobbies). Item artwork is decoded from available originals at output density, rather than capped at 56-pixel thumbnails. The dialog shows the actual PNG dimensions; download the PNG and zoom in to read individual rankings, since fitted previews and messaging apps may shrink it. While guest originals are still loading, those items use previews with an explicit notice.
+
+Exports include all players, categories, exact placements, Unranked, both summaries and app branding. No screenshot or upload service is used. Output is bounded to 64 million pixels and 30,000 pixels per edge; large exports adapt their density without shrinking below the logical layout. Larger lobbies fail clearly rather than dropping content or producing unreadable downscaled ratings. Themes render sequentially and canvases are released after encoding. Filenames include UTC time and theme. Object URLs and image resources are cleaned up after use.
 
 ## TierMaker imports
 
