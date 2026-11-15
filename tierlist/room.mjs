@@ -10,6 +10,7 @@ const CHUNK = 24000, MAX_PLAYERS = 16, OFFER_MS = 90000;
 const capabilityId = value => typeof value==='string' && /^[a-f0-9]{32}$/.test(value);
 // Case-sensitive, trimmed NFC equivalence only; colour never participates in matching.
 const reclaimName = value => cleanName(value).normalize('NFC');
+const unavailableResume = () => Object.assign(new Error('That saved seat is no longer available. Join again to create a new seat.'),{code:'resume-unavailable'});
 const readResume = () => { try { return JSON.parse(sessionStorage.getItem('tierlist-resume') || 'null'); } catch { return null; } };
 export const savedInvite = () => readResume()?.invite || '';
 export class TierRoom {
@@ -190,7 +191,10 @@ export class TierRoom {
             peer.offer={nonce:token(),expires:Date.now()+OFFER_MS,name,color,ids:new Set(candidates.map(player=>player.id))};
             this.send(conn,{type:'offline-ranking-offer',nonce:peer.offer.nonce,expiresIn:OFFER_MS,canJoinNew:this.players.size<MAX_PLAYERS,candidates:candidates.map(player=>({id:player.id,name:player.name,color:player.color,seq:player.seq,ranked:player.board.tiers.reduce((sum,tier)=>sum+tier.items.length,0)}))});return;
           }
-        }else if(m.resume)throw new Error('That saved seat is no longer available');
+        }
+        // Never silently fork a revoked resume into a fresh, empty ranking.
+        // A matching offline seat may be explicitly claimed above; otherwise stop.
+        if(m.resume)throw unavailableResume();
         this.admit(conn,peer,null,name,color,'Joined the lobby');return;
       }
       if(m.type==='offline-ranking-choice'){
@@ -241,7 +245,7 @@ export class TierRoom {
       }
       throw new Error('Unsupported lobby message');
     } catch (error) {
-      this.send(conn,{type:'rejected',message:error.message});
+      this.send(conn,{type:'rejected',message:error.message,...(error.code==='resume-unavailable'?{reason:error.code}:{})});
       if (!peer.seat) {peer.rejected=true;peer.offer=null;setTimeout(()=>this.transport?.disconnect(conn),200);}
     }
   }
@@ -337,6 +341,11 @@ export class TierRoom {
       for(const event of m.events)this.receiveEvent(event);
     } else if(m.type==='event')this.receiveEvent(m.event);
     else if (m.type==='rejected') {
+      if(m.reason==='resume-unavailable'){
+        const saved=readResume();
+        try{if(saved && saved.room===this.ticket?.room && saved.secret===this.resume)sessionStorage.removeItem('tierlist-resume');}catch{}
+        this.resume=null;
+      }
       this.onError(typeof m.message==='string'?m.message.slice(0,200):'Host rejected the request');
       this.connected=false;this.emit();await this.stop();this.onStatus('Disconnected · leave to try again');
     } else if (m.type==='seat-replaced') {

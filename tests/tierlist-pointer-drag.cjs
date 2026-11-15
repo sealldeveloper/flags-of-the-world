@@ -41,13 +41,14 @@ fs.mkdirSync(out,{recursive:true});const evidence={cases:[],limitations:['Contro
  for(const [p,label]of [[h,'host'],[g,'guest']]){
   async function bounded(action){let timer;try{return await Promise.race([action(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Native startup blocked instead of compatibility pointer movement')),5000);})]);}finally{clearTimeout(timer);}}
   async function begin(n){const pt=await points(p,n);await p.evaluate(()=>window.trace=[]);await p.mouse.move(pt.sx,pt.sy);await p.mouse.down();await bounded(()=>p.mouse.move(pt.sx+16,pt.sy,{steps:4}));await p.mouse.move(pt.x,pt.y,{steps:8});return pt;}
-  async function move(n,name){const before=await state(p);await begin(n);if(name==='trusted mouse pointer under native cancellation rule')await p.screenshot({path:out+'/'+label+'-pointer.png'});await p.mouse.up();const after=await state(p),trace=await p.evaluate(()=>window.trace);
+  async function move(n,name,spuriousNativeEnd=false){const before=await state(p);await begin(n);if(spuriousNativeEnd)await tile(p).dispatchEvent('dragend');if(name==='trusted mouse pointer under native cancellation rule')await p.screenshot({path:out+'/'+label+'-pointer.png'});await p.mouse.up();const after=await state(p),trace=await p.evaluate(()=>window.trace);
    assert.equal(after.seq,before.seq+1);assert(after.board.tiers[n].items.includes('image-0'));assert.equal(after.board.tiers[0].name,'Keep custom category');assert(after.connected&&!after.disposed);
    assert(trace.some(e=>e.kind==='pointerdown'&&e.trusted&&e.pointer==='mouse'));assert(!trace.some(e=>e.kind==='dragstart'),'compatibility path bypasses native startup');
    const own=await p.evaluate(()=>({id:window.testRoom.self,seq:window.testRoom.players.get(window.testRoom.self).seq}));await h.waitForFunction(({id,seq})=>window.testRoom.players.get(id)?.seq===seq,own);
    assert.equal(await p.locator('.touch-ghost,.sort-slot,.sort-origin').count(),0);assert(await tile(p).evaluate(n=>n.draggable));evidence.cases.push({label,kind:name,connected:after.connected,disposed:after.disposed,seq:after.seq,trace});
   }
   await move(1,'trusted mouse pointer under native cancellation rule');await move(0,'return pointer');
+  await move(1,'pointer survives synthetic native dragend',true);await move(0,'synthetic native cancellation return');
   // Selection must not break startup; keyboard here only selects, it does not move the card.
   await tile(p).press('Enter');await move(1,'selected-source pointer');await move(0,'selected return');
   // Escape before the movement threshold must not turn mouseup into a click-move.

@@ -156,7 +156,7 @@ function buildBoard(board, editable=false) {
       if (!editable) tile.tabIndex=-1;
       if (editable) {
         tile.addEventListener('dragstart',event=>{if(!nativeBoardDrag){event.preventDefault();return;}clearTimeout(clickTimer);event.dataTransfer.setData('text/x-tier-image',imageId);event.dataTransfer.effectAllowed='move';startSort(imageId,tile);});
-        tile.addEventListener('dragend',clearSort);
+        tile.addEventListener('dragend',()=>{if(nativeBoardDrag)clearSort();});
         tile.addEventListener('pointerdown',event=>startPointerDrag(event,imageId));
       }
       tiles.append(tile);

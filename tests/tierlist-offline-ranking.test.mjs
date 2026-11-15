@@ -9,6 +9,7 @@ function setup(){
  room.album.name='Immutable source album';room.album.copiedFrom='Original creator';
  room.album.images=[{id:'first'},{id:'second'},{id:'third'}];room.album.board.tiers[0].items=['second','first'];room.album.board.unranked=['third'];room.album.board.tiers[0].excludeFromRatings=true;
  for(const [key,online,name] of [[hostId,true,'Host'],[seatId,false,'Café']])room.players.set(key,{id:key,name,color:'#112233',online,phase:online?'ready':'offline',progress:100,originals:0,seq:27,board:copy(room.album.board)});
+ room.players.get(seatId).board.tiers[0].name='Custom offline category';room.players.get(seatId).board.tiers[1].name='Another saved category';room.players.get(seatId).board.tiers[0].color='#386641';
  room.seats.set(seatId,oldSecret);room.transport={disconnect:()=>{},close:async()=>{}};
  room.send=(conn,m)=>sent.push({conn,...m});
  const peer=conn=>room.peers.set(conn,{created:Date.now(),lastSeen:Date.now(),window:Date.now(),count:0});
@@ -25,8 +26,19 @@ test('explicit opt-in matches trimmed NFC case-sensitively regardless of colour,
  join('stale',{resume:oldSecret});assert.notEqual(room.peers.get('stale').seat,seatId);
 });
 test('valid resume is automatic without an offer; legacy guests and hosts retain ordinary join shape',()=>{
- const {room,sent,join}=setup();join('resumer',{resume:oldSecret});assert.equal(room.peers.get('resumer').seat,seatId);assert(!sent.some(m=>m.type==='offline-ranking-offer'));assert.equal(room.seats.get(seatId),oldSecret);
+ const {room,sent,join}=setup();join('resumer',{resume:oldSecret});assert.equal(room.peers.get('resumer').seat,seatId);assert(!sent.some(m=>m.type==='offline-ranking-offer'));assert.notEqual(room.seats.get(seatId),oldSecret);assert.equal(room.seats.get(seatId),sent.find(m=>m.type==='welcome').resume);
  for(const flag of [undefined,false,1,'true',{},[]]){const f=setup();f.join('legacy',{offlineRanking:flag});assert.equal(f.room.players.size,3);assert(!f.sent.some(m=>m.type==='offline-ranking-offer'));}
+});
+test('revoked resume never silently creates a fresh seat, but matching offline recovery stays explicit',()=>{
+ for(const mode of ['online','removed','other-name']){
+  const f=setup();f.room.seats.set(seatId,id(101));
+  if(mode==='online')Object.assign(f.room.players.get(seatId),{online:true,phase:'ready'});
+  if(mode==='removed')f.room.players.delete(seatId);
+  if(mode==='other-name')f.room.players.get(seatId).name='Someone else';
+  const before=copy([...f.room.players.values()]);assert.equal(f.join('stale',{resume:oldSecret}),undefined);
+  const rejection=f.sent.find(m=>m.conn==='stale'&&m.type==='rejected');assert.equal(rejection.reason,'resume-unavailable');assert.equal(f.room.peers.get('stale').seat,undefined);assert.deepEqual([...f.room.players.values()],before);
+ }
+ const f=setup(),board=copy(f.room.players.get(seatId).board);f.room.seats.set(seatId,id(101));const offer=f.join('recovery',{resume:oldSecret});assert(offer);f.claim('recovery',offer);assert.equal(f.room.players.size,2);assert.equal(f.room.peers.get('recovery').seat,seatId);assert.deepEqual(f.room.players.get(seatId).board,board);
 });
 test('case is not folded, online/occupied/host/removed seats never qualify and wrong invite reveals nothing',()=>{
  for(const mutate of [r=>{r.players.get(seatId).name='CAFÉ';},r=>{r.players.get(seatId).online=true;},r=>{r.peers.set('active',{seat:seatId});},r=>{r.hostId=seatId;},r=>{r.players.delete(seatId);},r=>{r.players.get(seatId).phase='ready';}]){
@@ -64,6 +76,18 @@ test('guest validates bounded offers and stale async decisions cannot send on a 
 
 test('an explicitly left but still-present offline ranking can be claimed even after its old resume was revoked',()=>{
  const f=setup();f.room.seats.delete(seatId);const offer=f.join('new');assert(offer);f.claim('new',offer);assert.equal(f.room.peers.get('new').seat,seatId);assert.match(f.room.seats.get(seatId),/^[a-f0-9]{32}$/);assert.equal(f.room.players.size,2);
+});
+test('typed unavailable-resume rejection clears only this saved credential and never resets its board',async t=>{
+ const descriptor=Object.getOwnPropertyDescriptor(globalThis,'sessionStorage');let stored;
+ Object.defineProperty(globalThis,'sessionStorage',{configurable:true,value:{getItem:()=>JSON.stringify(stored),removeItem:()=>{stored=null;}}});
+ t.after(()=>{if(descriptor)Object.defineProperty(globalThis,'sessionStorage',descriptor);else delete globalThis.sessionStorage;});
+ for(const mode of ['same','other-room','newer-secret','untyped']){
+  const room=new TierRoom({onState:()=>{},onStatus:()=>{},onError:()=>{}}),board=emptyAlbum().board;board.tiers[0].name='Preserved category';
+  Object.assign(room,{ticket:{room:id(90)},resume:oldSecret,self:seatId,connected:true,transport:{close:async()=>{}}});room.players.set(seatId,{id:seatId,seq:27,board});
+  stored={room:mode==='other-room'?id(99):id(90),secret:mode==='newer-secret'?id(102):oldSecret};
+  await room.guestMessage({type:'rejected',reason:mode==='untyped'?undefined:'resume-unavailable',message:'Saved seat unavailable'});
+  assert.equal(stored===null,mode==='same');assert.equal(room.disposed,true);assert.equal(room.players.get(seatId).board,board);assert.equal(room.players.get(seatId).seq,27);
+ }
 });
 test('pending offer count and lifetime are bounded without reserving seats',()=>{
  const f=setup();for(let n=0;n<16;n++){const offer=f.join('pending'+n);assert(offer);const pending=f.room.peers.get('pending'+n);assert(pending.offer.expires<=Date.now()+90000);assert.equal(pending.seat,undefined);}
