@@ -17,7 +17,7 @@ const $ = selector => document.querySelector(selector);
 const el = (tag, className='', text='') => {const node=document.createElement(tag);node.className=className;node.textContent=text;return node;};
 const button = (text, action, className='') => {const node=el('button',className,text);node.type='button';node.addEventListener('click',action);return node;};
 const imageElement = image => {const node=new Image();setImageSource(node,image);node.alt=image.label;node.width=image.width;node.height=image.height;return node;};
-let album=null, room=null, state=null, selected=null, activeTab='rank', tierId=null, dirty=false, busy=false, libraryRecords=[], saveTimer, generation=0, renderedSeq=-1, saveChain=Promise.resolve(), sort=null, clickTimer, suppressClickUntil=0;
+let album=null, room=null, state=null, selected=null, activeTab='rank', tierId=null, dirty=false, busy=false, libraryRecords=[], saveTimer, generation=0, renderedBoard=null, saveChain=Promise.resolve(), sort=null, clickTimer, suppressClickUntil=0;
 let rosterSignature='',joinInvite='',imageLayout='grid',highlight=null,highlightTimer;
 let lobbyState=null,viewingLobby=false,lobbyTab='rank',lobbyScroll=0,lobbySelected=null,lobbyStatus='',exportFilename='',copyDraft=null,copyOrigin=null,copySaving=false;
 const activity=new Activity({onLocate:locateActivity});
@@ -178,7 +178,10 @@ function buildBoard(board, editable=false) {
 function renderBoard() {
   clearTimeout(clickTimer);clearSort();
   if (!album || !currentBoard()) return;
-  $('#board').replaceChildren(buildBoard(currentBoard(),canEdit()));$('#empty-board').hidden=album.images.length>0;renderSelection();applyHighlight();
+  const editable=canEdit();
+  $('#board').replaceChildren(buildBoard(currentBoard(),editable));
+  renderedBoard={albumId:album.id,self:state?.self,seq:state?.players.find(player=>player.id===state.self)?.seq,editable};
+  $('#empty-board').hidden=album.images.length>0;renderSelection();applyHighlight();
 }
 function renderSelection() {
   $('#selection-bar').hidden=!selected;
@@ -404,7 +407,7 @@ async function showLibrary() {
 }
 async function returnToLobby() {
   if(!room || !lobbyState || busy)return;await persist();generation++;viewingLobby=true;state=lobbyState;album=state.album;selected=lobbySelected;dirty=false;rosterSignature='';clearError();
-  $('#library').hidden=true;$('#workspace').hidden=false;syncWorkspace();renderPlayers();setTab(lobbyTab);renderedSeq=state.players.find(player=>player.id===state.self)?.seq;status('');
+  $('#library').hidden=true;$('#workspace').hidden=false;syncWorkspace();renderPlayers();setTab(lobbyTab);status('');
   requestAnimationFrame(()=>scrollTo(0,lobbyScroll));
 }
 $('#back').addEventListener('click',attempt(showLibrary));$('#return-lobby').addEventListener('click',attempt(returnToLobby));
@@ -512,8 +515,9 @@ async function beginRoom(invite='') {
     $('#library').hidden=true;$('#workspace').hidden=false;syncWorkspace();renderPlayers();
     if(first)setTab('rank');
     if(next.connected){$('#join-dialog').close();$('#creating-dialog').close();status('');}
-    if(first || renderedSeq!==newSelf?.seq || !next.connected)renderBoard();
-    renderedSeq=newSelf?.seq;$('#cancel-join').hidden=true;
+    // Readiness can change without a board edit (early roster, disconnect or resume).
+    if(renderedBoard?.albumId!==album.id || renderedBoard?.self!==next.self || renderedBoard?.seq!==newSelf?.seq || renderedBoard?.editable!==canEdit())renderBoard();
+    $('#cancel-join').hidden=true;
     if(activeTab==='everyone')renderComparison();
     if(!$('#invite-fallback').open)$('#invite-output').value=current.invite();
   },onStatus:text=>{if(room!==current)return;lobbyStatus=text;$('#connection').textContent=text;renderLobbyBar();if(viewingLobby && !lobbyState){if($('#creating-dialog').open)$('#creating-status').textContent=text;else status(text);}},onError:problem=>{
