@@ -61,6 +61,7 @@ export class TierRoom {
         if(this.disposed || this.connected || this.connection || this.dialing)return;
         clearTimeout(this.retryTimer);this.retryTimer=null;this.retry=0;this.dial();
       };
+      this.hiddenAt=globalThis.document?.visibilityState==='hidden'?Date.now():null;
       this.onVisible=()=>{
         if(this.disposed)return;
         if(globalThis.document?.visibilityState!=='visible'){this.hiddenAt=Date.now();return;}
@@ -68,7 +69,7 @@ export class TierRoom {
         this.hiddenAt=null;this.wasFrozen=false;
         // Buffered pre-suspension pings can refresh lastSeen on a dead connection.
         // Reauthenticate the saved seat, rather than trusting that stale green state.
-        if(suspended && this.wasConnected && this.connection){
+        if(suspended && (this.wasConnected || this.resume) && this.connection){
           const old=this.connection;this.reconnect();this.transport.disconnect(old);
         }
         this.onConnectionAvailable();
