@@ -61,9 +61,34 @@ export class TierRoom {
         if(this.disposed || this.connected || this.connection || this.dialing)return;
         clearTimeout(this.retryTimer);this.retryTimer=null;this.retry=0;this.dial();
       };
-      this.onVisible=()=>{if(globalThis.document?.visibilityState==='visible')this.onConnectionAvailable();};
+      this.onVisible=()=>{
+        if(this.disposed)return;
+        if(globalThis.document?.visibilityState!=='visible'){this.hiddenAt=Date.now();return;}
+        const suspended=this.wasFrozen || this.hiddenAt!=null && Date.now()-this.hiddenAt>=25000;
+        this.hiddenAt=null;this.wasFrozen=false;
+        // Buffered pre-suspension pings can refresh lastSeen on a dead connection.
+        // Reauthenticate the saved seat, rather than trusting that stale green state.
+        if(suspended && this.wasConnected && this.connection){
+          const old=this.connection;this.reconnect();this.transport.disconnect(old);
+        }
+        this.onConnectionAvailable();
+      };
+      this.onFreeze=()=>{
+        if(this.disposed)return;this.wasFrozen=true;
+        clearTimeout(this.retryTimer);this.retryTimer=null;clearTimeout(this.joinTimer);
+        const old=this.connection;
+        if(old){
+          // Detach before freezing: queued originals/pings from this socket must
+          // not be processed as fresh messages during the resume/visibility gap.
+          this.reconnect();clearTimeout(this.retryTimer);this.retryTimer=null;
+          this.transport.disconnect(old);
+        }
+      };
+      this.onResume=()=>{if(!this.disposed && globalThis.document?.visibilityState==='visible')this.onVisible();};
       globalThis.addEventListener?.('online',this.onConnectionAvailable);
       globalThis.document?.addEventListener('visibilitychange',this.onVisible);
+      globalThis.document?.addEventListener('freeze',this.onFreeze);
+      globalThis.document?.addEventListener('resume',this.onResume);
       await this.dial();
     }
   }
@@ -419,6 +444,8 @@ export class TierRoom {
     clearTimeout(this.joinTimer);clearTimeout(this.retryTimer);
     globalThis.removeEventListener?.('online',this.onConnectionAvailable);
     globalThis.document?.removeEventListener('visibilitychange',this.onVisible);
+    globalThis.document?.removeEventListener('freeze',this.onFreeze);
+    globalThis.document?.removeEventListener('resume',this.onResume);
     await this.transport?.close();
   }
   async leave() {
